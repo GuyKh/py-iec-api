@@ -1,11 +1,11 @@
 # Code of Conduct
 
-To be a truly great community, `python-boilerplate-project` needs to welcome developers from all walks of life,
+To be a truly great community, `py-iec` needs to welcome developers from all walks of life,
 with different backgrounds, and with a wide range of experience. A diverse and friendly
 community will have more great ideas, more unique perspectives, and produce more great 
-code. We will work diligently to make the `python-boilerplate-project` community welcoming to everyone.
+code. We will work diligently to make the `py-iec` community welcoming to everyone.
 
-To give clarity of what is expected of our members, `python-boilerplate-project` has adopted the code of conduct 
+To give clarity of what is expected of our members, `py-iec` has adopted the code of conduct 
 defined by [contributor-covenant.org](https://www.contributor-covenant.org). This document is used across many open source 
 communities, and we think it articulates our values well. The full text is copied below:
 

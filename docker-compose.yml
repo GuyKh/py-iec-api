@@ -1,8 +1,8 @@
 version: "3.4"
 services:
-  python-boilerplate-project:
+  py-iec:
     tty: true
-    image: "python-boilerplate-project"
+    image: "py-iec"
     stdin_open: true
     build:
       context: .
