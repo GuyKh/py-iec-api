@@ -1,4 +1,4 @@
-APP_NAME="python-boilerplate-project"
+APP_NAME="py-iec"
 
 ################################
 # COMMANDS TO RUN LOCALLY

@@ -1,6 +1,6 @@
-# python-boilerplate-project
+# py-iec
 
-A python boilerplate project using poetry
+A python wrapper for Israel Electric Company API
 
 ## Technology and Resources
 

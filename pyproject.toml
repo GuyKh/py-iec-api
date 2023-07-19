@@ -1,8 +1,8 @@
 [tool.poetry]
-name = "python-boilerplate-project"
+name = "py-iec"
 version = "0.1.0"
-description = "A python boilerplate project using poetry"
-authors = [""]
+description = "A Python wrapper for Israel Electric Company API"
+authors = ["GuyKh"]
 license = "MIT"
 
 [tool.poetry.dependencies]
