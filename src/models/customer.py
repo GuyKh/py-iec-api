@@ -1,4 +1,34 @@
-""" Contract model. """
+""" Customer model. """
+
+# URL:
+# POST https://iecapi.iec.co.il/api/customer
+# Headers: Authorization: Bearer ...
+
+# Response: 
+# {
+#     "bpNumber": "...",
+#     "idType": 1,
+#     "accounts": [
+#         {
+#             "mainContractId": "...",
+#             "mainContractIdType": 1,
+#             "companyId": "...",
+#             "name": "...",
+#             "lastName": "...",
+#             "bpNumber": "...",
+#             "bpType": 1,
+#             "isActiveAccount": true,
+#             "customerRole": 0,
+#             "accountType": 1
+#         }
+#     ],
+#     "customerStatus": 1,
+#     "idNumber": "...",
+#     "firstName": "...",
+#     "lastName": "...",
+#     "mobilePhone": "...",
+#     "email": "..."
+# } 
 
 from dataclasses import dataclass, field
 from reponseDescriptor import ResponseDescriptor

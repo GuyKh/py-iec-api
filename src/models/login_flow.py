@@ -1,4 +1,4 @@
-""" Login Request Model. """
+""" Login Requests Model. """
 from dataclasses import dataclass, field
 from mashumaro import DataClassDictMixin, field_options
 
@@ -20,3 +20,17 @@ class LoginResponse(DataClassDictMixin):
 class ValidateSMSResponse(DataClassDictMixin):
     """ Validate SMS Response dataclass."""
     token: str
+
+@dataclass
+class OTPRequest:
+    """ OTP Validation Request dataclass."""
+    href: str
+    token: str
+    code: str
+
+@dataclass
+class OTPResponse:
+    """ OTP Validation Response dataclass."""
+    href: str
+    token: str
+    code: str
