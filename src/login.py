@@ -1,7 +1,7 @@
 """ IEC Login Module. """
 import requests
 from models.login_flow import LoginResponse, OTPRequest, OTPResponse
-from models.reponse_descriptor import ErrorResponseDescriptor
+from models.response_descriptor import ErrorResponseDescriptor
 
 SMS_URL = "https://iecapi.iec.co.il//api/Authentication/{}/1/-1"
 LOGIN_URL = "https://iecapi.iec.co.il//api/Authentication/login/{}"

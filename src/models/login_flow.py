@@ -29,7 +29,7 @@ class OTPRequest:
     code: str
 
 @dataclass
-class OTPResponse:
+class OTPResponse(DataClassDictMixin):
     """ OTP Validation Response dataclass."""
     href: str
     token: str
