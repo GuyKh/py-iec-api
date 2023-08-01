@@ -1,8 +1,8 @@
 """ Meter Reading model. """
 
-from mashumaro import DataClassDictMixin, field_options
 from dataclasses import dataclass, field
-from reponseDescriptor import ResponseDescriptor
+from mashumaro import DataClassDictMixin, field_options
+from response_descriptor import ResponseDescriptor
 
 
 @dataclass

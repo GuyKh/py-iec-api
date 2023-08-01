@@ -1,6 +1,6 @@
 """ Response Descriptor """
-from mashumaro import DataClassDictMixin, field_options
 from dataclasses import dataclass, field
+from mashumaro import DataClassDictMixin, field_options
 
 
 @dataclass
@@ -9,6 +9,7 @@ class ResponseDescriptor(DataClassDictMixin):
     is_success: bool = field(metadata=field_options(alias="isSuccess"))
     code: str
     description: str
+
 
 @dataclass
 class ErrorResponseDescriptor(DataClassDictMixin):

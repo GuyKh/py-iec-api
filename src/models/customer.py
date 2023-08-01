@@ -31,7 +31,7 @@
 # } 
 
 from dataclasses import dataclass, field
-from reponseDescriptor import ResponseDescriptor
+from response_descriptor import ResponseDescriptor
 from mashumaro import DataClassDictMixin, field_options
 
 

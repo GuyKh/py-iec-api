@@ -21,12 +21,14 @@ class ValidateSMSResponse(DataClassDictMixin):
     """ Validate SMS Response dataclass."""
     token: str
 
+
 @dataclass
 class OTPRequest:
     """ OTP Validation Request dataclass."""
     href: str
     token: str
     code: str
+
 
 @dataclass
 class OTPResponse(DataClassDictMixin):

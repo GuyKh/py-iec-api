@@ -27,9 +27,8 @@
 # }
 
 
-from mashumaro import DataClassDictMixin, field_options
 from dataclasses import dataclass, field
-from reponse_descriptor import ResponseDescriptor
+from mashumaro import DataClassDictMixin, field_options
 
 
 @dataclass
@@ -40,19 +39,6 @@ class RemoteReadingRequest:
     lastInvoiceDate: str
     fromDate: str
     resolution: int
-
-@dataclass
-class RemoteReadingResponse(DataClassDictMixin):
-    """ Remote Reading Response dataclass."""
-    status: int
-    future_consumption_info: FutureConsumptionInfo = field(metadata=field_options(alias="futureConsumptionInfo"))
-    from_date: str = field(metadata=field_options(alias="from_date"))
-    to_date: str = field(metadata=field_options(alias="to_date"))
-    total_consumption_for_period: float = field(metadata=field_options(alias="totalConsumptionForPeriod"))
-    total_import_date_for_period: str = field(metadata=field_options(alias="totalImportDateForPeriod"))
-    meter_start_date: str = field(metadata=field_options(alias="meterStartDate"))
-    total_import: float = field(metadata=field_options(alias="totalImport"))
-    data: RemoteReadingData
 
 
 @dataclass
@@ -71,3 +57,17 @@ class RemoteReadingData(DataClassDictMixin):
     status: int
     date: str
     value: float
+
+
+@dataclass
+class RemoteReadingResponse(DataClassDictMixin):
+    """ Remote Reading Response dataclass."""
+    status: int
+    future_consumption_info: FutureConsumptionInfo = field(metadata=field_options(alias="futureConsumptionInfo"))
+    from_date: str = field(metadata=field_options(alias="from_date"))
+    to_date: str = field(metadata=field_options(alias="to_date"))
+    total_consumption_for_period: float = field(metadata=field_options(alias="totalConsumptionForPeriod"))
+    total_import_date_for_period: str = field(metadata=field_options(alias="totalImportDateForPeriod"))
+    meter_start_date: str = field(metadata=field_options(alias="meterStartDate"))
+    total_import: float = field(metadata=field_options(alias="totalImport"))
+    data: RemoteReadingData
