@@ -33,7 +33,8 @@ from mashumaro import DataClassDictMixin, field_options
 
 @dataclass
 class RemoteReadingRequest:
-    """ Remote Reading Request ."""
+    """Remote Reading Request ."""
+
     meterSerialNumber: str
     meterCode: int
     lastInvoiceDate: str
@@ -43,7 +44,8 @@ class RemoteReadingRequest:
 
 @dataclass
 class FutureConsumptionInfo(DataClassDictMixin):
-    """ Future Consumption Info dataclass."""
+    """Future Consumption Info dataclass."""
+
     last_invoice_date: str = field(metadata=field_options(alias="lastInvoiceDate"))
     current_date: str = field(metadata=field_options(alias="currentDate"))
     future_consumption: float = field(metadata=field_options(alias="futureConsumption"))
@@ -53,7 +55,8 @@ class FutureConsumptionInfo(DataClassDictMixin):
 
 @dataclass
 class RemoteReadingData(DataClassDictMixin):
-    """ Remote Reading Data dataclass."""
+    """Remote Reading Data dataclass."""
+
     status: int
     date: str
     value: float
@@ -61,13 +64,20 @@ class RemoteReadingData(DataClassDictMixin):
 
 @dataclass
 class RemoteReadingResponse(DataClassDictMixin):
-    """ Remote Reading Response dataclass."""
+    """Remote Reading Response dataclass."""
+
     status: int
-    future_consumption_info: FutureConsumptionInfo = field(metadata=field_options(alias="futureConsumptionInfo"))
+    future_consumption_info: FutureConsumptionInfo = field(
+        metadata=field_options(alias="futureConsumptionInfo")
+    )
     from_date: str = field(metadata=field_options(alias="from_date"))
     to_date: str = field(metadata=field_options(alias="to_date"))
-    total_consumption_for_period: float = field(metadata=field_options(alias="totalConsumptionForPeriod"))
-    total_import_date_for_period: str = field(metadata=field_options(alias="totalImportDateForPeriod"))
+    total_consumption_for_period: float = field(
+        metadata=field_options(alias="totalConsumptionForPeriod")
+    )
+    total_import_date_for_period: str = field(
+        metadata=field_options(alias="totalImportDateForPeriod")
+    )
     meter_start_date: str = field(metadata=field_options(alias="meterStartDate"))
     total_import: float = field(metadata=field_options(alias="totalImport"))
     data: RemoteReadingData

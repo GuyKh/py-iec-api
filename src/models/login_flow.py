@@ -5,7 +5,8 @@ from mashumaro import DataClassDictMixin, field_options
 
 @dataclass
 class LoginResponse(DataClassDictMixin):
-    """ Login Response dataclass."""
+    """Login Response dataclass."""
+
     phone_number: str = field(metadata=field_options(alias="phoneNumber"))
     phone_prefix: str = field(metadata=field_options(alias="phonePrefix"))
     phone_suffix: str = field(metadata=field_options(alias="phoneSuffix"))
@@ -18,13 +19,15 @@ class LoginResponse(DataClassDictMixin):
 
 @dataclass
 class ValidateSMSResponse(DataClassDictMixin):
-    """ Validate SMS Response dataclass."""
+    """Validate SMS Response dataclass."""
+
     token: str
 
 
 @dataclass
 class OTPRequest:
-    """ OTP Validation Request dataclass."""
+    """OTP Validation Request dataclass."""
+
     href: str
     token: str
     code: str
@@ -32,7 +35,8 @@ class OTPRequest:
 
 @dataclass
 class OTPResponse(DataClassDictMixin):
-    """ OTP Validation Response dataclass."""
+    """OTP Validation Response dataclass."""
+
     href: str
     token: str
     code: str

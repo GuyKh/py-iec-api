@@ -5,7 +5,8 @@ from mashumaro import DataClassDictMixin, field_options
 
 @dataclass
 class ResponseDescriptor(DataClassDictMixin):
-    """ Response Descriptor"""
+    """Response Descriptor"""
+
     is_success: bool = field(metadata=field_options(alias="isSuccess"))
     code: str
     description: str
@@ -13,7 +14,8 @@ class ResponseDescriptor(DataClassDictMixin):
 
 @dataclass
 class ErrorResponseDescriptor(DataClassDictMixin):
-    """ Error Response Descriptor """
+    """Error Response Descriptor"""
+
     error: str = field(metadata=field_options(alias="Error"))
     code: int = field(metadata=field_options(alias="Code"))
     rid: str = field(metadata=field_options(alias="Rid"))

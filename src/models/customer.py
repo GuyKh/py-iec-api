@@ -4,7 +4,7 @@
 # POST https://iecapi.iec.co.il/api/customer
 # Headers: Authorization: Bearer ...
 
-# Response: 
+# Response:
 # {
 #     "bpNumber": "...",
 #     "idType": 1,
@@ -28,7 +28,7 @@
 #     "lastName": "...",
 #     "mobilePhone": "...",
 #     "email": "..."
-# } 
+# }
 
 from dataclasses import dataclass, field
 from response_descriptor import ResponseDescriptor
@@ -43,13 +43,17 @@ class Contract(DataClassDictMixin):
     total_debt: float = field(metadata=field_options(alias="totalDebt"))
     frequency: int
     status: int
-    from_pativte_producer: bool = field(metadata=field_options(alias="fromPativteProducer"))
+    from_pativte_producer: bool = field(
+        metadata=field_options(alias="fromPativteProducer")
+    )
     city_code: str = field(metadata=field_options(alias="cityCode"))
     city_name: str = field(metadata=field_options(alias="cityName"))
     street_code: str = field(metadata=field_options(alias="streetCode"))
     street_name: str = field(metadata=field_options(alias="streetName"))
     house_number: str = field(metadata=field_options(alias="houseNumber"))
-    debt_for_invoices_due_date_not_passed: float = field(metadata=field_options(alias="debtForInvoicesDueDateNotPassed"))
+    debt_for_invoices_due_date_not_passed: float = field(
+        metadata=field_options(alias="debtForInvoicesDueDateNotPassed")
+    )
     is_touz: bool = field(metadata=field_options(alias="isTouz"))
     smart_meter: bool = field(metadata=field_options(alias="smartMeter"))
     producer_type: int = field(metadata=field_options(alias="producerType"))
@@ -65,4 +69,6 @@ class Contracts(DataClassDictMixin):
 @dataclass
 class GetContractResponse(DataClassDictMixin):
     data: Contracts
-    response_descriptor: ResponseDescriptor = field(metadata=field_options(alias="responseDescriptor"))
+    response_descriptor: ResponseDescriptor = field(
+        metadata=field_options(alias="responseDescriptor")
+    )

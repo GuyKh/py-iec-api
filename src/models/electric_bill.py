@@ -4,6 +4,7 @@ from dataclasses import dataclass, field
 from response_descriptor import ResponseDescriptor
 from mashumaro import DataClassDictMixin, field_options
 
+
 @dataclass
 class Invoice(DataClassDictMixin):
     full_date: str = field(metadata=field_options(alias="fullDate"))
@@ -16,7 +17,9 @@ class Invoice(DataClassDictMixin):
     contract_number: int = field(metadata=field_options(alias="contractNumber"))
     order_number: int = field(metadata=field_options(alias="orderNumber"))
     last_date: str = field(metadata=field_options(alias="lastDate"))
-    invoice_payment_status: int = field(metadata=field_options(alias="invoicePaymentStatus"))
+    invoice_payment_status: int = field(
+        metadata=field_options(alias="invoicePaymentStatus")
+    )
     document_id: str = field(metadata=field_options(alias="documentId"))
     days_period: str = field(metadata=field_options(alias="daysPeriod"))
     has_direct_debit: bool = field(metadata=field_options(alias="hasDirectDebit"))
@@ -26,11 +29,16 @@ class Invoice(DataClassDictMixin):
 @dataclass
 class Invoices(DataClassDictMixin):
     total_amount_to_pay: float = field(metadata=field_options(alias="totalAmountToPay"))
-    total_invoices_to_pay: int = field(metadata=field_options(alias="totalInvoicesToPay"))
+    total_invoices_to_pay: int = field(
+        metadata=field_options(alias="totalInvoicesToPay")
+    )
     last_date_to_pay: str = field(metadata=field_options(alias="lastDateToPay"))
     invoices: list[Invoice]
+
 
 @dataclass
 class GetInvoicesResponse(DataClassDictMixin):
     data: Invoices
-    response_descriptor: ResponseDescriptor = field(metadata=field_options(alias="responseDescriptor"))
+    response_descriptor: ResponseDescriptor = field(
+        metadata=field_options(alias="responseDescriptor")
+    )

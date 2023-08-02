@@ -27,7 +27,9 @@ def get_login_response(id_number: str) -> LoginResponse:
     return LoginResponse.from_dict(response.json())
 
 
-def get_login_token(id_number: str, login_response: LoginResponse, sms_code: str) -> str:
+def get_login_token(
+    id_number: str, login_response: LoginResponse, sms_code: str
+) -> str:
     """Get login token from IEC API by SMS authentication."""
     data = OTPRequest(login_response.href, login_response.state_token, sms_code)
 
@@ -50,7 +52,9 @@ def get_authorization_token() -> str:
     login_response = get_login_response(id_number)
 
     print(f"Hi {login_response.first_name}")
-    print(f"please enter the SMS code sent to phone {login_response.phone_prefix}*****{login_response.phone_suffix}\n")
+    print(
+        f"please enter the SMS code sent to phone {login_response.phone_prefix}*****{login_response.phone_suffix}\n"
+    )
 
     sms_code = input("Enter the SMS code:")
     return get_login_token(id_number, login_response, sms_code)
@@ -67,4 +71,4 @@ class IECLoginError(Exception):
     def __init__(self, code, error):
         self.code = code
         self.error = error
-        super().__init__(f'(Code {self.code}): {self.error}')
+        super().__init__(f"(Code {self.code}): {self.error}")

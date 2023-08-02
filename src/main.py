@@ -13,4 +13,4 @@ if __name__ == "__main__":  # pragma: no cover
         token = login.get_authorization_token()
         print(f"Token: {token}")
     except login.IECLoginError as err:
-        logger.error('Failed Login: (Code %d): %s', err.code, err.error)
+        logger.error("Failed Login: (Code %d): %s", err.code, err.error)
