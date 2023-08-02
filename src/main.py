@@ -2,11 +2,11 @@
 
 from logging import getLogger
 from logging.config import fileConfig as logConfig
+
 import login
 
 logConfig("./logging.conf", disable_existing_loggers=False)
 logger = getLogger(__name__)
-
 
 if __name__ == "__main__":  # pragma: no cover
     try:

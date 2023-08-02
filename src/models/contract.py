@@ -1,8 +1,9 @@
 """ Contract model. """
 
 from dataclasses import dataclass, field
-from response_descriptor import ResponseDescriptor
+
 from mashumaro import DataClassDictMixin, field_options
+from response_descriptor import ResponseDescriptor
 
 
 @dataclass

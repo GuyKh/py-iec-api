@@ -5,7 +5,8 @@
 #   -H 'accept: application/json, text/plain, /' \
 #   -H 'authorization: Bearer <base64_token>' \
 #   -H 'content-type: application/json' \
-#   --data-raw '{"meterSerialNumber":"XXXXXXXX","meterCode":"503","lastInvoiceDate":"2000-01-01","fromDate":"2023-07-20","resolution":1}'
+#   --data-raw '{"meterSerialNumber":"XXXXXXXX","meterCode":"503","lastInvoiceDate":"2000-01-01"\
+#                   ,"fromDate":"2023-07-20","resolution":1}'
 #
 # Response:
 # {
@@ -28,6 +29,7 @@
 
 
 from dataclasses import dataclass, field
+
 from mashumaro import DataClassDictMixin, field_options
 
 
@@ -35,10 +37,10 @@ from mashumaro import DataClassDictMixin, field_options
 class RemoteReadingRequest:
     """Remote Reading Request ."""
 
-    meterSerialNumber: str
-    meterCode: int
-    lastInvoiceDate: str
-    fromDate: str
+    meterSerialNumber: str  # noqa: N815
+    meterCode: int  # noqa: N815
+    lastInvoiceDate: str  # noqa: N815
+    fromDate: str  # noqa: N815
     resolution: int
 
 
