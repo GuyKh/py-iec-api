@@ -1,11 +1,11 @@
 """ IEC Login Module. """
 import requests
-from models.login_flow import LoginResponse, OTPRequest, OTPResponse
-from models.response_descriptor import ErrorResponseDescriptor
+from src.models.login_flow import LoginResponse, OTPRequest, OTPResponse
+from src.models.response_descriptor import ErrorResponseDescriptor
 
-SMS_URL = "https://iecapi.iec.co.il//api/Authentication/{}/1/-1"
-LOGIN_URL = "https://iecapi.iec.co.il//api/Authentication/login/{}"
-HEADERS = {
+_SMS_URL = "https://iecapi.iec.co.il//api/Authentication/{}/1/-1"
+_LOGIN_URL = "https://iecapi.iec.co.il//api/Authentication/login/{}"
+_HEADERS = {
     "Content-Type": "application/json",
     "accept": "application/json, text/plain, */*",
     "origin": "https://www.iec.co.il",
@@ -19,7 +19,7 @@ HEADERS = {
 def get_login_response(id_number: str) -> LoginResponse:
     """Get first login response from IEC API."""
     # sending get request and saving the response as response object
-    response = requests.get(url=SMS_URL.format(id_number), headers=HEADERS, timeout=10)
+    response = requests.get(url=_SMS_URL.format(id_number), headers=_HEADERS, timeout=10)
 
     if response.status_code != 200:
         login_error_response = ErrorResponseDescriptor.from_dict(response.json())
@@ -35,7 +35,7 @@ def get_login_token(
     data = OTPRequest(login_response.href, login_response.state_token, sms_code)
 
     response = requests.post(
-        url=LOGIN_URL.format(id_number), headers=HEADERS, data=data, timeout=10
+        url=_LOGIN_URL.format(id_number), headers=_HEADERS, data=data, timeout=10
     )
 
     if response.status_code != 200:

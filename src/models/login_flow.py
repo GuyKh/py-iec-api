@@ -38,6 +38,4 @@ class OTPRequest:
 class OTPResponse(DataClassDictMixin):
     """OTP Validation Response dataclass."""
 
-    href: str
     token: str
-    code: str
