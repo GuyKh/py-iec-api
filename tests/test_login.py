@@ -1,13 +1,13 @@
 from unittest import TestCase
 from unittest.mock import MagicMock, patch
 
-from src.login import get_login_response, get_login_token, IECLoginError
-from src.models.login_flow import LoginResponse, OTPResponse
+from src.login import IECLoginError, get_login_response, get_login_token
+from src.models.login_flow import LoginResponse
 
 
 class LoginTest(TestCase):
     @staticmethod
-    def _get_login_sucessful_response() -> dict:
+    def _get_login_successful_response() -> dict:
         return {
             "phoneNumber": None,
             "phonePrefix": "051",
@@ -21,7 +21,7 @@ class LoginTest(TestCase):
 
     @patch("src.login.requests")
     def test_get_login_response(self, mock_requests):
-        login_response_json = self._get_login_sucessful_response()
+        login_response_json = self._get_login_successful_response()
 
         # mock the response
         mock_response: MagicMock = MagicMock()
@@ -34,7 +34,7 @@ class LoginTest(TestCase):
         self.assertEqual(get_login_response("123456789"), expected_login_response)
 
     @patch("src.login.requests")
-    def test_login_404_reponse(self, mock_requests):
+    def test_login_404_response(self, mock_requests):
         # mock the response
         mock_response: MagicMock = MagicMock()
         mock_response.status_code = 404
@@ -50,8 +50,8 @@ class LoginTest(TestCase):
 
     @patch("src.login.requests")
     def test_get_login_token(self, mock_requests):
-        authorizatoin_token = "123456"
-        otp_response_json = {"token": authorizatoin_token}
+        authorization_token = "123456"
+        otp_response_json = {"token": authorization_token}
 
         # mock the response
         mock_response: MagicMock = MagicMock()
@@ -60,7 +60,7 @@ class LoginTest(TestCase):
 
         mock_requests.post.return_value = mock_response
 
-        login_response = LoginResponse.from_dict(self._get_login_sucessful_response())
+        login_response = LoginResponse.from_dict(self._get_login_successful_response())
         self.assertEqual(
-            get_login_token("123456789", login_response, "1234"), authorizatoin_token
+            get_login_token("123456789", login_response, "1234"), authorization_token
         )
