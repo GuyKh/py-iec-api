@@ -64,3 +64,21 @@ class LoginTest(TestCase):
         self.assertEqual(
             get_login_token("123456789", login_response, "1234"), authorization_token
         )
+
+    @patch("src.login.requests")
+    def test_get_login_token_returning_403(self, mock_requests):
+
+        # mock the response
+        mock_response: MagicMock = MagicMock()
+        mock_response.status_code = 403
+        mock_response.json.return_value = {
+                "Error": "Exception of type 'IEC.Digital.Common.Exception.CustomException' was thrown.",
+                "Code": 403,
+                "Rid": "800119d6-1234-2313-b63f-84710c7967bb"
+            }
+
+        mock_requests.post.return_value = mock_response
+
+        login_response = LoginResponse.from_dict(self._get_login_successful_response())
+        with self.assertRaises(IECLoginError):
+            get_login_token("123456789", login_response, "1234")
