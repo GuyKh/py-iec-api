@@ -46,7 +46,7 @@ def get_login_token(
     return OTPResponse.from_dict(response.json()).token
 
 
-def get_authorization_token() -> str:
+def get_authorization_token() -> str:  # pragma: no cover
     """Get authorization token from IEC API."""
     id_number = input("Enter ID number:")
 
