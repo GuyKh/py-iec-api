@@ -10,7 +10,7 @@ python = "^3.11"
 dynaconf = "3.2.3"
 
 [tool.poetry.dev-dependencies]
-pytest = "7.4.2"
+pytest = "7.4.3"
 pytest-cov = "^4.1.0"
 ruff = "^0.0.291"
 
