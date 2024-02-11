@@ -7,20 +7,15 @@ license = "MIT"
 
 [tool.poetry.dependencies]
 python = "^3.11"
-dynaconf = "3.2.2"
-requests = "^2.31.0"
-mashumaro = "^3.8.1"
+dynaconf = "3.2.4"
 
 [tool.poetry.dev-dependencies]
-pytest = "7.4.1"
+pytest = "8.0.0"
 pytest-cov = "^4.1.0"
-ruff = "^0.0.287"
+ruff = "^0.2.0"
 
 [tool.pytest.ini_options]
 testpaths = ["tests",]
-
-[tool.poetry.group.dev.dependencies]
-pylint = "^2.17.4"
 
 [tool.coverage.run]
 branch = true
@@ -28,7 +23,7 @@ omit = ["*/tests/*"]
 
 [tool.coverage.report]
 show_missing = true
-fail_under = 80
+fail_under = 100
 
 [tool.coverage.html]
 directory = "htmlcov"
