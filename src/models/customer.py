@@ -56,7 +56,7 @@ class Customer(DataClassDictMixin):
     accounts: list[Account]
     customer_status: int = field(metadata=field_options(alias="customerStatus"))
     id_number: str = field(metadata=field_options(alias="idNumber"))
-    first_name: str = field(metadata=field_options(alias="firstname"))
+    first_name: str = field(metadata=field_options(alias="firstName"))
     last_name: str = field(metadata=field_options(alias="lastName"))
     mobile_phone: str = field(metadata=field_options(alias="mobilePhone"))
     email: str

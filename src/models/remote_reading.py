@@ -36,7 +36,6 @@ from mashumaro import DataClassDictMixin, field_options
 @dataclass
 class RemoteReadingRequest:
     """Remote Reading Request ."""
-
     meterSerialNumber: str  # noqa: N815
     meterCode: int  # noqa: N815
     lastInvoiceDate: str  # noqa: N815

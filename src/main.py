@@ -13,9 +13,11 @@ logger = getLogger(__name__)
 if __name__ == "__main__":  # pragma: no cover
     try:
         # token = get_authorization_token()
-        token = input("Input bearer token:")
-        print(f"Token: {token}")
-        HEADERS_WITH_AUTH["Authorization"] = "Bearer " + token
+        token = input("Input bearer token: ")
+        cookie = input("Input cookie: ")
+
+        HEADERS_WITH_AUTH["Authorization"] = f"Bearer {token}"
+        HEADERS_WITH_AUTH["Cookie"] = cookie
         print(HEADERS_WITH_AUTH)
 
         consumer = get_consumer()
