@@ -33,43 +33,30 @@
 from dataclasses import dataclass, field
 
 from mashumaro import DataClassDictMixin, field_options
-from response_descriptor import ResponseDescriptor
 
 
 @dataclass
-class Contract(DataClassDictMixin):
-    address: str
-    contract_id: str = field(metadata=field_options(alias="contractId"))
-    due_date: str = field(metadata=field_options(alias="dueDate"))
-    total_debt: float = field(metadata=field_options(alias="totalDebt"))
-    frequency: int
-    status: int
-    from_pativte_producer: bool = field(
-        metadata=field_options(alias="fromPativteProducer")
-    )
-    city_code: str = field(metadata=field_options(alias="cityCode"))
-    city_name: str = field(metadata=field_options(alias="cityName"))
-    street_code: str = field(metadata=field_options(alias="streetCode"))
-    street_name: str = field(metadata=field_options(alias="streetName"))
-    house_number: str = field(metadata=field_options(alias="houseNumber"))
-    debt_for_invoices_due_date_not_passed: float = field(
-        metadata=field_options(alias="debtForInvoicesDueDateNotPassed")
-    )
-    is_touz: bool = field(metadata=field_options(alias="isTouz"))
-    smart_meter: bool = field(metadata=field_options(alias="smartMeter"))
-    producer_type: int = field(metadata=field_options(alias="producerType"))
+class Account(DataClassDictMixin):
+    main_contract_id: str = field(metadata=field_options(alias="mainContractId"))
+    main_contract_id_type: int = field(metadata=field_options(alias="mainContractIdType"))
+    company_id: str = field(metadata=field_options(alias="companyId"))
+    name: str
+    last_name: str = field(metadata=field_options(alias="lastName"))
+    bp_number: str = field(metadata=field_options(alias="bpNumber"))
+    bp_type: int = field(metadata=field_options(alias="bpType"))
+    is_active_account: bool = field(metadata=field_options(alias="isActiveAccount"))
+    customer_role: int = field(metadata=field_options(alias="customerRole"))
+    account_type: int = field(metadata=field_options(alias="accountType"))
 
 
 @dataclass
-class Contracts(DataClassDictMixin):
-    contracts: list[Contract]
-    contract_amount: int
-    total_to_pay: float
-
-
-@dataclass
-class GetContractResponse(DataClassDictMixin):
-    data: Contracts
-    response_descriptor: ResponseDescriptor = field(
-        metadata=field_options(alias="responseDescriptor")
-    )
+class Customer(DataClassDictMixin):
+    bp_number: str = field(metadata=field_options(alias="bpNumber"))
+    id_type: int = field(metadata=field_options(alias="idType"))
+    accounts: list[Account]
+    customer_status: int = field(metadata=field_options(alias="customerStatus"))
+    id_number: str = field(metadata=field_options(alias="idNumber"))
+    first_name: str = field(metadata=field_options(alias="firstname"))
+    last_name: str = field(metadata=field_options(alias="lastName"))
+    mobile_phone: str = field(metadata=field_options(alias="mobilePhone"))
+    email: str
