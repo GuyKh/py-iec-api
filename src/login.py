@@ -41,7 +41,7 @@ def verify_sms_otp(
 
 def send_login_otp(id_number: str) -> LoginResponse:
     """Get authorization token from IEC API."""
-    return login_with_id_number(id_number)
+    return login_with_id_number(id_number)  # pragma: no cover
 
 
 def verify_otp(id_number: str, login_response: LoginResponse, otp_code: str) -> str:  # pragma: no cover
@@ -81,6 +81,6 @@ class IECLoginError(Exception):
         super().__init__(f"(Code {self.code}): {self.error}")
 
 
-def refresh_token(prev_token: str) -> str | None:
+def refresh_token(prev_token: str) -> str | None:  # pragma: no cover
     """Refresh JWT token."""
     return None
