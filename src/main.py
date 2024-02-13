@@ -1,14 +1,31 @@
-from logging import getLogger
-from logging.config import fileConfig as logConfig
+""" Main IEC Python API module. """
 
-logConfig("./logging.conf", disable_existing_loggers=False)
+import os
+from logging import getLogger
+
+from src.iec_api_client import IecApiClient
+from src.login import IECLoginError
+
+ROOT_DIR = os.path.dirname(
+    os.path.abspath(__file__)
+)
+# logConfig("logging.conf", disable_existing_loggers=False)
 logger = getLogger(__name__)
 
-
-def hello() -> str:
-    logger.info("Hello")
-    return "Hello"
-
-
 if __name__ == "__main__":  # pragma: no cover
-    print(hello())
+    try:
+        # Example of usage
+        token = input("Input bearer token: ")
+        client = IecApiClient("123456789")
+        client.override_token(token)
+        customer = client.get_customer()
+        print(customer)
+
+        contracts = client.get_contracts()
+        for contract in contracts:
+            print(contract)
+
+        reading = client.get_last_meter_reading(customer.bp_number, contracts[0].contract_id)
+        print(reading)
+    except IECLoginError as err:
+        logger.error("Failed Login: (Code %d): %s", err.code, err.error)
