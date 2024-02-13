@@ -13,6 +13,46 @@ A python wrapper for Israel Electric Company API
 
 *Please pay attention on **pre-requisites** resources that you must install/configure.*
 
+## (Temporary) How to get JWT token?
+
+First, enter www.iec.co.il.
+
+Open DevTools (You can use Option + ⌘ + J (on macOS), or Shift + CTRL + J (on Windows/Linux)).
+
+Go to Network tab, and filter by `customer`
+
+Login with your ID and go through the SMS OTP token.
+
+When you'll see the GET request to `customer` endpoint, open the `headers` tab and copy the `Authorization` header without the word **Bearer**
+
+This is your token
+
+![selecting jwt token](assets/jwt_token.png "JWT Token in Dev Tools")
+
+
+
+
+## Module Usage
+
+```python
+    try:
+        client = IecApiClient("123456789")
+        # client.login() - (Still not working)
+        token = input("Input bearer token: ") # you have to override the JWT token manually for now 
+        client.override_token(token)
+        customer = client.get_customer()
+        print(customer)
+
+        contracts = client.get_contracts()
+        for contract in contracts:
+            print(contract)
+
+        reading = client.get_last_meter_reading(customer.bp_number, contracts[0].contract_id)
+        print(reading)
+    except IECLoginError as err:
+        logger.error("Failed Login: (Code %d): %s", err.code, err.error)
+```
+
 ## How to install, run and test
 
 ### Environment variables
