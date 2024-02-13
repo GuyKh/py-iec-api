@@ -1,16 +1,16 @@
 import requests
 import logging
 
+from src.commons import add_jwt_to_headers
+from src.const import (GET_CONSUMER_URL, HEADERS_WITH_AUTH, GET_REQUEST_READING_URL, GET_ELECTRIC_BILL_URL,
+                       GET_SINGLE_CONTRACT_URL, GET_LAST_METER_READING_URL)
 from src.login import IECLoginError
 from src.models.contract import GetContractResponse
 from src.models.customer import Customer
-from src.const import GET_CONSUMER_URL, HEADERS_WITH_AUTH, GET_REQUEST_READING_URL, GET_ELECTRIC_BILL_URL, \
-    GET_SINGLE_CONTRACT_URL, GET_LAST_METER_READING_URL
-from src.models.meter_reading import GetLastMeterReadingResponse
-from src.models.response_descriptor import ErrorResponseDescriptor
-from src.models.remote_reading import RemoteReadingRequest, RemoteReadingResponse
 from src.models.electric_bill import GetElectricBillResponse
-from src.commons import add_jwt_to_headers
+from src.models.meter_reading import GetLastMeterReadingResponse
+from src.models.remote_reading import RemoteReadingRequest, RemoteReadingResponse
+from src.models.response_descriptor import ErrorResponseDescriptor
 
 logger = logging.getLogger(__name__)
 
