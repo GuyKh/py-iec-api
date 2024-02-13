@@ -3,7 +3,43 @@
 from dataclasses import dataclass, field
 
 from mashumaro import DataClassDictMixin, field_options
-from response_descriptor import ResponseDescriptor
+from src.models.response_descriptor import ResponseDescriptor
+
+
+# GET https://iecapi.iec.co.il//api/customer/contract/{bp_number}?count=1
+#
+#
+# {
+#     "data": {
+#         "contracts": [
+#             {
+#                 "address": "הכתובת שלי",
+#                 "contractId": "0001234",
+#                 "dueDate": "1900-01-01",
+#                 "totalDebt": 0.0,
+#                 "frequency": 2,
+#                 "status": 1,
+#                 "fromPativteProducer": false,
+#                 "cityCode": "000000001864",
+#                 "cityName": "תל אביב - יפו",
+#                 "streetCode": "00000000111",
+#                 "streetName": "נמיר",
+#                 "houseNumber": "22",
+#                 "debtForInvoicesDueDateNotPassed": 0.0,
+#                 "isTouz": false,
+#                 "smartMeter": false,
+#                 "producerType": 1
+#             }
+#         ],
+#         "contractAmount": 1,
+#         "totalToPay": 0.0
+#     },
+#     "reponseDescriptor": {
+#         "isSuccess": true,
+#         "code": "0",
+#         "description": ""
+#     }
+# }
 
 
 @dataclass
@@ -33,13 +69,13 @@ class Contract(DataClassDictMixin):
 @dataclass
 class Contracts(DataClassDictMixin):
     contracts: list[Contract]
-    contract_amount: int
-    total_to_pay: float
+    contract_amount: int = field(metadata=field_options(alias="contractAmount"))
+    total_to_pay: float = field(metadata=field_options(alias="totalToPay"))
 
 
 @dataclass
 class GetContractResponse(DataClassDictMixin):
     data: Contracts
     response_descriptor: ResponseDescriptor = field(
-        metadata=field_options(alias="responseDescriptor")
+        metadata=field_options(alias="reponseDescriptor")
     )

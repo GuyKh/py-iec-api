@@ -4,17 +4,17 @@ from librecaptcha import librecaptcha
 
 from src.models.login_flow import LoginResponse, OTPRequest, OTPResponse
 from src.models.response_descriptor import ErrorResponseDescriptor
+from src import const
 
 _SMS_URL = "https://iecapi.iec.co.il//api/Authentication/{}/1/-1"
 _LOGIN_URL = "https://iecapi.iec.co.il//api/Authentication/login/{}"
 
 
-def get_login_response(id_number: str) -> LoginResponse:
-
-    recaptcha_token = librecaptcha.get_token(api_key="", site_url="https://iecapi.iec.co.il//api/content/he-IL/login", )
+def login_with_id_number(id_number: str) -> LoginResponse:
+    # recaptcha_token = librecaptcha.get_token(api_key="", site_url="https://iecapi.iec.co.il//api/content/he-IL/login")
     """Get first login response from IEC API."""
     # sending get request and saving the response as response object
-    response = requests.get(url=_SMS_URL.format(id_number), headers=_HEADERS, timeout=10)
+    response = requests.get(url=_SMS_URL.format(id_number), headers=const.HEADERS_NO_AUTH, timeout=10)
 
     if response.status_code != 200:
         login_error_response = ErrorResponseDescriptor.from_dict(response.json())
@@ -23,14 +23,14 @@ def get_login_response(id_number: str) -> LoginResponse:
     return LoginResponse.from_dict(response.json())
 
 
-def get_login_token(
-    id_number: str, login_response: LoginResponse, sms_code: str
+def verify_sms_otp(
+        id_number: str, login_response: LoginResponse, sms_code: str
 ) -> str:
     """Get login token from IEC API by SMS authentication."""
     data = OTPRequest(login_response.href, login_response.state_token, sms_code)
 
     response = requests.post(
-        url=_LOGIN_URL.format(id_number), headers=_HEADERS, data=data, timeout=10
+        url=_LOGIN_URL.format(id_number), headers=const.HEADERS_NO_AUTH, data=data, timeout=10
     )
 
     if response.status_code != 200:
@@ -40,12 +40,24 @@ def get_login_token(
     return OTPResponse.from_dict(response.json()).token
 
 
-def get_authorization_token() -> str:  # pragma: no cover
+def send_login_otp(id_number: str) -> LoginResponse:
+    """Get authorization token from IEC API."""
+    return login_with_id_number(id_number)
+
+
+def verify_otp(id_number: str, login_response: LoginResponse, otp_code: str) -> str:  # pragma: no cover
+    """
+    Verify OTP code and get authorization token from IEC API.
+    """
+    return verify_sms_otp(id_number, login_response, otp_code)
+
+
+def get_authorization_token_from_user() -> str:  # pragma: no cover
     """Get authorization token from IEC API."""
     id_number = input("Enter ID number:")
 
     print(f"id_number: {id_number}")
-    login_response = get_login_response(id_number)
+    login_response = login_with_id_number(id_number)
 
     print(f"Hi {login_response.first_name}")
     print(
@@ -53,7 +65,7 @@ def get_authorization_token() -> str:  # pragma: no cover
     )
 
     sms_code = input("Enter the SMS code:")
-    return get_login_token(id_number, login_response, sms_code)
+    return verify_sms_otp(id_number, login_response, sms_code)
 
 
 class IECLoginError(Exception):
@@ -68,3 +80,8 @@ class IECLoginError(Exception):
         self.code = code
         self.error = error
         super().__init__(f"(Code {self.code}): {self.error}")
+
+
+def refresh_token(prev_token: str) -> str | None:
+    """Refresh JWT token."""
+    return None

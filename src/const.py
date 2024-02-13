@@ -26,3 +26,8 @@ HEADERS_WITH_AUTH['Cookie'] = ('ARRAffinity=?; '
 
 GET_CONSUMER_URL = "https://iecapi.iec.co.il//api/customer"
 GET_REQUEST_READING_URL = "https://iecapi.iec.co.il//api/Consumption/RemoteReadingRange"
+GET_ELECTRIC_BILL_URL = "https://iecapi.iec.co.il//api/ElectricBillsDrawers/ElectricBills/{contract_id}/{bp_number}"
+GET_CONTRACTS_URL = "https://iecapi.iec.co.il//api/customer/contract/{bp_number}?count=1"
+GET_SINGLE_CONTRACT_URL = "https://iecapi.iec.co.il//api/customer/contract/{bp_number}?count=1"
+GET_LAST_METER_READING_URL = "https://iecapi.iec.co.il//api/Device/LastMeterReading/{contract_id}/{bp_number}"
+AUTHENTICATE_URL = "https://iecapi.iec.co.il//api/Authentication/{id}/1/-1?customErrorPage=true"

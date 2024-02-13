@@ -5,7 +5,7 @@
 #   -H 'accept: application/json, text/plain, /' \
 #   -H 'authorization: Bearer <base64_token>' \
 #   -H 'content-type: application/json' \
-#   --data-raw '{"meterSerialNumber":"XXXXXXXX","meterCode":"503","lastInvoiceDate":"2000-01-01"\
+#   --data-raw '{"meterSerialNumber":"XXXXXXXX","meterCode":"123","lastInvoiceDate":"2000-01-01"\
 #                   ,"fromDate":"2023-07-20","resolution":1}'
 #
 # Response:
@@ -27,9 +27,7 @@
 #   "data": [{ "status": 8192, "date": "2023-07-20T00:00:00.000000", "value": 0 }]
 # }
 
-
 from dataclasses import dataclass, field
-
 from mashumaro import DataClassDictMixin, field_options
 
 

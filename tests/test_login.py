@@ -1,7 +1,7 @@
 from unittest import TestCase
 from unittest.mock import MagicMock, patch
 
-from src.login import IECLoginError, get_login_response, get_login_token
+from src.login import IECLoginError, login_with_id_number, verify_sms_otp
 from src.models.login_flow import LoginResponse
 
 
@@ -31,7 +31,7 @@ class LoginTest(TestCase):
         mock_requests.get.return_value = mock_response
 
         expected_login_response = LoginResponse.from_dict(login_response_json)
-        self.assertEqual(get_login_response("123456789"), expected_login_response)
+        self.assertEqual(login_with_id_number("123456789"), expected_login_response)
 
     @patch("src.login.requests")
     def test_login_404_response(self, mock_requests):
@@ -46,7 +46,7 @@ class LoginTest(TestCase):
 
         mock_requests.get.return_value = mock_response
         with self.assertRaises(IECLoginError):
-            get_login_response("123456789")
+            login_with_id_number("123456789")
 
     @patch("src.login.requests")
     def test_get_login_token(self, mock_requests):
@@ -62,7 +62,7 @@ class LoginTest(TestCase):
 
         login_response = LoginResponse.from_dict(self._get_login_successful_response())
         self.assertEqual(
-            get_login_token("123456789", login_response, "1234"), authorization_token
+            verify_sms_otp("123456789", login_response, "1234"), authorization_token
         )
 
     @patch("src.login.requests")
@@ -81,4 +81,4 @@ class LoginTest(TestCase):
 
         login_response = LoginResponse.from_dict(self._get_login_successful_response())
         with self.assertRaises(IECLoginError):
-            get_login_token("123456789", login_response, "1234")
+            verify_sms_otp("123456789", login_response, "1234")
