@@ -1,9 +1,16 @@
-import requests
 import logging
 
+import requests
+
 from src.commons import add_jwt_to_headers
-from src.const import (GET_CONSUMER_URL, HEADERS_WITH_AUTH, GET_REQUEST_READING_URL, GET_ELECTRIC_BILL_URL,
-                       GET_SINGLE_CONTRACT_URL, GET_LAST_METER_READING_URL)
+from src.const import (
+    GET_CONSUMER_URL,
+    GET_ELECTRIC_BILL_URL,
+    GET_LAST_METER_READING_URL,
+    GET_REQUEST_READING_URL,
+    GET_SINGLE_CONTRACT_URL,
+    HEADERS_WITH_AUTH,
+)
 from src.login import IECLoginError
 from src.models.contract import GetContractResponse
 from src.models.customer import Customer

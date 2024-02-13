@@ -14,7 +14,7 @@ def add_jwt_to_headers(headers, token) -> dict:
     return headers
 
 
-phoneRegex = '^(+972|0)5[0-9]{8}$'
+PHONE_REGEX: str = '^(+972|0)5[0-9]{8}$'
 
 
 def check_phone(phone):
@@ -25,5 +25,5 @@ def check_phone(phone):
     Returns:
     bool: True if the phone number is valid, False otherwise.
     """
-    if not phone or not re.match(phoneRegex, phone):
+    if not phone or not re.match(PHONE_REGEX, phone):
         raise ValueError("Invalid phone number")

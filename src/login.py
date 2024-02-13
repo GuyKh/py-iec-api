@@ -1,10 +1,9 @@
 """ IEC Login Module. """
 import requests
-from librecaptcha import librecaptcha
 
+from src import const
 from src.models.login_flow import LoginResponse, OTPRequest, OTPResponse
 from src.models.response_descriptor import ErrorResponseDescriptor
-from src import const
 
 _SMS_URL = "https://iecapi.iec.co.il//api/Authentication/{}/1/-1"
 _LOGIN_URL = "https://iecapi.iec.co.il//api/Authentication/login/{}"

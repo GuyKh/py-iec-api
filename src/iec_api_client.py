@@ -2,7 +2,7 @@ from logging import getLogger
 
 import jwt
 
-from src import login, data
+from src import data, login
 from src.const import HEADERS_WITH_AUTH
 from src.models.contract import Contract
 from src.models.customer import Customer
