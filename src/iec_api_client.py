@@ -31,7 +31,8 @@ class IecApiClient:
         self._factor_id: str | None = None  # Factor ID for multi-factor authentication
         self._session_token: str | None = None  # Token for maintaining the user's session
         self.logged_in: bool = False  # Flag to indicate if the user is logged in
-        self._token: JWT = JWT(access_token="", refresh_token="", token_type="", expires_in=0, scope="", id_token="")  # Token for authentication
+        self._token: JWT = JWT(access_token="", refresh_token="", token_type="", expires_in=0,
+                               scope="", id_token="")  # Token for authentication
         self._user_id: str = user_id  # User ID associated with the instance
         self._login_response: str | None = None  # Response from the login attempt
         self._bp_number: str | None = None  # BP Number associated with the instance
@@ -205,8 +206,8 @@ class IecApiClient:
             RemoteReadingResponse: The response containing the remote reading.
         """
         self.check_token()
-        return data.get_remote_reading(self._token.id_token, meter_serial_number, meter_code, last_invoice_date, from_date,
-                                       resolution)
+        return data.get_remote_reading(self._token.id_token, meter_serial_number, meter_code,
+                                       last_invoice_date, from_date, resolution)
 
 
     def get_device_type(self, bp_number: str, contract_id: str) -> DeviceType:

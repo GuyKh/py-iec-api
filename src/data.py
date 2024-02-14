@@ -37,7 +37,7 @@ def _get_url(url, headers):
 
 def get_customer(token: JWT) -> Customer:
     """Get customer data response from IEC API."""
-    headers = add_jwt_to_headers(HEADERS_WITH_AUTH, token.access_token)
+    headers = add_jwt_to_headers(HEADERS_WITH_AUTH, token.id_token)
     # sending get request and saving the response as response object
     response = _get_url(url=GET_CONSUMER_URL, headers=headers)
 
@@ -54,7 +54,7 @@ def get_customer(token: JWT) -> Customer:
 
 def get_remote_reading(token: JWT, meter_serial_number: str, meter_code: int, last_invoice_date: str, from_date: str,
                        resolution: int) -> RemoteReadingResponse:
-    headers = add_jwt_to_headers(HEADERS_WITH_AUTH, token.access_token)
+    headers = add_jwt_to_headers(HEADERS_WITH_AUTH, token.id_token)
     req = RemoteReadingRequest(meterSerialNumber=meter_serial_number, meterCode=meter_code,
                                lastInvoiceDate=last_invoice_date, fromDate=from_date, resolution=resolution)
 
