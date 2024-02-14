@@ -87,7 +87,7 @@ class IecClient:
         :return: None
         """
         logger.debug("Overriding jwt.py token: %s", token)
-        self._token = JWT(access_token=token, refresh_token="", token_type="", expires_in=0, scope="", id_token="")
+        self._token = JWT(access_token="", refresh_token="", token_type="", expires_in=0, scope="", id_token=token)
         self._token.id_token = token
         self.logged_in = True
 

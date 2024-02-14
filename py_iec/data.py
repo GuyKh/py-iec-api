@@ -204,9 +204,7 @@ def get_device_type(token: JWT, bp_number: str, contract_id: str) -> DeviceType:
         else:
             raise IECError(response.status_code, response.reason)
 
-    logger.debug("Response: %s", response.json())
-    resp = DeviceTypeResponse.from_dict(response.json())
-    return resp.data
+    return DeviceType.from_dict(response.json())
 
 
 def get_billing_invoices(token: JWT, bp_number: str, contract_id: str) -> GetInvoicesBody:

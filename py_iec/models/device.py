@@ -77,12 +77,12 @@ class CounterDevice(DataClassDictMixin):
 @dataclass
 class Devices(DataClassDictMixin):
     """Devices dataclass."""
-    counter_devices: list[CounterDevice]
+    counter_devices: list[CounterDevice] | None = field(metadata=field_options(alias="counterDevices"))
     mr_type: str = field(metadata=field_options(alias="mrType"))
 
 
 @dataclass
-class GetDeviceResponse(Device):
+class GetDeviceResponse(DataClassDictMixin):
     """Get Device Response dataclass."""
     data: Devices
     response_descriptor: ResponseDescriptor = field(metadata=field_options(alias="reponseDescriptor"))
