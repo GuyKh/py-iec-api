@@ -11,6 +11,8 @@ dynaconf = "3.2.4"
 librecaptcha = "0.7.3"
 mashumaro = "^3.12"
 pyjwt = "^2.8.0"
+requests = "^2.31.0"
+pkce = "^1.0.3"
 
 [tool.poetry.dev-dependencies]
 pytest = "8.0.0"

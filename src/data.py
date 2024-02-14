@@ -15,6 +15,7 @@ from src.login import IECLoginError
 from src.models.contract import GetContractResponse
 from src.models.customer import Customer
 from src.models.electric_bill import GetElectricBillResponse
+from src.models.jwt import JWT
 from src.models.meter_reading import GetLastMeterReadingResponse
 from src.models.remote_reading import RemoteReadingRequest, RemoteReadingResponse
 from src.models.response_descriptor import ErrorResponseDescriptor
@@ -27,9 +28,9 @@ def _get_url(url, headers):
     return requests.get(url=url, headers=headers, timeout=10)
 
 
-def get_customer(token: str = "") -> Customer:
-    headers = add_jwt_to_headers(HEADERS_WITH_AUTH, token)
+def get_customer(token: JWT) -> Customer:
     """Get customer data response from IEC API."""
+    headers = add_jwt_to_headers(HEADERS_WITH_AUTH, token.access_token)
     # sending get request and saving the response as response object
     response = _get_url(url=GET_CONSUMER_URL, headers=headers)
 
@@ -44,9 +45,9 @@ def get_customer(token: str = "") -> Customer:
     return Customer.from_dict(response.json())
 
 
-def get_remote_reading(token: str, meter_serial_number: str, meter_code: int, last_invoice_date: str, from_date: str,
+def get_remote_reading(token: JWT, meter_serial_number: str, meter_code: int, last_invoice_date: str, from_date: str,
                        resolution: int) -> RemoteReadingResponse:
-    headers = add_jwt_to_headers(HEADERS_WITH_AUTH, token)
+    headers = add_jwt_to_headers(HEADERS_WITH_AUTH, token.access_token)
     req = RemoteReadingRequest(meterSerialNumber=meter_serial_number, meterCode=meter_code,
                                lastInvoiceDate=last_invoice_date, fromDate=from_date, resolution=resolution)
 

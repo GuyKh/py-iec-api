@@ -15,9 +15,8 @@ logger = getLogger(__name__)
 if __name__ == "__main__":  # pragma: no cover
     try:
         # Example of usage
-        token = input("Input bearer token: ")
         client = IecApiClient("123456789")
-        client.override_token(token)
+        client.manual_login()
         customer = client.get_customer()
         print(customer)
 
