@@ -4,17 +4,16 @@ import random
 import re
 import string
 from typing import Tuple
-from urllib.parse import parse_qs
 
 import pkce
 import requests
 
 from src.models.jwt import JWT
 
-CLIENT_ID = "0oantydrc56Nyf1qV2p7"
+# CLIENT_ID = "0oantydrc56Nyf1qV2p7"
 APP_CLIENT_ID = "0oaqf6zr7yEcQZqqt2p7"
 CODE_CHALLENGE_METHOD = "S256"
-REDIRECT_URI = "https://www.iec.co.il/"
+# REDIRECT_URI = "https://www.iec.co.il/"
 APP_REDIRECT_URI = "com.iecrn:/"
 code_verifier, code_challenge = pkce.generate_pkce_pair()
 STATE = "".join(random.choice(string.digits + string.ascii_letters) for _ in range(12))
@@ -80,18 +79,6 @@ def send_otp_code(factor_id: object, state_token: object, pass_code: object = No
     return None
 
 
-def extract_code_from_redirection_url(redirection_code_url):
-    """
-    Extracts the code from the given redirection URL.
-    Args:
-        redirection_code_url (str): The URL from which to extract the code.
-    Returns:
-        str: The extracted code.
-    """
-    response = requests.get(redirection_code_url, allow_redirects=False, timeout=10)
-    return parse_qs(response.next.path_url).get("/?code")[0]
-
-
 def get_access_token(code) -> JWT:
     """
     Get the access token using the provided authorization code.
@@ -148,15 +135,16 @@ def verify_otp_code(factor_id: str, state_token: str, otp_code: str) -> JWT:
     return jwt
 
 
-def manual_authorization() -> JWT | None:  # pragma: no cover
+def manual_authorization(id_number) -> JWT | None:  # pragma: no cover
     """Get authorization token from IEC API."""
-    id_number = input("Enter your ID Number: ")
+    if not id_number:
+        id_number = input("Enter your ID Number: ")
     state_token, factor_id, session_token = first_login(id_number)
     if not state_token:
-        print("Failed to send SMS OTP")
+        print("Failed to send OTP")
         return None
 
-    otp_code = input("Enter your SMS OTP code: ")
+    otp_code = input("Enter your OTP code: ")
     code = authorize_session(otp_code)
     jwt = verify_otp_code(factor_id, state_token, code)
     print(f"Access token: {jwt.access_token}\nRefresh token: {jwt.refresh_token}\nid_token: {jwt.id_token}")
