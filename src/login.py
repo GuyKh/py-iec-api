@@ -4,7 +4,6 @@ import random
 import re
 import string
 from typing import Tuple
-from urllib.parse import parse_qs
 
 import pkce
 import requests
