@@ -5,7 +5,10 @@ import jwt
 from src import data, login
 from src.models.contract import Contract
 from src.models.customer import Customer
+from src.models.device import Device, Devices
+from src.models.device_type import DeviceType
 from src.models.electric_bill import Invoices
+from src.models.invoice import GetInvoicesBody
 from src.models.jwt import JWT
 from src.models.meter_reading import MeterReadings
 from src.models.remote_reading import RemoteReadingResponse
@@ -152,6 +155,40 @@ class IecApiClient:
             return response.data
         return None
 
+    def get_devices(self, bp_number: str) -> list[Device] | None:
+        """
+        Get a list of devices for the user
+        Args:
+            self: The instance of the class.
+            bp_number (str): The BP number of the meter.
+        Returns:
+            list[Device]: List of devices
+        """
+        self.check_token()
+
+        if not bp_number:
+            bp_number = self._bp_number
+
+        return data.get_devices(self._token, bp_number)
+
+    def get_devices_by_contract_id(self, bp_number: str, contract_id: str) -> Devices:
+        """
+        Get a list of devices for the user
+        Args:
+            self: The instance of the class.
+            bp_number (str): The BP number of the meter.
+        Returns:
+            list[Device]: List of devices
+        """
+        self.check_token()
+
+        if not contract_id:
+            contract_id = self.contract_id
+
+        if not bp_number:
+            bp_number = self._bp_number
+
+        return data.get_devices_by_contract_id(self._token, bp_number, contract_id)
 
     def get_remote_reading(self, meter_serial_number: str, meter_code: int, last_invoice_date: str, from_date: str,
                            resolution: int) -> RemoteReadingResponse:
@@ -170,6 +207,47 @@ class IecApiClient:
         self.check_token()
         return data.get_remote_reading(self._token.id_token, meter_serial_number, meter_code, last_invoice_date, from_date,
                                        resolution)
+
+
+    def get_device_type(self, bp_number: str, contract_id: str) -> DeviceType:
+        """
+        Get a list of devices for the user
+        Args:
+            self: The instance of the class.
+            bp_number (str): The BP number of the meter.
+            contract_id (str: The Contract ID
+        Returns:
+            DeviceType
+        """
+        self.check_token()
+
+        if not bp_number:
+            bp_number = self._bp_number
+
+        if not contract_id:
+            contract_id = self._contract_id
+
+        return data.get_device_type(self._token, bp_number, contract_id)
+
+    def get_billing_invoices(self, bp_number: str, contract_id: str) -> GetInvoicesBody:
+        """
+        Get a list of devices for the user
+        Args:
+            self: The instance of the class.
+            bp_number (str): The BP number of the meter.
+            contract_id (str: The Contract ID
+        Returns:
+            Billing Invoices data
+        """
+        self.check_token()
+
+        if not bp_number:
+            bp_number = self._bp_number
+
+        if not contract_id:
+            contract_id = self._contract_id
+
+        return data.get_billing_invoices(self._token, bp_number, contract_id)
 
     def check_token(self):
         """
