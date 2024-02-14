@@ -5,6 +5,7 @@ import jwt
 from src import data, login
 from src.models.contract import Contract
 from src.models.customer import Customer
+from src.models.device import Device
 from src.models.electric_bill import Invoices
 from src.models.jwt import JWT
 from src.models.meter_reading import MeterReadings
@@ -151,6 +152,22 @@ class IecApiClient:
         if response.data:
             return response.data
         return None
+
+    def get_devices(self, bp_number: str) -> list[Device] | None:
+        """
+        Get a list of devices for the user
+        Args:
+            self: The instance of the class.
+            bp_number (str): The BP number of the meter.
+        Returns:
+            list[Device]: List of devices
+        """
+        self.check_token()
+
+        if not bp_number:
+            bp_number = self._bp_number
+
+        return data.get_devices(self._token, bp_number)
 
     def get_remote_reading(self, meter_serial_number: str, meter_code: int, last_invoice_date: str, from_date: str,
                            resolution: int) -> RemoteReadingResponse:
