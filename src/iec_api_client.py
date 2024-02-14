@@ -76,7 +76,7 @@ class IecApiClient:
         :return: None
         """
         logger.debug("Overriding jwt.py token: %s", token)
-        self._token = JWT(access_token=token, refresh_token="", token_type="", expires_in=0, scope="", id_token="")
+        self._token = JWT(access_token="", refresh_token="", token_type="", expires_in=0, scope="", id_token=token)
         self._token.id_token = token
         self.logged_in = True
 
@@ -111,7 +111,7 @@ class IecApiClient:
             return contracts
         return []
 
-    def get_last_meter_reading(self, bp_number: str, contract_id: str) -> MeterReadings | None:
+    def get_last_meter_reading(self, bp_number: str = None, contract_id: str = None) -> MeterReadings | None:
         """
         Retrieves a last meter reading for a specific contract and user.
         Args:
@@ -133,7 +133,7 @@ class IecApiClient:
             return response.data
         return None
 
-    def get_electric_bill(self, bp_number: str, contract_id: str) -> Invoices | None:
+    def get_electric_bill(self, bp_number: str = None, contract_id: str = None) -> Invoices | None:
         """
         Retrieves a remote reading for a specific meter using the provided parameters.
         Args:
@@ -156,7 +156,7 @@ class IecApiClient:
             return response.data
         return None
 
-    def get_devices(self, bp_number: str) -> list[Device] | None:
+    def get_devices(self, bp_number: str = None) -> list[Device] | None:
         """
         Get a list of devices for the user
         Args:
@@ -170,26 +170,27 @@ class IecApiClient:
         if not bp_number:
             bp_number = self._bp_number
 
-        return data.get_devices(self._token, bp_number)
+        return data.get_devices(self._token.id_token, bp_number)
 
-    def get_devices_by_contract_id(self, bp_number: str, contract_id: str) -> Devices:
+    def get_devices_by_contract_id(self, bp_number: str = None, contract_id: str = None) -> Devices:
         """
         Get a list of devices for the user
         Args:
             self: The instance of the class.
             bp_number (str): The BP number of the meter.
+            contract_id (str): The contract ID of the meter.
         Returns:
             list[Device]: List of devices
         """
         self.check_token()
 
         if not contract_id:
-            contract_id = self.contract_id
+            contract_id = self._contract_id
 
         if not bp_number:
             bp_number = self._bp_number
 
-        return data.get_devices_by_contract_id(self._token, bp_number, contract_id)
+        return data.get_devices_by_contract_id(self._token.id_token, bp_number, contract_id)
 
     def get_remote_reading(self, meter_serial_number: str, meter_code: int, last_invoice_date: str, from_date: str,
                            resolution: int) -> RemoteReadingResponse:
@@ -206,11 +207,10 @@ class IecApiClient:
             RemoteReadingResponse: The response containing the remote reading.
         """
         self.check_token()
-        return data.get_remote_reading(self._token.id_token, meter_serial_number, meter_code,
+        return data.get_remote_reading(self._token, meter_serial_number, meter_code,
                                        last_invoice_date, from_date, resolution)
 
-
-    def get_device_type(self, bp_number: str, contract_id: str) -> DeviceType:
+    def get_device_type(self, bp_number: str = None, contract_id: str = None) -> DeviceType:
         """
         Get a list of devices for the user
         Args:
@@ -228,9 +228,9 @@ class IecApiClient:
         if not contract_id:
             contract_id = self._contract_id
 
-        return data.get_device_type(self._token, bp_number, contract_id)
+        return data.get_device_type(self._token.id_token, bp_number, contract_id)
 
-    def get_billing_invoices(self, bp_number: str, contract_id: str) -> GetInvoicesBody:
+    def get_billing_invoices(self, bp_number: str = None, contract_id: str = None) -> GetInvoicesBody:
         """
         Get a list of devices for the user
         Args:
@@ -248,7 +248,7 @@ class IecApiClient:
         if not contract_id:
             contract_id = self._contract_id
 
-        return data.get_billing_invoices(self._token, bp_number, contract_id)
+        return data.get_billing_invoices(self._token.id_token, bp_number, contract_id)
 
     def check_token(self):
         """

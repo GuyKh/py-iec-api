@@ -56,5 +56,5 @@ class Invoices(DataClassDictMixin):
 class GetElectricBillResponse(DataClassDictMixin):
     data: Invoices
     response_descriptor: ResponseDescriptor = field(
-        metadata=field_options(alias="responseDescriptor")
+        metadata=field_options(alias="reponseDescriptor")
     )

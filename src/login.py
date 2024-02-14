@@ -132,8 +132,7 @@ def verify_otp_code(factor_id: str, state_token: str, otp_code: str) -> JWT:
     """
     otp_session_token = send_otp_code(factor_id, state_token, otp_code)
     code = authorize_session(otp_session_token)
-    jwt = get_access_token(code)
-    return jwt
+    return get_access_token(code)
 
 
 def manual_authorization(id_number) -> JWT | None:  # pragma: no cover
@@ -147,9 +146,11 @@ def manual_authorization(id_number) -> JWT | None:  # pragma: no cover
 
     otp_code = input("Enter your OTP code: ")
     code = authorize_session(otp_code)
-    jwt = verify_otp_code(factor_id, state_token, code)
-    print(f"Access token: {jwt.access_token}\nRefresh token: {jwt.refresh_token}\nid_token: {jwt.id_token}")
-    return jwt
+    jwt_token = verify_otp_code(factor_id, state_token, code)
+    print(f"Access token: {jwt_token.access_token}\n"
+          f"Refresh token: {jwt_token.refresh_token}\n"
+          f"id_token: {jwt_token.id_token}")
+    return jwt_token
 
 
 def refresh_token(token: JWT) -> JWT | None:
@@ -162,13 +163,13 @@ def refresh_token(token: JWT) -> JWT | None:
     return None
 
 
-def save_token_to_file(token: JWT, path: str = "token.json") -> None:
+def save_token_to_file(token: JWT, path: str = "token.json.bak") -> None:
     """Save token to file."""
     with open(path, "w", encoding="utf-8") as f:
         json.dump(token.to_dict(), f)
 
 
-def load_token_from_file(path: str = "token.json") -> JWT:
+def load_token_from_file(path: str = "token.json.bak") -> JWT:
     """Load token from file."""
     with open(path, "r", encoding="utf-8") as f:
         jwt_data = JWT.from_dict(json.load(f))
