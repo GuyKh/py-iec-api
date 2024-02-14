@@ -4,7 +4,10 @@ import requests
 
 from src.commons import add_jwt_to_headers
 from src.const import (
+    GET_BILLING_INVOICES,
     GET_CONSUMER_URL,
+    GET_DEVICE_TYPE_URL,
+    GET_DEVICES_BY_CONTRACT_ID_URL,
     GET_DEVICES_URL,
     GET_ELECTRIC_BILL_URL,
     GET_LAST_METER_READING_URL,
@@ -15,8 +18,10 @@ from src.const import (
 from src.login import IECLoginError
 from src.models.contract import GetContractResponse
 from src.models.customer import Customer
-from src.models.device import Device
+from src.models.device import Device, Devices, GetDeviceResponse
+from src.models.device_type import DeviceType
 from src.models.electric_bill import GetElectricBillResponse
+from src.models.invoice import GetInvoicesBody, GetInvoicesResponse
 from src.models.jwt import JWT
 from src.models.meter_reading import GetLastMeterReadingResponse
 from src.models.remote_reading import RemoteReadingRequest, RemoteReadingResponse
@@ -136,3 +141,59 @@ def get_devices(token: str, bp_number: str) -> list[Device]:
             raise IECLoginError(response.status_code, response.reason)
 
     return [Device.from_dict(device) for device in response.json()]
+
+
+def get_devices_by_contract_id(token: str, bp_number: str, contract_id: str) -> Devices:
+    """Get Device data response from IEC API."""
+    headers = add_jwt_to_headers(HEADERS_WITH_AUTH, token)
+    # sending get request and saving the response as response object
+    response = _get_url(url=GET_DEVICES_BY_CONTRACT_ID_URL.format(bp_number=bp_number, contract_id=contract_id),
+                        headers=headers)
+
+    if response.status_code != 200:
+        print(f"Failed Login: (Code {response.status_code}): {response.reason}")
+        if len(response.content) > 0:
+            login_error_response = ErrorResponseDescriptor.from_dict(response.json())
+            raise IECLoginError(login_error_response.code, login_error_response.error)
+        else:
+            raise IECLoginError(response.status_code, response.reason)
+
+    res = GetDeviceResponse.from_dict(response.json())
+    return res.data
+
+
+def get_device_type(token: str, bp_number: str, contract_id: str) -> DeviceType:
+    """Get Device Type data response from IEC API."""
+    headers = add_jwt_to_headers(HEADERS_WITH_AUTH, token)
+    # sending get request and saving the response as response object
+    response = _get_url(url=GET_DEVICE_TYPE_URL.format(bp_number=bp_number, contract_id=contract_id),
+                        headers=headers)
+
+    if response.status_code != 200:
+        print(f"Failed Login: (Code {response.status_code}): {response.reason}")
+        if len(response.content) > 0:
+            login_error_response = ErrorResponseDescriptor.from_dict(response.json())
+            raise IECLoginError(login_error_response.code, login_error_response.error)
+        else:
+            raise IECLoginError(response.status_code, response.reason)
+
+    return DeviceType.from_dict(response.json())
+
+
+def get_billing_invoices(token: str, bp_number: str, contract_id: str) -> GetInvoicesBody:
+    """Get Device Type data response from IEC API."""
+    headers = add_jwt_to_headers(HEADERS_WITH_AUTH, token)
+    # sending get request and saving the response as response object
+    response = _get_url(url=GET_BILLING_INVOICES.format(bp_number=bp_number, contract_id=contract_id),
+                        headers=headers)
+
+    if response.status_code != 200:
+        print(f"Failed Login: (Code {response.status_code}): {response.reason}")
+        if len(response.content) > 0:
+            login_error_response = ErrorResponseDescriptor.from_dict(response.json())
+            raise IECLoginError(login_error_response.code, login_error_response.error)
+        else:
+            raise IECLoginError(response.status_code, response.reason)
+
+    res = GetInvoicesResponse.from_dict(response.json())
+    return res.data
