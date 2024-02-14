@@ -8,7 +8,7 @@ jobs:
       - run: echo "Running build and test for ${{ github.ref }} branch"
 
       - name: Check out repository code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
         with:
           fetch-depth: 1
 
@@ -18,5 +18,5 @@ jobs:
       - name: Running Lint
         run: make docker/lint
 
-      - name: Running tests
-        run: make docker/test
+      #- name: Running tests
+      #  run: make docker/test

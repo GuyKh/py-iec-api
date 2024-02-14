@@ -3,10 +3,10 @@ from logging import getLogger
 import jwt
 
 from src import data, login
-from src.const import HEADERS_WITH_AUTH
 from src.models.contract import Contract
 from src.models.customer import Customer
 from src.models.electric_bill import Invoices
+from src.models.jwt import JWT
 from src.models.meter_reading import MeterReadings
 from src.models.remote_reading import RemoteReadingResponse
 
@@ -14,45 +14,54 @@ logger = getLogger(__name__)
 
 
 class IecApiClient:
+    """ IEC API Client. """
 
-    def __init__(self, user_id):
+    def __init__(self, user_id, automatically_login: bool = False):
         """
-        Initialize the class with the provided phone number.
+        Initializes the class with the provided user ID and optionally logs in automatically.
+
         Args:
-        user_id (str): The User ID (SSN) to be associated with the instance.
+        user_id (str): The user ID (SSN) to be associated with the instance.
+        automatically_login (bool): Whether to automatically log in the user. Default is False.
         """
-        # check_phone(phone)
-
+        self._state_token = None  # Token for maintaining the state of the user's session
+        self._factor_id = None  # Factor ID for multi-factor authentication
+        self._session_token = None  # Token for maintaining the user's session
         self.logged_in = None  # Flag to indicate if the user is logged in
         self._token = None  # Token for authentication
         self._user_id = user_id  # User ID associated with the instance
-        self._login_response = None  # Login Response for OTP login
+        self._login_response = None  # Response from the login attempt
         self._bp_number = None  # BP Number associated with the instance
         self._contract_id = None  # Contract ID associated with the instance
+        if automatically_login:
+            self.login_with_id()  # Attempt to log in automatically if specified
 
     def login_with_id(self):
         """
         Login with ID and wait for SMS OTP
-        :return: Login
         """
-        self._login_response = login.login_with_id_number(self._user_id)
+        state_token, factor_id, session_token = self._login_response = login.first_login(self._user_id)
+        self._state_token = state_token
+        self._factor_id = factor_id
+        self._session_token = session_token
 
-    def verify_otp(self, otp_code: str) -> str:
+    def verify_otp(self, otp_code: str) -> bool:
         """
         Verify the OTP code and return the token
         :param otp_code: The OTP code to be verified
         :return: The token
         """
-        return login.verify_otp(self._user_id, self._login_response, otp_code)
+        jwt_token = login.verify_otp_code(self._factor_id, self._state_token, otp_code)
+        self._token = jwt_token
+        self.logged_in = True
+        return True
 
     def manual_login(self):
         """
         Logs the user in by obtaining an authorization token, setting the authorization header,
         and updating the login status and token attribute.
         """
-        token = login.get_authorization_token_from_user()
-        logger.debug("Logged in with jwt token: %s", token)
-        HEADERS_WITH_AUTH["Authorization"] = f"Bearer {token}"
+        token = login.manual_authorization()
         self.logged_in = True
         self._token = token
 
@@ -62,9 +71,10 @@ class IecApiClient:
         :param token: The new token to be set.
         :return: None
         """
-        logger.debug("Overriding jwt token: %s", token)
+        logger.debug("Overriding jwt.py token: %s", token)
+        self._token = JWT()
+        self._token.access_token = token
         self.logged_in = True
-        self._token = token
 
     def get_customer(self) -> Customer:
         """
@@ -72,7 +82,6 @@ class IecApiClient:
         :return: Customer data
         """
         self.check_token()
-        """Get consumer data response from IEC API."""
         customer = data.get_customer(self._token)
         if customer:
             self._bp_number = customer.bp_number
@@ -163,11 +172,11 @@ class IecApiClient:
 
     def check_token(self):
         """
-        Check the validity of the jwt token and refresh in the case of expired signature errors.
+        Check the validity of the jwt.py token and refresh in the case of expired signature errors.
         """
         try:
-            jwt.decode(self._token, options={"verify_signature": False}, algorithms=["RS256"])
+            jwt.decode(self._token.access_token, options={"verify_signature": False}, algorithms=["RS256"])
         except jwt.exceptions.ExpiredSignatureError:
-            logger.debug("jwt token expired, retrying login")
+            logger.debug("jwt.py token expired, retrying login")
             self.logged_in = False
             login.refresh_token(self._token)

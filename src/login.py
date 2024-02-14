@@ -1,70 +1,176 @@
 """ IEC Login Module. """
+import json
+import random
+import re
+import string
+from typing import Tuple
+from urllib.parse import parse_qs
+
+import pkce
 import requests
 
-from src import const
-from src.models.login_flow import LoginResponse, OTPRequest, OTPResponse
-from src.models.response_descriptor import ErrorResponseDescriptor
+from src.models.jwt import JWT
 
-_SMS_URL = "https://iecapi.iec.co.il//api/Authentication/{}/1/-1"
-_LOGIN_URL = "https://iecapi.iec.co.il//api/Authentication/login/{}"
+CLIENT_ID = "0oantydrc56Nyf1qV2p7"
+APP_CLIENT_ID = "0oaqf6zr7yEcQZqqt2p7"
+CODE_CHALLENGE_METHOD = "S256"
+REDIRECT_URI = "https://www.iec.co.il/"
+APP_REDIRECT_URI = "com.iecrn:/"
+code_verifier, code_challenge = pkce.generate_pkce_pair()
+STATE = "".join(random.choice(string.digits + string.ascii_letters) for _ in range(12))
+IEC_OKTA_BASE_URL = "https://iec-ext.okta.com"
 
-
-def login_with_id_number(id_number: str) -> LoginResponse:
-    # recaptcha_token = librecaptcha.get_token(api_key="", site_url="https://iecapi.iec.co.il//api/content/he-IL/login")
-    """Get first login response from IEC API."""
-    # sending get request and saving the response as response object
-    response = requests.get(url=_SMS_URL.format(id_number), headers=const.HEADERS_NO_AUTH, timeout=10)
-
-    if response.status_code != 200:
-        login_error_response = ErrorResponseDescriptor.from_dict(response.json())
-        raise IECLoginError(login_error_response.code, login_error_response.error)
-
-    return LoginResponse.from_dict(response.json())
+AUTHORIZE_URL = "https://iec-ext.okta.com/oauth2/default/v1/authorize?client_id={client_id}&response_type=id_token+code&response_mode=form_post&scope=openid%20email%20profile%20offline_access&redirect_uri=com.iecrn:/&state=123abc&nonce=abc123&code_challenge_method=S256&sessionToken={sessionToken}&code_challenge={challenge}"
 
 
-def verify_sms_otp(
-        id_number: str, login_response: LoginResponse, sms_code: str
-) -> str:
-    """Get login token from IEC API by SMS authentication."""
-    data = OTPRequest(login_response.href, login_response.state_token, sms_code)
+def authorize_session(session_token) -> str:
+    """
+    Authorizes a session using the provided session token.
+    Args:
+        session_token (str): The session token to be used for authorization.
+    Returns:
+        str: The code obtained from the authorization response.
+    """
+    cmd_url = AUTHORIZE_URL.format(client_id=APP_CLIENT_ID, sessionToken=session_token, challenge=code_challenge)
+    authorize_response = requests.get(cmd_url, timeout=10)
+    code = re.findall(r"<input type=\"hidden\" name=\"code\" value=\"(.+)\"/>",
+                      authorize_response.content.decode('unicode-escape')
+                      .encode('latin1').decode('utf-8'))[0]
+    return code
+
+
+def get_first_factor_id(user_id: str):
+    """
+    Function to get the first factor ID using the provided ID.
+        Args:
+        id (str): The user ID be used for authorization.
+    Returns:
+        Tuple[str,str]: [The state token, the factor id]
+    """
+    data = {"username": f"{user_id}@iec.co.il"}
+    headers = {"accept": "application/json", "content-type": "application/json"}
+
+    response = requests.post(f"{IEC_OKTA_BASE_URL}/api/v1/authn", data=json.dumps(data), headers=headers, timeout=10)
+    return response.json().get("stateToken", ""), response.json().get("_embedded", {}).get("factors", {})[0].get("id")
+
+
+def send_otp_code(factor_id: object, state_token: object, pass_code: object = None) -> str | None:
+    """
+    Send OTP code for factor verification and return the session token if successful.
+
+    Args:
+        factor_id (object): The identifier of the factor for verification.
+        state_token (object): The state token for the verification process.
+        pass_code (object, optional): The pass code for verification. Defaults to None.
+
+    Returns:
+        str | None: The session token if verification is successful, otherwise None.
+    """
+    data = {"stateToken": state_token}
+    if pass_code:
+        data["passCode"] = pass_code
+    headers = {"accept": "application/json", "content-type": "application/json"}
 
     response = requests.post(
-        url=_LOGIN_URL.format(id_number), headers=const.HEADERS_NO_AUTH, data=data, timeout=10
+        f"{IEC_OKTA_BASE_URL}/api/v1/authn/factors/{factor_id}/verify", data=json.dumps(data),
+        headers=headers, timeout=10
     )
-
-    if response.status_code != 200:
-        login_error_response = ErrorResponseDescriptor.from_dict(response.json())
-        raise IECLoginError(login_error_response.code, login_error_response.error)
-
-    return OTPResponse.from_dict(response.json()).token
+    if response.json().get("status") == "SUCCESS":
+        return response.json().get("sessionToken")
+    return None
 
 
-def send_login_otp(id_number: str) -> LoginResponse:
-    """Get authorization token from IEC API."""
-    return login_with_id_number(id_number)  # pragma: no cover
-
-
-def verify_otp(id_number: str, login_response: LoginResponse, otp_code: str) -> str:  # pragma: no cover
+def extract_code_from_redirection_url(redirection_code_url):
     """
-    Verify OTP code and get authorization token from IEC API.
+    Extracts the code from the given redirection URL.
+    Args:
+        redirection_code_url (str): The URL from which to extract the code.
+    Returns:
+        str: The extracted code.
     """
-    return verify_sms_otp(id_number, login_response, otp_code)
+    response = requests.get(redirection_code_url, allow_redirects=False, timeout=10)
+    return parse_qs(response.next.path_url).get("/?code")[0]
 
 
-def get_authorization_token_from_user() -> str:  # pragma: no cover
+def get_access_token(code) -> JWT:
+    """
+    Get the access token using the provided authorization code.
+    Args:
+        code (str): The authorization code.
+    Returns:
+        JWT: The access token as a JWT object.
+    """
+    data = {
+        "client_id": APP_CLIENT_ID,
+        "code_verifier": code_verifier,
+        "grant_type": "authorization_code",
+        "redirect_uri": APP_REDIRECT_URI,
+        "code": code,
+    }
+    response = requests.post(f"{IEC_OKTA_BASE_URL}/oauth2/default/v1/token", data=data, timeout=10)
+    return JWT.from_dict(response.json())
+
+
+def first_login(id_number: str) -> Tuple[str, str, str]:
+    """
+    Perform the first login for a user.
+
+    Args:
+        id_number (str): The user's ID number.
+
+    Returns:
+        Tuple[str, str, str]: A tuple containing the state token, factor ID, and session token.
+    """
+    # Get the first factor ID and state token
+    state_token, factor_id = get_first_factor_id(id_number)
+
+    # Send OTP code and get session token
+    session_token = send_otp_code(factor_id, state_token)
+
+    return state_token, factor_id, session_token
+
+
+def verify_otp_code(factor_id: str, state_token: str, otp_code: str) -> JWT:
+    """
+    Verify the OTP code for the given factor_id, state_token, and otp_code and return the JWT.
+
+    Args:
+        factor_id (str): The factor ID for the OTP verification.
+        state_token (str): The state token for the OTP verification.
+        otp_code (str): The OTP code to be verified.
+
+    Returns:
+        JWT: The JSON Web Token (JWT) for the authorized session.
+    """
+    otp_session_token = send_otp_code(factor_id, state_token, otp_code)
+    code = authorize_session(otp_session_token)
+    jwt = get_access_token(code)
+    return jwt
+
+
+def manual_authorization() -> JWT | None:  # pragma: no cover
     """Get authorization token from IEC API."""
-    id_number = input("Enter ID number:")
+    id_number = input("Enter your ID Number: ")
+    state_token, factor_id, session_token = first_login(id_number)
+    if not state_token:
+        print("Failed to send SMS OTP")
+        return None
 
-    print(f"id_number: {id_number}")
-    login_response = login_with_id_number(id_number)
+    otp_code = input("Enter your SMS OTP code: ")
+    code = authorize_session(otp_code)
+    jwt = verify_otp_code(factor_id, state_token, code)
+    print(f"Access token: {jwt.access_token}\nRefresh token: {jwt.refresh_token}\nid_token: {jwt.id_token}")
+    return jwt
 
-    print(f"Hi {login_response.first_name}")
-    print(
-        f"please enter the SMS code sent to phone {login_response.phone_prefix}*****{login_response.phone_suffix}\n"
-    )
 
-    sms_code = input("Enter the SMS code:")
-    return verify_sms_otp(id_number, login_response, sms_code)
+def refresh_token(token: JWT) -> JWT | None:
+    """Refresh IEC JWT token."""
+    headers = {"accept": "application/json", "content-type": "application/json"}
+    data = {"refresh_token": token.refresh_token}
+    response = requests.post(f"{IEC_OKTA_BASE_URL}/oauth2/default/v1/token", data=data, headers=headers, timeout=10)
+    if response.status_code == 200:
+        return JWT.from_dict(response.json())
+    return None
 
 
 class IECLoginError(Exception):
@@ -79,8 +185,3 @@ class IECLoginError(Exception):
         self.code = code
         self.error = error
         super().__init__(f"(Code {self.code}): {self.error}")
-
-
-def refresh_token(prev_token: str) -> str | None:  # pragma: no cover
-    """Refresh JWT token."""
-    return None
