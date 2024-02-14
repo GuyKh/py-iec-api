@@ -24,15 +24,15 @@ class IecApiClient:
         user_id (str): The user ID (SSN) to be associated with the instance.
         automatically_login (bool): Whether to automatically log in the user. Default is False.
         """
-        self._state_token = None  # Token for maintaining the state of the user's session
-        self._factor_id = None  # Factor ID for multi-factor authentication
-        self._session_token = None  # Token for maintaining the user's session
-        self.logged_in = None  # Flag to indicate if the user is logged in
-        self._token = None  # Token for authentication
-        self._user_id = user_id  # User ID associated with the instance
-        self._login_response = None  # Response from the login attempt
-        self._bp_number = None  # BP Number associated with the instance
-        self._contract_id = None  # Contract ID associated with the instance
+        self._state_token: str | None = None  # Token for maintaining the state of the user's session
+        self._factor_id: str | None = None  # Factor ID for multi-factor authentication
+        self._session_token: str | None = None  # Token for maintaining the user's session
+        self.logged_in: bool = False  # Flag to indicate if the user is logged in
+        self._token: JWT = JWT(access_token="", refresh_token="", token_type="", expires_in=0, scope="", id_token="")  # Token for authentication
+        self._user_id: str = user_id  # User ID associated with the instance
+        self._login_response: str | None = None  # Response from the login attempt
+        self._bp_number: str | None = None  # BP Number associated with the instance
+        self._contract_id: str | None = None  # Contract ID associated with the instance
         if automatically_login:
             self.login_with_id()  # Attempt to log in automatically if specified
 
@@ -72,8 +72,8 @@ class IecApiClient:
         :return: None
         """
         logger.debug("Overriding jwt.py token: %s", token)
-        self._token = JWT()
-        self._token.access_token = token
+        self._token = JWT(access_token=token, refresh_token="", token_type="", expires_in=0, scope="", id_token="")
+        self._token.id_token = token
         self.logged_in = True
 
     def get_customer(self) -> Customer:
@@ -99,13 +99,13 @@ class IecApiClient:
         if not bp_number:
             bp_number = self._bp_number
 
-        get_contract_response = data.get_contract(self._token, bp_number)
+        get_contract_response = data.get_contract(self._token.id_token, bp_number)
         if get_contract_response and get_contract_response.data:
             contracts = get_contract_response.data.contracts
             if contracts and len(contracts) > 0:
                 self._contract_id = contracts[0].contract_id
             return contracts
-        return list()
+        return []
 
     def get_last_meter_reading(self, bp_number: str, contract_id: str) -> MeterReadings | None:
         """
@@ -124,7 +124,7 @@ class IecApiClient:
         if not contract_id:
             contract_id = self._contract_id
 
-        response = data.get_last_meter_reading(self._token, bp_number, contract_id)
+        response = data.get_last_meter_reading(self._token.id_token, bp_number, contract_id)
         if response and response.data:
             return response.data
         return None
@@ -147,10 +147,11 @@ class IecApiClient:
         if not contract_id:
             contract_id = self._contract_id
 
-        response = data.get_electric_bill(self._token, bp_number, contract_id)
+        response = data.get_electric_bill(self._token.id_token, bp_number, contract_id)
         if response.data:
             return response.data
         return None
+
 
     def get_remote_reading(self, meter_serial_number: str, meter_code: int, last_invoice_date: str, from_date: str,
                            resolution: int) -> RemoteReadingResponse:
@@ -167,7 +168,7 @@ class IecApiClient:
             RemoteReadingResponse: The response containing the remote reading.
         """
         self.check_token()
-        return data.get_remote_reading(self._token, meter_serial_number, meter_code, last_invoice_date, from_date,
+        return data.get_remote_reading(self._token.id_token, meter_serial_number, meter_code, last_invoice_date, from_date,
                                        resolution)
 
     def check_token(self):
@@ -175,8 +176,21 @@ class IecApiClient:
         Check the validity of the jwt.py token and refresh in the case of expired signature errors.
         """
         try:
-            jwt.decode(self._token.access_token, options={"verify_signature": False}, algorithms=["RS256"])
+            jwt.decode(self._token.id_token, options={"verify_signature": False}, algorithms=["RS256"])
         except jwt.exceptions.ExpiredSignatureError:
             logger.debug("jwt.py token expired, retrying login")
             self.logged_in = False
             login.refresh_token(self._token)
+
+    def load_token(self, file_path: str = "token.json"):
+        """
+        Load token from file.
+        """
+        self._token = login.load_token_from_file(file_path)
+        self.logged_in = True
+
+    def save_token(self, file_path: str = "token.json"):
+        """
+        Save token to file.
+        """
+        login.save_token_to_file(self._token, file_path)
