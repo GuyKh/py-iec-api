@@ -16,7 +16,17 @@ if __name__ == "__main__":  # pragma: no cover
     try:
         # Example of usage
         client = IecApiClient("123456789")
-        client.manual_login()
+
+        token_json_file = "token.json"
+        if os.path.exists(token_json_file):
+            client.load_token(token_json_file)
+        else:
+            client.login_with_id()
+            otp = input("Enter your ID Number: ")
+            client.verify_otp(otp)
+            client.save_token(token_json_file)
+
+        # client.manual_login()
         customer = client.get_customer()
         print(customer)
 

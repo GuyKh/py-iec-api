@@ -5,6 +5,7 @@ import re
 import string
 from typing import Tuple
 
+import jwt
 import pkce
 import requests
 
@@ -159,6 +160,20 @@ def refresh_token(token: JWT) -> JWT | None:
     if response.status_code == 200:
         return JWT.from_dict(response.json())
     return None
+
+
+def save_token_to_file(token: JWT, path: str = "token.json") -> None:
+    """Save token to file."""
+    with open(path, "w", encoding="utf-8") as f:
+        json.dump(token.to_dict(), f)
+
+
+def load_token_from_file(path: str = "token.json") -> JWT:
+    """Load token from file."""
+    with open(path, "r", encoding="utf-8") as f:
+        jwt_data = JWT.from_dict(json.load(f))
+        jwt.decode(jwt_data.access_token, options={"verify_signature": False}, algorithms=["RS256"])
+        return jwt_data
 
 
 class IECLoginError(Exception):
