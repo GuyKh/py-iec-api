@@ -38,7 +38,7 @@ class IecApiClient:
 
     def login_with_id(self):
         """
-        Login with ID and wait for SMS OTP
+        Login with ID and wait for OTP
         """
         state_token, factor_id, session_token = self._login_response = login.first_login(self._user_id)
         self._state_token = state_token
@@ -61,7 +61,7 @@ class IecApiClient:
         Logs the user in by obtaining an authorization token, setting the authorization header,
         and updating the login status and token attribute.
         """
-        token = login.manual_authorization()
+        token = login.manual_authorization(self._user_id)
         self.logged_in = True
         self._token = token
 
