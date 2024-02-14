@@ -19,7 +19,7 @@ from src.login import IECLoginError
 from src.models.contract import GetContractResponse
 from src.models.customer import Customer
 from src.models.device import Device, Devices, GetDeviceResponse
-from src.models.device_type import DeviceType
+from src.models.device_type import DeviceType, DeviceTypeResponse
 from src.models.electric_bill import GetElectricBillResponse
 from src.models.invoice import GetInvoicesBody, GetInvoicesResponse
 from src.models.jwt import JWT
@@ -177,7 +177,8 @@ def get_device_type(token: str, bp_number: str, contract_id: str) -> DeviceType:
         else:
             raise IECLoginError(response.status_code, response.reason)
 
-    return DeviceType.from_dict(response.json())
+    resp = DeviceTypeResponse.from_dict(response.json())
+    return resp.data
 
 
 def get_billing_invoices(token: str, bp_number: str, contract_id: str) -> GetInvoicesBody:
