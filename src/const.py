@@ -24,10 +24,15 @@ HEADERS_WITH_AUTH['Cookie'] = ('ARRAffinity=?; '
                                'ARRAffinitySameSite=?;'
                                ' GCLB=?')
 
-GET_CONSUMER_URL = "https://iecapi.iec.co.il//api/customer"
-GET_REQUEST_READING_URL = "https://iecapi.iec.co.il//api/Consumption/RemoteReadingRange"
-GET_ELECTRIC_BILL_URL = "https://iecapi.iec.co.il//api/ElectricBillsDrawers/ElectricBills/{contract_id}/{bp_number}"
-GET_CONTRACTS_URL = "https://iecapi.iec.co.il//api/customer/contract/{bp_number}?count=1"
-GET_SINGLE_CONTRACT_URL = "https://iecapi.iec.co.il//api/customer/contract/{bp_number}?count=1"
-GET_LAST_METER_READING_URL = "https://iecapi.iec.co.il//api/Device/LastMeterReading/{contract_id}/{bp_number}"
-AUTHENTICATE_URL = "https://iecapi.iec.co.il//api/Authentication/{id}/1/-1?customErrorPage=true"
+IEC_API_BASE_URL = "https://iecapi.iec.co.il//api/"
+GET_CONSUMER_URL = IEC_API_BASE_URL + "customer"
+GET_REQUEST_READING_URL = IEC_API_BASE_URL + "Consumption/RemoteReadingRange"
+GET_ELECTRIC_BILL_URL = IEC_API_BASE_URL + "ElectricBillsDrawers/ElectricBills/{contract_id}/{bp_number}"
+GET_CONTRACTS_URL = IEC_API_BASE_URL + "customer/contract/{bp_number}?count=1"
+GET_SINGLE_CONTRACT_URL = IEC_API_BASE_URL + "customer/contract/{bp_number}?count=1"
+GET_LAST_METER_READING_URL = IEC_API_BASE_URL + "Device/LastMeterReading/{contract_id}/{bp_number}"
+AUTHENTICATE_URL = IEC_API_BASE_URL + "Authentication/{id}/1/-1?customErrorPage=true"
+GET_DEVICES_URL = IEC_API_BASE_URL + "Device/{bp_number}"
+GET_DEVICES_BY_CONTRACT_ID_URL = IEC_API_BASE_URL + "Device/{bp_number/{contract_id}"
+GET_DEVICE_TYPE_URL = IEC_API_BASE_URL + "Device/type/{bp_number}/{contract_id}/false"
+GET_BILLING_INVOICES = IEC_API_BASE_URL + "billingCollection/invoices/{bp_number}/{contract_number}"
