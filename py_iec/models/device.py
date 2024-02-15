@@ -2,7 +2,7 @@ from dataclasses import dataclass, field
 
 from mashumaro import DataClassDictMixin, field_options
 
-from src.models.response_descriptor import ResponseDescriptor
+from py_iec.models.response_descriptor import ResponseDescriptor
 
 #
 # GET https://iecapi.iec.co.il//api/Device/{bp_number}
@@ -48,9 +48,9 @@ from src.models.response_descriptor import ResponseDescriptor
 class Device(DataClassDictMixin):
     """Device dataclass."""
 
-    device_type: int = field(metadata=field_options(alias="deviceType"))
-    device_number: str = field(metadata=field_options(alias="deviceNumber"))
-    device_code: str = field(metadata=field_options(alias="deviceCode"))
+    device_type: int | None = field(metadata=field_options(alias="deviceType"))
+    device_number: str | None = field(metadata=field_options(alias="deviceNumber"))
+    device_code: str | None = field(metadata=field_options(alias="deviceCode"))
     is_active: bool = field(metadata=field_options(alias="isActive"))
 
 

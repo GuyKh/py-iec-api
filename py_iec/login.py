@@ -3,24 +3,29 @@ import json
 import random
 import re
 import string
+from logging import getLogger
 from typing import Tuple
 
 import jwt
 import pkce
 import requests
 
-from src.models.jwt import JWT
+from py_iec.models.exceptions import IECLoginError
+from py_iec.models.jwt import JWT
 
-# CLIENT_ID = "0oantydrc56Nyf1qV2p7"
 APP_CLIENT_ID = "0oaqf6zr7yEcQZqqt2p7"
 CODE_CHALLENGE_METHOD = "S256"
-# REDIRECT_URI = "https://www.iec.co.il/"
 APP_REDIRECT_URI = "com.iecrn:/"
 code_verifier, code_challenge = pkce.generate_pkce_pair()
 STATE = "".join(random.choice(string.digits + string.ascii_letters) for _ in range(12))
 IEC_OKTA_BASE_URL = "https://iec-ext.okta.com"
 
-AUTHORIZE_URL = "https://iec-ext.okta.com/oauth2/default/v1/authorize?client_id={client_id}&response_type=id_token+code&response_mode=form_post&scope=openid%20email%20profile%20offline_access&redirect_uri=com.iecrn:/&state=123abc&nonce=abc123&code_challenge_method=S256&sessionToken={sessionToken}&code_challenge={challenge}"
+AUTHORIZE_URL = ("https://iec-ext.okta.com/oauth2/default/v1/authorize?client_id={"
+                 "client_id}&response_type=id_token+code&response_mode=form_post&scope=openid%20email%20profile"
+                 "%20offline_access&redirect_uri=com.iecrn:/&state=123abc&nonce=abc123&code_challenge_method=S256"
+                 "&sessionToken={sessionToken}&code_challenge={challenge}")
+
+logger = getLogger(__name__)
 
 
 def authorize_session(session_token) -> str:
@@ -109,13 +114,18 @@ def first_login(id_number: str) -> Tuple[str, str, str]:
     Returns:
         Tuple[str, str, str]: A tuple containing the state token, factor ID, and session token.
     """
-    # Get the first factor ID and state token
-    state_token, factor_id = get_first_factor_id(id_number)
 
-    # Send OTP code and get session token
-    session_token = send_otp_code(factor_id, state_token)
+    try:
+        # Get the first factor ID and state token
+        state_token, factor_id = get_first_factor_id(id_number)
 
-    return state_token, factor_id, session_token
+        # Send OTP code and get session token
+        session_token = send_otp_code(factor_id, state_token)
+
+        return state_token, factor_id, session_token
+    except Exception as error:
+        logger.warning("Failed at first login: %s", error)
+        raise IECLoginError(-1, "Failed at first login")
 
 
 def verify_otp_code(factor_id: str, state_token: str, otp_code: str) -> JWT:
@@ -130,10 +140,14 @@ def verify_otp_code(factor_id: str, state_token: str, otp_code: str) -> JWT:
     Returns:
         JWT: The JSON Web Token (JWT) for the authorized session.
     """
-    otp_session_token = send_otp_code(factor_id, state_token, otp_code)
-    code = authorize_session(otp_session_token)
-    jwt = get_access_token(code)
-    return jwt
+    try:
+        otp_session_token = send_otp_code(factor_id, state_token, otp_code)
+        code = authorize_session(otp_session_token)
+        jwt_token = get_access_token(code)
+        return jwt_token
+    except Exception as error:
+        logger.warning("Failed at OTP verification: %s", error)
+        raise IECLoginError(-1, "Failed at OTP verification")
 
 
 def manual_authorization(id_number) -> JWT | None:  # pragma: no cover
@@ -147,9 +161,11 @@ def manual_authorization(id_number) -> JWT | None:  # pragma: no cover
 
     otp_code = input("Enter your OTP code: ")
     code = authorize_session(otp_code)
-    jwt = verify_otp_code(factor_id, state_token, code)
-    print(f"Access token: {jwt.access_token}\nRefresh token: {jwt.refresh_token}\nid_token: {jwt.id_token}")
-    return jwt
+    jwt_token = verify_otp_code(factor_id, state_token, code)
+    print(f"Access token: {jwt_token.access_token}\n"
+          f"Refresh token: {jwt_token.refresh_token}\n"
+          f"id_token: {jwt_token.id_token}")
+    return jwt_token
 
 
 def refresh_token(token: JWT) -> JWT | None:
@@ -174,17 +190,3 @@ def load_token_from_file(path: str = "token.json") -> JWT:
         jwt_data = JWT.from_dict(json.load(f))
         jwt.decode(jwt_data.access_token, options={"verify_signature": False}, algorithms=["RS256"])
         return jwt_data
-
-
-class IECLoginError(Exception):
-    """Exception raised for errors in the IEC Login.
-
-    Attributes:
-        code -- input salary which caused the error.
-        error -- description of the error
-    """
-
-    def __init__(self, code, error):
-        self.code = code
-        self.error = error
-        super().__init__(f"(Code {self.code}): {self.error}")

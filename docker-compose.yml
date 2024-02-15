@@ -8,5 +8,5 @@ services:
       context: .
       target: "development"
     volumes:
-      - ".:/src"
+      - ".:/py_iec"
     env_file: .env

@@ -2,8 +2,8 @@ from dataclasses import dataclass, field
 
 from mashumaro import DataClassDictMixin, field_options
 
-from src.models.meter_reading import MeterReading
-from src.models.response_descriptor import ResponseDescriptor
+from py_iec.models.meter_reading import MeterReading
+from py_iec.models.response_descriptor import ResponseDescriptor
 
 # GET https://iecapi.iec.co.il//api/billingCollection/invoices/{bp_number}/{contract_number}
 #
@@ -67,7 +67,7 @@ class Invoice(DataClassDictMixin):
     invoice_payment_status: int = field(
         metadata=field_options(alias="invoicePaymentStatus")
     )
-    document_id: str = field(metadata=field_options(alias="documentId"))
+    document_id: str = field(metadata=field_options(alias="documentID"))
     days_period: str = field(metadata=field_options(alias="daysPeriod"))
     has_direct_debit: bool = field(metadata=field_options(alias="hasDirectDebit"))
     invoice_type: int = field(metadata=field_options(alias="invoiceType"))
