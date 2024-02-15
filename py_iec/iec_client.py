@@ -6,7 +6,7 @@ import jwt
 
 from py_iec import data, login
 from py_iec.commons import is_valid_israeli_id
-from py_iec.const import MINUTES_BEFORE_TO_REFRESH
+from py_iec.const import DEFAULT_MINUTES_BEFORE_TO_REFRESH
 from py_iec.models.contract import Contract
 from py_iec.models.customer import Customer
 from py_iec.models.device import Device, Devices
@@ -23,7 +23,8 @@ logger = getLogger(__name__)
 class IecClient:
     """ IEC API Client. """
 
-    def __init__(self, user_id: str | int, automatically_login: bool = False):
+    def __init__(self, user_id: str | int, automatically_login: bool = False,
+                 mins_before_token_refresh: int = DEFAULT_MINUTES_BEFORE_TO_REFRESH):
         """
         Initializes the class with the provided user ID and optionally logs in automatically.
 
@@ -45,6 +46,8 @@ class IecClient:
         self._login_response: str | None = None  # Response from the login attempt
         self._bp_number: str | None = None  # BP Number associated with the instance
         self._contract_id: str | None = None  # Contract ID associated with the instance
+        self._mins_before_token_refresh = mins_before_token_refresh # Minutes before requiring JWT token to refresh
+
         if automatically_login:
             self.login_with_id()  # Attempt to log in automatically if specified
 
@@ -316,7 +319,7 @@ class IecClient:
             remaining_to_expiration = self.get_token_remaining_time_to_expiration()
             if remaining_to_expiration < 0:
                 should_relogin = True
-            if remaining_to_expiration < datetime.timedelta(minutes=MINUTES_BEFORE_TO_REFRESH).seconds:
+            if remaining_to_expiration < datetime.timedelta(minutes=self._mins_before_token_refresh).seconds:
                 should_refresh = True
 
         except jwt.exceptions.ExpiredSignatureError:
@@ -332,7 +335,6 @@ class IecClient:
     def get_token_remaining_time_to_expiration(self):
         decoded_token = jwt.decode(self._token.id_token, options={"verify_signature": False}, algorithms=["RS256"])
         return decoded_token['exp'] - int(time.time())
-
 
     def refresh_token(self):
         """

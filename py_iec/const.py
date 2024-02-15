@@ -37,4 +37,4 @@ GET_DEVICES_BY_CONTRACT_ID_URL = IEC_API_BASE_URL + "Device/{bp_number}/{contrac
 GET_DEVICE_TYPE_URL = IEC_API_BASE_URL + "Device/type/{bp_number}/{contract_id}/false"
 GET_BILLING_INVOICES = IEC_API_BASE_URL + "billingCollection/invoices/{bp_number}/{contract_number}"
 
-MINUTES_BEFORE_TO_REFRESH = 20
+DEFAULT_MINUTES_BEFORE_TO_REFRESH = 20

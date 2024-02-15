@@ -17,12 +17,12 @@ from py_iec.const import (
     GET_REQUEST_READING_URL,
     HEADERS_WITH_AUTH,
 )
-from py_iec.login import IECLoginError
 from py_iec.models.contract import GetContractResponse
 from py_iec.models.customer import Customer
 from py_iec.models.device import Device, Devices, GetDeviceResponse
 from py_iec.models.device_type import DeviceType, DeviceTypeResponse
 from py_iec.models.electric_bill import GetElectricBillResponse
+from py_iec.models.exceptions import IECError
 from py_iec.models.invoice import GetInvoicesBody, GetInvoicesResponse
 from py_iec.models.jwt import JWT
 from py_iec.models.meter_reading import GetLastMeterReadingResponse
@@ -47,10 +47,11 @@ def get_customer(token: JWT) -> Customer:
         print(f"Failed Login: (Code {response.status_code}): {response.reason}")
         if len(response.content) > 0:
             login_error_response = ErrorResponseDescriptor.from_dict(response.json())
-            raise IECLoginError(login_error_response.code, login_error_response.error)
+            raise IECError(login_error_response.code, login_error_response.error)
         else:
-            raise IECLoginError(response.status_code, response.reason)
+            raise IECError(response.status_code, response.reason)
 
+    logger.debug("Response: %s", response.json())
     return Customer.from_dict(response.json())
 
 
@@ -67,10 +68,11 @@ def get_remote_reading(token: JWT, meter_serial_number: str, meter_code: int, la
         print(f"Failed Login: (Code {response.status_code}): {response.reason}")
         if len(response.content) > 0:
             login_error_response = ErrorResponseDescriptor.from_dict(response.json())
-            raise IECLoginError(login_error_response.code, login_error_response.error)
+            raise IECError(login_error_response.code, login_error_response.error)
         else:
-            raise IECLoginError(response.status_code, response.reason)
+            raise IECError(response.status_code, response.reason)
 
+    logger.debug("Response: %s", response.json())
     return RemoteReadingResponse.from_dict(response.json())
 
 
@@ -85,10 +87,11 @@ def get_electric_bill(token: JWT, bp_number: str, contract_id: str) -> GetElectr
         print(f"Failed Login: (Code {response.status_code}): {response.reason}")
         if len(response.content) > 0:
             login_error_response = ErrorResponseDescriptor.from_dict(response.json())
-            raise IECLoginError(login_error_response.code, login_error_response.error)
+            raise IECError(login_error_response.code, login_error_response.error)
         else:
-            raise IECLoginError(response.status_code, response.reason)
+            raise IECError(response.status_code, response.reason)
 
+    logger.debug("Response: %s", response.json())
     return GetElectricBillResponse.from_dict(response.json())
 
 
@@ -102,10 +105,11 @@ def get_default_contract(token: JWT, bp_number: str) -> GetContractResponse:
         print(f"Failed Login: (Code {response.status_code}): {response.reason}")
         if len(response.content) > 0:
             login_error_response = ErrorResponseDescriptor.from_dict(response.json())
-            raise IECLoginError(login_error_response.code, login_error_response.error)
+            raise IECError(login_error_response.code, login_error_response.error)
         else:
-            raise IECLoginError(response.status_code, response.reason)
+            raise IECError(response.status_code, response.reason)
 
+    logger.debug("Response: %s", response.json())
     return GetContractResponse.from_dict(response.json())
 
 
@@ -119,10 +123,11 @@ def get_contracts(token: JWT, bp_number: str) -> GetContractResponse:
         print(f"Failed Login: (Code {response.status_code}): {response.reason}")
         if len(response.content) > 0:
             login_error_response = ErrorResponseDescriptor.from_dict(response.json())
-            raise IECLoginError(login_error_response.code, login_error_response.error)
+            raise IECError(login_error_response.code, login_error_response.error)
         else:
-            raise IECLoginError(response.status_code, response.reason)
+            raise IECError(response.status_code, response.reason)
 
+    logger.debug("Response: %s", response.json())
     return GetContractResponse.from_dict(response.json())
 
 
@@ -137,10 +142,11 @@ def get_last_meter_reading(token: JWT, bp_number: str, contract_id: str) -> GetL
         print(f"Failed Login: (Code {response.status_code}): {response.reason}")
         if len(response.content) > 0:
             login_error_response = ErrorResponseDescriptor.from_dict(response.json())
-            raise IECLoginError(login_error_response.code, login_error_response.error)
+            raise IECError(login_error_response.code, login_error_response.error)
         else:
-            raise IECLoginError(response.status_code, response.reason)
+            raise IECError(response.status_code, response.reason)
 
+    logger.debug("Response: %s", response.json())
     return GetLastMeterReadingResponse.from_dict(response.json())
 
 
@@ -155,10 +161,11 @@ def get_devices(token: JWT, bp_number: str) -> list[Device]:
         print(f"Failed Login: (Code {response.status_code}): {response.reason}")
         if len(response.content) > 0:
             login_error_response = ErrorResponseDescriptor.from_dict(response.json())
-            raise IECLoginError(login_error_response.code, login_error_response.error)
+            raise IECError(login_error_response.code, login_error_response.error)
         else:
-            raise IECLoginError(response.status_code, response.reason)
+            raise IECError(response.status_code, response.reason)
 
+    logger.debug("Response: %s", response.json())
     return [Device.from_dict(device) for device in response.json()]
 
 
@@ -173,10 +180,11 @@ def get_devices_by_contract_id(token: JWT, bp_number: str, contract_id: str) -> 
         print(f"Failed Login: (Code {response.status_code}): {response.reason}")
         if len(response.content) > 0:
             login_error_response = ErrorResponseDescriptor.from_dict(response.json())
-            raise IECLoginError(login_error_response.code, login_error_response.error)
+            raise IECError(login_error_response.code, login_error_response.error)
         else:
-            raise IECLoginError(response.status_code, response.reason)
+            raise IECError(response.status_code, response.reason)
 
+    logger.debug("Response: %s", response.json())
     res = GetDeviceResponse.from_dict(response.json())
     return res.data
 
@@ -192,10 +200,11 @@ def get_device_type(token: JWT, bp_number: str, contract_id: str) -> DeviceType:
         print(f"Failed Login: (Code {response.status_code}): {response.reason}")
         if len(response.content) > 0:
             login_error_response = ErrorResponseDescriptor.from_dict(response.json())
-            raise IECLoginError(login_error_response.code, login_error_response.error)
+            raise IECError(login_error_response.code, login_error_response.error)
         else:
-            raise IECLoginError(response.status_code, response.reason)
+            raise IECError(response.status_code, response.reason)
 
+    logger.debug("Response: %s", response.json())
     resp = DeviceTypeResponse.from_dict(response.json())
     return resp.data
 
@@ -211,9 +220,10 @@ def get_billing_invoices(token: JWT, bp_number: str, contract_id: str) -> GetInv
         print(f"Failed Login: (Code {response.status_code}): {response.reason}")
         if len(response.content) > 0:
             login_error_response = ErrorResponseDescriptor.from_dict(response.json())
-            raise IECLoginError(login_error_response.code, login_error_response.error)
+            raise IECError(login_error_response.code, login_error_response.error)
         else:
-            raise IECLoginError(response.status_code, response.reason)
+            raise IECError(response.status_code, response.reason)
 
+    logger.debug("Response: %s", response.json())
     res = GetInvoicesResponse.from_dict(response.json())
     return res.data
