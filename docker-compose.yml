@@ -1,12 +1,12 @@
 version: "3.4"
 services:
-  py-iec:
+  iec-api:
     tty: true
-    image: "py-iec"
+    image: "iec-api"
     stdin_open: true
     build:
       context: .
       target: "development"
     volumes:
-      - ".:/py_iec"
+      - ".:/iec_api"
 #    env_file: .env

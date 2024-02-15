@@ -4,18 +4,18 @@ from logging import getLogger
 
 import jwt
 
-from py_iec import data, login
-from py_iec.commons import is_valid_israeli_id
-from py_iec.const import DEFAULT_MINUTES_BEFORE_TO_REFRESH
-from py_iec.models.contract import Contract
-from py_iec.models.customer import Customer
-from py_iec.models.device import Device, Devices
-from py_iec.models.device_type import DeviceType
-from py_iec.models.electric_bill import Invoices
-from py_iec.models.invoice import GetInvoicesBody
-from py_iec.models.jwt import JWT
-from py_iec.models.meter_reading import MeterReadings
-from py_iec.models.remote_reading import RemoteReadingResponse
+from iec_api import data, login
+from iec_api.commons import is_valid_israeli_id
+from iec_api.const import DEFAULT_MINUTES_BEFORE_TO_REFRESH
+from iec_api.models.contract import Contract
+from iec_api.models.customer import Customer
+from iec_api.models.device import Device, Devices
+from iec_api.models.device_type import DeviceType
+from iec_api.models.electric_bill import Invoices
+from iec_api.models.invoice import GetInvoicesBody
+from iec_api.models.jwt import JWT
+from iec_api.models.meter_reading import MeterReadings
+from iec_api.models.remote_reading import RemoteReadingResponse
 
 logger = getLogger(__name__)
 

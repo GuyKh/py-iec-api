@@ -3,8 +3,8 @@ import logging
 
 import requests
 
-from py_iec.commons import add_jwt_to_headers
-from py_iec.const import (
+from iec_api.commons import add_jwt_to_headers
+from iec_api.const import (
     GET_BILLING_INVOICES,
     GET_CONSUMER_URL,
     GET_CONTRACTS_URL,
@@ -17,17 +17,17 @@ from py_iec.const import (
     GET_REQUEST_READING_URL,
     HEADERS_WITH_AUTH,
 )
-from py_iec.models.contract import GetContractResponse
-from py_iec.models.customer import Customer
-from py_iec.models.device import Device, Devices, GetDeviceResponse
-from py_iec.models.device_type import DeviceType
-from py_iec.models.electric_bill import GetElectricBillResponse
-from py_iec.models.exceptions import IECError
-from py_iec.models.invoice import GetInvoicesBody, GetInvoicesResponse
-from py_iec.models.jwt import JWT
-from py_iec.models.meter_reading import GetLastMeterReadingResponse
-from py_iec.models.remote_reading import RemoteReadingRequest, RemoteReadingResponse
-from py_iec.models.response_descriptor import ErrorResponseDescriptor
+from iec_api.models.contract import GetContractResponse
+from iec_api.models.customer import Customer
+from iec_api.models.device import Device, Devices, GetDeviceResponse
+from iec_api.models.device_type import DeviceType
+from iec_api.models.electric_bill import GetElectricBillResponse
+from iec_api.models.exceptions import IECError
+from iec_api.models.invoice import GetInvoicesBody, GetInvoicesResponse
+from iec_api.models.jwt import JWT
+from iec_api.models.meter_reading import GetLastMeterReadingResponse
+from iec_api.models.remote_reading import RemoteReadingRequest, RemoteReadingResponse
+from iec_api.models.response_descriptor import ErrorResponseDescriptor
 
 logger = logging.getLogger(__name__)
 

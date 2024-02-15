@@ -13,4 +13,4 @@ RUN poetry install
 COPY . .
 
 FROM dependencies AS production
-COPY py_iec src
+COPY iec_api src
