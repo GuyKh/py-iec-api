@@ -27,3 +27,22 @@ def check_phone(phone):
     """
     if not phone or not re.match(PHONE_REGEX, phone):
         raise ValueError("Invalid phone number")
+
+
+def is_valid_israeli_id(id_number: str | int) -> bool:
+    """
+    Check if the ID number is valid.
+    Args:
+    id_number (str): The ID number to be checked.
+    Returns:
+    bool: True if the ID number is valid, False otherwise.
+    """
+
+    id_str = str(id_number).strip()
+    if len(id_str) > 9 or not id_str.isdigit():
+        return False
+    id_str = id_str.zfill(9)
+    return sum(
+        (int(digit) if i % 2 == 0 else int(digit) * 2 if int(digit) * 2 < 10 else int(digit) * 2 - 9) for i, digit
+        in enumerate(id_str)) % 10 == 0
+

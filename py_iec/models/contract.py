@@ -4,7 +4,7 @@ from dataclasses import dataclass, field
 
 from mashumaro import DataClassDictMixin, field_options
 
-from src.models.response_descriptor import ResponseDescriptor
+from py_iec.models.response_descriptor import ResponseDescriptor
 
 # GET https://iecapi.iec.co.il//api/customer/contract/{bp_number}?count=1
 #

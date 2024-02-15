@@ -4,7 +4,7 @@ APP_NAME="py-iec"
 # COMMANDS TO RUN LOCALLY
 ################################
 
-local/install: generate-default-env-file
+local/install:
 	poetry install
 
 local/tests:
@@ -25,7 +25,7 @@ local/run:
 # COMMANDS TO RUN USING DOCKER (RECOMMENDED)
 ############################################
 
-docker/install: generate-default-env-file
+docker/install:
 	docker-compose build ${APP_NAME}
 
 docker/up:
@@ -49,6 +49,3 @@ docker/run:
 ##################
 # HEPFUL COMMANDS
 ##################
-
-generate-default-env-file:
-	@if [ ! -f .env ]; then cp env.template .env; fi;

@@ -13,5 +13,4 @@ RUN poetry install
 COPY . .
 
 FROM dependencies AS production
-COPY src src
-COPY settings.toml src
+COPY py_iec src
