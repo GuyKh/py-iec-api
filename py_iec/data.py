@@ -20,7 +20,7 @@ from py_iec.const import (
 from py_iec.models.contract import GetContractResponse
 from py_iec.models.customer import Customer
 from py_iec.models.device import Device, Devices, GetDeviceResponse
-from py_iec.models.device_type import DeviceType, DeviceTypeResponse
+from py_iec.models.device_type import DeviceType
 from py_iec.models.electric_bill import GetElectricBillResponse
 from py_iec.models.exceptions import IECError
 from py_iec.models.invoice import GetInvoicesBody, GetInvoicesResponse
