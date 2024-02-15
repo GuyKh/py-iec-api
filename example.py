@@ -16,7 +16,7 @@ logger = getLogger(__name__)
 if __name__ == "__main__":  # pragma: no cover
     try:
         # Example of usage
-        client = IecClient(123456782)
+        client = IecClient("123456782")
 
         token_json_file = "token.json"
         if os.path.exists(token_json_file):
@@ -29,6 +29,11 @@ if __name__ == "__main__":  # pragma: no cover
                 client.save_token(token_json_file)
             except IECLoginError as err:
                 logger.error("Failed Login: (Code %d): %s", err.code, err.error)
+
+        # refresh token example
+        #token = client.refresh_token()
+        #client.save_token(token_json_file)
+        #exit(1)
 
         # client.manual_login()
         customer = client.get_customer()
