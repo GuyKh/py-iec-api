@@ -9,4 +9,4 @@ services:
       target: "development"
     volumes:
       - ".:/py_iec"
-    env_file: .env
+#    env_file: .env
