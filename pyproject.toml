@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "iec-api"
-version = "0.1.1"
+version = "0.1.2"
 description = "A Python wrapper for Israel Electric Company API"
 authors = ["GuyKh"]
 license = "MIT"
