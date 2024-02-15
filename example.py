@@ -3,9 +3,9 @@
 import os
 from logging import config, getLogger
 
-from py_iec.iec_client import IecClient
-from py_iec.login import IECLoginError
-from py_iec.models.exceptions import IECError
+from iec_api.iec_client import IecClient
+from iec_api.login import IECLoginError
+from iec_api.models.exceptions import IECError
 
 ROOT_DIR = os.path.dirname(
     os.path.abspath(__file__)

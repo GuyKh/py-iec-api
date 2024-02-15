@@ -1,4 +1,4 @@
-APP_NAME="py-iec"
+APP_NAME="iec-api"
 
 ################################
 # COMMANDS TO RUN LOCALLY

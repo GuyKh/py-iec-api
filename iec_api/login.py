@@ -10,8 +10,8 @@ import jwt
 import pkce
 import requests
 
-from py_iec.models.exceptions import IECLoginError
-from py_iec.models.jwt import JWT
+from iec_api.models.exceptions import IECLoginError
+from iec_api.models.jwt import JWT
 
 APP_CLIENT_ID = "0oaqf6zr7yEcQZqqt2p7"
 CODE_CHALLENGE_METHOD = "S256"

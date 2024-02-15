@@ -1,4 +1,4 @@
-# py-iec - Developer information
+# iec-api - Developer information
 
 A python wrapper for Israel Electric Company API
 
