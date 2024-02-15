@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "iec-api"
-version = "0.1.2"
+version = "0.1.3"
 description = "A Python wrapper for Israel Electric Company API"
 authors = ["GuyKh"]
 license = "MIT"
@@ -13,7 +13,7 @@ homepage = "https://pypi.org/project/iec-api/"
 keywords = ["python", "poetry", "api", "iec", "israel", "electric"]
 
 [tool.poetry.dependencies]
-python = "^3.9"
+python = "^3.10"
 mashumaro = "^3.12"
 pyjwt = "^2.8.0"
 requests = "^2.31.0"
