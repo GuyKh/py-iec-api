@@ -170,8 +170,8 @@ def manual_authorization(id_number) -> JWT | None:  # pragma: no cover
 
 def refresh_token(token: JWT) -> JWT | None:
     """Refresh IEC JWT token."""
-    headers = {"accept": "application/json", "content-type": "application/json"}
-    data = {"refresh_token": token.refresh_token}
+    headers = {"accept": "application/json", "content-type": "application/x-www-form-urlencoded"}
+    data = {"refresh_token": token.refresh_token,"grant_type":"refresh_token","client_id":APP_CLIENT_ID}
     response = requests.post(f"{IEC_OKTA_BASE_URL}/oauth2/default/v1/token", data=data, headers=headers, timeout=10)
     if response.status_code == 200:
         return JWT.from_dict(response.json())

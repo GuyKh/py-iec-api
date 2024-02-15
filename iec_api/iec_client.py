@@ -342,8 +342,11 @@ class IecClient:
         """
         Refresh IEC JWT token.
         """
-        self._token = login.refresh_token(self._token)
-        self.logged_in = True
+        token = login.refresh_token(self._token)
+        if token:
+            self._token = token
+            self.logged_in = True
+            self.save_token()
 
     def load_token(self, file_path: str = "token.json"):
         """
