@@ -316,25 +316,24 @@ class IecClient:
         should_relogin = False
 
         try:
-            remaining_to_expiration = self.get_token_remaining_time_to_expiration()
+            decoded_token = jwt.decode(self._token.id_token, options={"verify_signature": False}, algorithms=["RS256"])
+            remaining_to_expiration = decoded_token['exp'] - int(time.time())
             if remaining_to_expiration < 0:
                 should_relogin = True
-            if remaining_to_expiration < datetime.timedelta(minutes=self._mins_before_token_refresh).seconds:
+            if remaining_to_expiration < datetime.timedelta(minutes=MINUTES_BEFORE_TO_REFRESH).seconds:
                 should_refresh = True
 
         except jwt.exceptions.ExpiredSignatureError:
             should_relogin = True
 
         if should_refresh:
+            logger.debug("jwt.py token is about to expire, refreshing token")
             self.logged_in = False
             self.refresh_token()
 
         if should_relogin:
+            logger.debug("jwt.py token expired, retrying login")
             self.logged_in = False
-
-    def get_token_remaining_time_to_expiration(self):
-        decoded_token = jwt.decode(self._token.id_token, options={"verify_signature": False}, algorithms=["RS256"])
-        return decoded_token['exp'] - int(time.time())
 
     def refresh_token(self):
         """
