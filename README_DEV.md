@@ -4,7 +4,7 @@ A python wrapper for Israel Electric Company API
 
 ## Technology and Resources
 
-- [Python 3.11](https://www.python.org/downloads/release/python-3110/) - **pre-requisite**
+- [Python 3.10](https://www.python.org/downloads/release/python-3100/) - **pre-requisite**
 - [Docker](https://www.docker.com/get-started) - **pre-requisite**
 - [Docker Compose](https://docs.docker.com/compose/) - **pre-requisite**
 - [Poetry](https://python-poetry.org/) - **pre-requisite**
