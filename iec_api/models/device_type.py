@@ -2,7 +2,7 @@ from dataclasses import dataclass, field
 
 from mashumaro import DataClassDictMixin, field_options
 
-from py_iec.models.response_descriptor import ResponseDescriptor
+from iec_api.models.response_descriptor import ResponseDescriptor
 
 #
 # GET https://iecapi.iec.co.il//api/Device/type/{bp_number}/{contract_id}/false
