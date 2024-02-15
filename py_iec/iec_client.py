@@ -284,7 +284,7 @@ class IecClient:
 
         return data.get_device_type(self._token, bp_number, contract_id)
 
-    def get_billing_invoices(self, bp_number: str | None = None, contract_id: str | None = None) -> GetInvoicesBody:
+    def get_billing_invoices(self, bp_number: str, contract_id: str) -> GetInvoicesBody:
         """
         Get a list of devices for the user
         Args:
