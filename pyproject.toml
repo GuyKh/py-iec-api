@@ -5,6 +5,12 @@ description = "A Python wrapper for Israel Electric Company API"
 authors = ["GuyKh"]
 license = "MIT"
 readme = "README.md"
+maintainers = [
+    "Guy Khmelnitsky <guykhmel@gmail.com>",
+]
+repository = "https://github.com/GuyKh/py-iec-api"
+homepage = "https://pypi.org/project/iec-api/"
+keywords = ["python", "poetry", "api", "iec", "israel", "electric"]
 
 [tool.poetry.dependencies]
 python = "^3.11"
