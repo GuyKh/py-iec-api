@@ -171,7 +171,6 @@ def manual_authorization(id_number) -> JWT | None:  # pragma: no cover
 def refresh_token(token: JWT) -> JWT | None:
     """Refresh IEC JWT token."""
     headers = {"accept": "application/json", "content-type": "application/x-www-form-urlencoded"}
-    data = {"refresh_token": token.refresh_token, "grant_type": "refresh_token", "scope": "openid email profile offline_access"}
     data = {
         "client_id": APP_CLIENT_ID,
         "redirect_uri": APP_REDIRECT_URI,
