@@ -1,4 +1,5 @@
 from dataclasses import dataclass, field
+from typing import Optional
 
 from mashumaro import DataClassDictMixin, field_options
 
@@ -48,9 +49,9 @@ from iec_api.models.response_descriptor import ResponseDescriptor
 class Device(DataClassDictMixin):
     """Device dataclass."""
 
-    device_type: int | None = field(metadata=field_options(alias="deviceType"))
-    device_number: str | None = field(metadata=field_options(alias="deviceNumber"))
-    device_code: str | None = field(metadata=field_options(alias="deviceCode"))
+    device_type: Optional[int] = field(metadata=field_options(alias="deviceType"))
+    device_number: Optional[str] = field(metadata=field_options(alias="deviceNumber"))
+    device_code: Optional[str] = field(metadata=field_options(alias="deviceCode"))
     is_active: bool = field(metadata=field_options(alias="isActive"))
 
 
@@ -77,7 +78,7 @@ class CounterDevice(DataClassDictMixin):
 @dataclass
 class Devices(DataClassDictMixin):
     """Devices dataclass."""
-    counter_devices: list[CounterDevice] | None = field(metadata=field_options(alias="counterDevices"))
+    counter_devices: Optional[list[CounterDevice]] = field(metadata=field_options(alias="counterDevices"))
     mr_type: str = field(metadata=field_options(alias="mrType"))
 
 

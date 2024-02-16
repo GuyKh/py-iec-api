@@ -1,6 +1,7 @@
 import datetime
 import time
 from logging import getLogger
+from typing import Optional
 
 import jwt
 
@@ -36,17 +37,17 @@ class IecClient:
         if not is_valid_israeli_id(user_id):
             raise ValueError("User ID must be a valid Israeli ID.")
 
-        self._state_token: str | None = None  # Token for maintaining the state of the user's session
-        self._factor_id: str | None = None  # Factor ID for multi-factor authentication
-        self._session_token: str | None = None  # Token for maintaining the user's session
+        self._state_token: Optional[str] = None  # Token for maintaining the state of the user's session
+        self._factor_id: Optional[str] = None  # Factor ID for multifactor authentication
+        self._session_token: Optional[str] = None  # Token for maintaining the user's session
         self.logged_in: bool = False  # Flag to indicate if the user is logged in
         self._token: JWT = JWT(access_token="", refresh_token="", token_type="", expires_in=0,
                                scope="", id_token="")  # Token for authentication
         self._user_id: str = str(user_id)  # User ID associated with the instance
-        self._login_response: str | None = None  # Response from the login attempt
-        self._bp_number: str | None = None  # BP Number associated with the instance
-        self._contract_id: str | None = None  # Contract ID associated with the instance
-        self._mins_before_token_refresh = mins_before_token_refresh # Minutes before requiring JWT token to refresh
+        self._login_response: Optional[str] = None  # Response from the login attempt
+        self._bp_number: Optional[str] = None  # BP Number associated with the instance
+        self._contract_id: Optional[str] = None  # Contract ID associated with the instance
+        self._mins_before_token_refresh = mins_before_token_refresh  # Minutes before requiring JWT token to refresh
 
         if automatically_login:
             self.login_with_id()  # Attempt to log in automatically if specified
@@ -102,7 +103,7 @@ class IecClient:
             self._bp_number = customer.bp_number
         return customer
 
-    def get_default_contract(self, bp_number: str = None) -> Contract | None:
+    def get_default_contract(self, bp_number: str = None) -> Optional[Contract]:
         """
         This function retrieves the default contract based on the given BP number.
         :param bp_number: A string representing the BP number
@@ -146,8 +147,8 @@ class IecClient:
             return contracts
         return []
 
-    def get_last_meter_reading(self, bp_number: str | None = None,
-                               contract_id: str | None = None) -> MeterReadings | None:
+    def get_last_meter_reading(self, bp_number: Optional[str] = None,
+                               contract_id: Optional[str] = None) -> Optional[MeterReadings]:
         """
         Retrieves a last meter reading for a specific contract and user.
         Args:
@@ -173,7 +174,8 @@ class IecClient:
             return response.data
         return None
 
-    def get_electric_bill(self, bp_number: str | None = None, contract_id: str | None = None) -> Invoices | None:
+    def get_electric_bill(self, bp_number: Optional[str] = None, contract_id: Optional[str] = None) \
+            -> Optional[Invoices]:
         """
         Retrieves a remote reading for a specific meter using the provided parameters.
         Args:
@@ -200,7 +202,7 @@ class IecClient:
             return response.data
         return None
 
-    def get_devices(self, bp_number: str | None = None) -> list[Device] | None:
+    def get_devices(self, bp_number: Optional[str] = None) -> Optional[list[Device]]:
         """
         Get a list of devices for the user
         Args:
@@ -218,7 +220,7 @@ class IecClient:
 
         return data.get_devices(self._token, bp_number)
 
-    def get_devices_by_contract_id(self, bp_number: str | None = None, contract_id: str | None = None) -> Devices:
+    def get_devices_by_contract_id(self, bp_number: Optional[str] = None, contract_id: Optional[str] = None) -> Devices:
         """
         Get a list of devices for the user
         Args:
@@ -260,7 +262,7 @@ class IecClient:
         return data.get_remote_reading(self._token, meter_serial_number, meter_code,
                                        last_invoice_date, from_date, resolution)
 
-    def get_device_type(self, bp_number: str | None = None, contract_id: str | None = None) -> DeviceType:
+    def get_device_type(self, bp_number: Optional[str] = None, contract_id: Optional[str] = None) -> DeviceType:
         """
         Get a list of devices for the user
         Args:
@@ -284,7 +286,8 @@ class IecClient:
 
         return data.get_device_type(self._token, bp_number, contract_id)
 
-    def get_billing_invoices(self, bp_number: str, contract_id: str) -> GetInvoicesBody:
+    def get_billing_invoices(self, bp_number: Optional[str] = None, contract_id: Optional[str] = None) \
+            -> GetInvoicesBody:
         """
         Get a list of devices for the user
         Args:

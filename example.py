@@ -10,7 +10,7 @@ from iec_api.models.exceptions import IECError
 ROOT_DIR = os.path.dirname(
     os.path.abspath(__file__)
 )
-config.fileConfig("logging.conf", disable_existing_loggers=False)
+config.fileConfig(ROOT_DIR + "/logging.conf", disable_existing_loggers=False)
 logger = getLogger(__name__)
 
 if __name__ == "__main__":  # pragma: no cover
