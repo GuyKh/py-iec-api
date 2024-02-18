@@ -3,10 +3,11 @@ import time
 from logging import getLogger
 
 import jwt
+from aiohttp import ClientSession
 
 from iec_api import data, login
-from iec_api.commons import is_valid_israeli_id
-from iec_api.const import DEFAULT_MINUTES_BEFORE_TO_REFRESH
+from iec_api.commons import add_jwt_to_headers, is_valid_israeli_id
+from iec_api.const import DEFAULT_MINUTES_BEFORE_TO_REFRESH, HEADERS_WITH_AUTH
 from iec_api.models.contract import Contract
 from iec_api.models.customer import Customer
 from iec_api.models.device import Device, Devices
@@ -23,7 +24,7 @@ logger = getLogger(__name__)
 class IecClient:
     """ IEC API Client. """
 
-    def __init__(self, user_id: str | int, automatically_login: bool = False,
+    def __init__(self, session: ClientSession, user_id: str | int, automatically_login: bool = False,
                  mins_before_token_refresh: int = DEFAULT_MINUTES_BEFORE_TO_REFRESH):
         """
         Initializes the class with the provided user ID and optionally logs in automatically.
@@ -36,6 +37,7 @@ class IecClient:
         if not is_valid_israeli_id(user_id):
             raise ValueError("User ID must be a valid Israeli ID.")
 
+        self._session = session  # Web session
         self._state_token: str | None = None  # Token for maintaining the state of the user's session
         self._factor_id: str | None = None  # Factor ID for multi-factor authentication
         self._session_token: str | None = None  # Token for maintaining the user's session
@@ -46,38 +48,43 @@ class IecClient:
         self._login_response: str | None = None  # Response from the login attempt
         self._bp_number: str | None = None  # BP Number associated with the instance
         self._contract_id: str | None = None  # Contract ID associated with the instance
-        self._mins_before_token_refresh = mins_before_token_refresh # Minutes before requiring JWT token to refresh
+        self._mins_before_token_refresh = mins_before_token_refresh  # Minutes before requiring JWT token to refresh
 
         if automatically_login:
             self.login_with_id()  # Attempt to log in automatically if specified
 
-    def login_with_id(self):
+    async def login_with_id(self):
         """
         Login with ID and wait for OTP
         """
-        state_token, factor_id, session_token = self._login_response = login.first_login(self._user_id)
+        state_token, factor_id, session_token = self._login_response = await login.first_login(self._session,
+                                                                                               self._user_id)
         self._state_token = state_token
         self._factor_id = factor_id
         self._session_token = session_token
 
-    def verify_otp(self, otp_code: str | int) -> bool:
+    async def verify_otp(self, otp_code: str | int) -> bool:
         """
         Verify the OTP code and return the token
         :param otp_code: The OTP code to be verified
         :return: The token
         """
-        jwt_token = login.verify_otp_code(self._factor_id, self._state_token, str(otp_code))
+        jwt_token = await login.verify_otp_code(self._session, self._factor_id, self._state_token, str(otp_code))
         self._token = jwt_token
+        headers = add_jwt_to_headers(HEADERS_WITH_AUTH, self._token.id_token)
+        self._session.headers.update(headers)
         self.logged_in = True
         return True
 
-    def manual_login(self):
+    async def manual_login(self):
         """
         Logs the user in by obtaining an authorization token, setting the authorization header,
         and updating the login status and token attribute.
         """
-        token = login.manual_authorization(self._user_id)
+        token = await login.manual_authorization(self._session, self._user_id)
         self.logged_in = True
+        headers = add_jwt_to_headers(HEADERS_WITH_AUTH, self._token.id_token)
+        self._session.headers.update(headers)
         self._token = token
 
     def override_token(self, token):
@@ -89,20 +96,22 @@ class IecClient:
         logger.debug("Overriding jwt.py token: %s", token)
         self._token = JWT(access_token="", refresh_token="", token_type="", expires_in=0, scope="", id_token=token)
         self._token.id_token = token
+        headers = add_jwt_to_headers(HEADERS_WITH_AUTH, self._token.id_token)
+        self._session.headers.update(headers)
         self.logged_in = True
 
-    def get_customer(self) -> Customer:
+    async def get_customer(self) -> Customer:
         """
         Get consumer data response from IEC API.
         :return: Customer data
         """
         self.check_token()
-        customer = data.get_customer(self._token)
+        customer = await data.get_customer(self._session, self._token)
         if customer:
             self._bp_number = customer.bp_number
         return customer
 
-    def get_default_contract(self, bp_number: str = None) -> Contract | None:
+    async def get_default_contract(self, bp_number: str = None) -> Contract | None:
         """
         This function retrieves the default contract based on the given BP number.
         :param bp_number: A string representing the BP number
@@ -116,7 +125,7 @@ class IecClient:
 
         assert bp_number, "BP number must be provided"
 
-        get_contract_response = data.get_contracts(self._token, bp_number)
+        get_contract_response = await data.get_contracts(self._session, self._token, bp_number)
         if get_contract_response and get_contract_response.data:
             contracts = get_contract_response.data.contracts
             if contracts and len(contracts) > 0:
@@ -124,7 +133,7 @@ class IecClient:
             return contracts[0]
         return None
 
-    def get_contracts(self, bp_number: str = None) -> list[Contract]:
+    async def get_contracts(self, bp_number: str = None) -> list[Contract]:
         """
         This function retrieves a contract based on the given BP number.
         :param bp_number: A string representing the BP number
@@ -138,7 +147,7 @@ class IecClient:
 
         assert bp_number, "BP number must be provided"
 
-        get_contract_response = data.get_contracts(self._token, bp_number)
+        get_contract_response = await data.get_contracts(self._session, self._token, bp_number)
         if get_contract_response and get_contract_response.data:
             contracts = get_contract_response.data.contracts
             if contracts and len(contracts) > 0:
@@ -146,8 +155,8 @@ class IecClient:
             return contracts
         return []
 
-    def get_last_meter_reading(self, bp_number: str | None = None,
-                               contract_id: str | None = None) -> MeterReadings | None:
+    async def get_last_meter_reading(self, bp_number: str | None = None,
+                                     contract_id: str | None = None) -> MeterReadings | None:
         """
         Retrieves a last meter reading for a specific contract and user.
         Args:
@@ -168,12 +177,12 @@ class IecClient:
 
         assert contract_id, "Contract ID must be provided"
 
-        response = data.get_last_meter_reading(self._token, bp_number, contract_id)
+        response = await data.get_last_meter_reading(self._session, self._token, bp_number, contract_id)
         if response and response.data:
             return response.data
         return None
 
-    def get_electric_bill(self, bp_number: str | None = None, contract_id: str | None = None) -> Invoices | None:
+    async def get_electric_bill(self, bp_number: str | None = None, contract_id: str | None = None) -> Invoices | None:
         """
         Retrieves a remote reading for a specific meter using the provided parameters.
         Args:
@@ -195,12 +204,12 @@ class IecClient:
 
         assert contract_id, "Contract ID must be provided"
 
-        response = data.get_electric_bill(self._token, bp_number, contract_id)
+        response = await data.get_electric_bill(self._session, self._token, bp_number, contract_id)
         if response.data:
             return response.data
         return None
 
-    def get_devices(self, bp_number: str | None = None) -> list[Device] | None:
+    async def get_devices(self, bp_number: str | None = None) -> list[Device] | None:
         """
         Get a list of devices for the user
         Args:
@@ -216,9 +225,9 @@ class IecClient:
 
         assert bp_number, "BP number must be provided"
 
-        return data.get_devices(self._token, bp_number)
+        return await data.get_devices(self._session, self._token, bp_number)
 
-    def get_devices_by_contract_id(self, bp_number: str | None = None, contract_id: str | None = None) -> Devices:
+    async def get_devices_by_contract_id(self, bp_number: str | None = None, contract_id: str | None = None) -> Devices:
         """
         Get a list of devices for the user
         Args:
@@ -240,10 +249,10 @@ class IecClient:
 
         assert contract_id, "Contract ID must be provided"
 
-        return data.get_devices_by_contract_id(self._token, bp_number, contract_id)
+        return await data.get_devices_by_contract_id(self._session, self._token, bp_number, contract_id)
 
-    def get_remote_reading(self, meter_serial_number: str, meter_code: int, last_invoice_date: str, from_date: str,
-                           resolution: int) -> RemoteReadingResponse:
+    async def get_remote_reading(self, meter_serial_number: str, meter_code: int, last_invoice_date: str,
+                                 from_date: str, resolution: int) -> RemoteReadingResponse:
         """
         Retrieves a remote reading for a specific meter using the provided parameters.
         Args:
@@ -257,10 +266,10 @@ class IecClient:
             RemoteReadingResponse: The response containing the remote reading.
         """
         self.check_token()
-        return data.get_remote_reading(self._token, meter_serial_number, meter_code,
-                                       last_invoice_date, from_date, resolution)
+        return await data.get_remote_reading(self._session, self._token, meter_serial_number, meter_code,
+                                             last_invoice_date, from_date, resolution)
 
-    def get_device_type(self, bp_number: str | None = None, contract_id: str | None = None) -> DeviceType:
+    async def get_device_type(self, bp_number: str | None = None, contract_id: str | None = None) -> DeviceType:
         """
         Get a list of devices for the user
         Args:
@@ -282,9 +291,9 @@ class IecClient:
 
         assert contract_id, "Contract ID must be provided"
 
-        return data.get_device_type(self._token, bp_number, contract_id)
+        return await data.get_device_type(self._session, self._token, bp_number, contract_id)
 
-    def get_billing_invoices(self, bp_number: str, contract_id: str) -> GetInvoicesBody:
+    async def get_billing_invoices(self, bp_number: str, contract_id: str) -> GetInvoicesBody:
         """
         Get a list of devices for the user
         Args:
@@ -306,7 +315,7 @@ class IecClient:
 
         assert contract_id, "Contract ID must be provided"
 
-        return data.get_billing_invoices(self._token, bp_number, contract_id)
+        return await data.get_billing_invoices(self._session, self._token, bp_number, contract_id)
 
     def check_token(self):
         """
@@ -338,11 +347,13 @@ class IecClient:
         decoded_token = jwt.decode(self._token.id_token, options={"verify_signature": False}, algorithms=["RS256"])
         return decoded_token['exp'] - int(time.time())
 
-    def refresh_token(self):
+    async def refresh_token(self):
         """
         Refresh IEC JWT token.
         """
-        self._token = login.refresh_token(self._token)
+        self._token = await login.refresh_token(self._session, self._token)
+        headers = add_jwt_to_headers(HEADERS_WITH_AUTH, self._token.id_token)
+        self._session.headers.update(headers)
         self.logged_in = True
 
     def load_token(self, file_path: str = "token.json"):

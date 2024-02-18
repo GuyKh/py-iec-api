@@ -8,8 +8,9 @@ from typing import Tuple
 
 import jwt
 import pkce
-import requests
+from aiohttp import ClientSession
 
+from iec_api.commons import send_get_request, send_post_request
 from iec_api.models.exceptions import IECLoginError
 from iec_api.models.jwt import JWT
 
@@ -28,23 +29,24 @@ AUTHORIZE_URL = ("https://iec-ext.okta.com/oauth2/default/v1/authorize?client_id
 logger = getLogger(__name__)
 
 
-def authorize_session(session_token) -> str:
+async def authorize_session(session: ClientSession, session_token: str) -> str:
     """
     Authorizes a session using the provided session token.
     Args:
+        session (ClientSession): Client Session
         session_token (str): The session token to be used for authorization.
     Returns:
         str: The code obtained from the authorization response.
     """
     cmd_url = AUTHORIZE_URL.format(client_id=APP_CLIENT_ID, sessionToken=session_token, challenge=code_challenge)
-    authorize_response = requests.get(cmd_url, timeout=10)
+    authorize_response = await send_get_request(session, cmd_url, timeout=10)
     code = re.findall(r"<input type=\"hidden\" name=\"code\" value=\"(.+)\"/>",
-                      authorize_response.content.decode('unicode-escape')
+                      authorize_response.get('content').decode('unicode-escape')
                       .encode('latin1').decode('utf-8'))[0]
     return code
 
 
-def get_first_factor_id(user_id: str):
+async def get_first_factor_id(session: ClientSession, user_id: str):
     """
     Function to get the first factor ID using the provided ID.
         Args:
@@ -55,15 +57,18 @@ def get_first_factor_id(user_id: str):
     data = {"username": f"{user_id}@iec.co.il"}
     headers = {"accept": "application/json", "content-type": "application/json"}
 
-    response = requests.post(f"{IEC_OKTA_BASE_URL}/api/v1/authn", data=json.dumps(data), headers=headers, timeout=10)
-    return response.json().get("stateToken", ""), response.json().get("_embedded", {}).get("factors", {})[0].get("id")
+    response = await send_post_request(session, f"{IEC_OKTA_BASE_URL}/api/v1/authn", data=data, headers=headers,
+                                       timeout=10)
+    return response.get("stateToken", ""), response.get("_embedded", {}).get("factors", {})[0].get("id")
 
 
-def send_otp_code(factor_id: object, state_token: object, pass_code: object = None) -> str | None:
+async def send_otp_code(session: ClientSession, factor_id: object, state_token: object,
+                        pass_code: object = None) -> str | None:
     """
     Send OTP code for factor verification and return the session token if successful.
 
     Args:
+        session (ClientSession): Client Session
         factor_id (object): The identifier of the factor for verification.
         state_token (object): The state token for the verification process.
         pass_code (object, optional): The pass code for verification. Defaults to None.
@@ -76,19 +81,21 @@ def send_otp_code(factor_id: object, state_token: object, pass_code: object = No
         data["passCode"] = pass_code
     headers = {"accept": "application/json", "content-type": "application/json"}
 
-    response = requests.post(
-        f"{IEC_OKTA_BASE_URL}/api/v1/authn/factors/{factor_id}/verify", data=json.dumps(data),
+    response = await send_post_request(
+        session,
+        f"{IEC_OKTA_BASE_URL}/api/v1/authn/factors/{factor_id}/verify", data=data,
         headers=headers, timeout=10
     )
-    if response.json().get("status") == "SUCCESS":
-        return response.json().get("sessionToken")
+    if response.get("status") == "SUCCESS":
+        return response.get("sessionToken")
     return None
 
 
-def get_access_token(code) -> JWT:
+async def get_access_token(session: ClientSession, code: str) -> JWT:
     """
     Get the access token using the provided authorization code.
     Args:
+        session (ClientSession): Client Session
         code (str): The authorization code.
     Returns:
         JWT: The access token as a JWT object.
@@ -100,15 +107,17 @@ def get_access_token(code) -> JWT:
         "redirect_uri": APP_REDIRECT_URI,
         "code": code,
     }
-    response = requests.post(f"{IEC_OKTA_BASE_URL}/oauth2/default/v1/token", data=data, timeout=10)
-    return JWT.from_dict(response.json())
+    response = await send_post_request(session, f"{IEC_OKTA_BASE_URL}/oauth2/default/v1/token",
+                                       data=data, timeout=10)
+    return JWT.from_dict(response)
 
 
-def first_login(id_number: str) -> Tuple[str, str, str]:
+async def first_login(session: ClientSession, id_number: str) -> Tuple[str, str, str]:
     """
     Perform the first login for a user.
 
     Args:
+        session (ClientSession): Client Session
         id_number (str): The user's ID number.
 
     Returns:
@@ -117,10 +126,10 @@ def first_login(id_number: str) -> Tuple[str, str, str]:
 
     try:
         # Get the first factor ID and state token
-        state_token, factor_id = get_first_factor_id(id_number)
+        state_token, factor_id = await get_first_factor_id(session, id_number)
 
         # Send OTP code and get session token
-        session_token = send_otp_code(factor_id, state_token)
+        session_token = await send_otp_code(session, factor_id, state_token)
 
         return state_token, factor_id, session_token
     except Exception as error:
@@ -128,11 +137,12 @@ def first_login(id_number: str) -> Tuple[str, str, str]:
         raise IECLoginError(-1, "Failed at first login")
 
 
-def verify_otp_code(factor_id: str, state_token: str, otp_code: str) -> JWT:
+async def verify_otp_code(session: ClientSession, factor_id: str, state_token: str, otp_code: str) -> JWT:
     """
     Verify the OTP code for the given factor_id, state_token, and otp_code and return the JWT.
 
     Args:
+        session (ClientSession): Client Session
         factor_id (str): The factor ID for the OTP verification.
         state_token (str): The state token for the OTP verification.
         otp_code (str): The OTP code to be verified.
@@ -141,34 +151,34 @@ def verify_otp_code(factor_id: str, state_token: str, otp_code: str) -> JWT:
         JWT: The JSON Web Token (JWT) for the authorized session.
     """
     try:
-        otp_session_token = send_otp_code(factor_id, state_token, otp_code)
-        code = authorize_session(otp_session_token)
-        jwt_token = get_access_token(code)
+        otp_session_token = await send_otp_code(session, factor_id, state_token, otp_code)
+        code = await authorize_session(session, otp_session_token)
+        jwt_token = await get_access_token(session, code)
         return jwt_token
     except Exception as error:
         logger.warning("Failed at OTP verification: %s", error)
         raise IECLoginError(-1, "Failed at OTP verification")
 
 
-def manual_authorization(id_number) -> JWT | None:  # pragma: no cover
+async def manual_authorization(session: ClientSession, id_number: str | int) -> JWT | None:  # pragma: no cover
     """Get authorization token from IEC API."""
     if not id_number:
         id_number = input("Enter your ID Number: ")
-    state_token, factor_id, session_token = first_login(id_number)
+    state_token, factor_id, session_token = await first_login(session, str(id_number))
     if not state_token:
-        print("Failed to send OTP")
+        logger.error("Failed to send OTP")
         return None
 
     otp_code = input("Enter your OTP code: ")
-    code = authorize_session(otp_code)
-    jwt_token = verify_otp_code(factor_id, state_token, code)
-    print(f"Access token: {jwt_token.access_token}\n"
-          f"Refresh token: {jwt_token.refresh_token}\n"
-          f"id_token: {jwt_token.id_token}")
+    code = await authorize_session(session, otp_code)
+    jwt_token = await verify_otp_code(session, factor_id, state_token, code)
+    logger.debug(f"Access token: {jwt_token.access_token}\n"
+                 f"Refresh token: {jwt_token.refresh_token}\n"
+                 f"id_token: {jwt_token.id_token}")
     return jwt_token
 
 
-def refresh_token(token: JWT) -> JWT | None:
+async def refresh_token(session: ClientSession, token: JWT) -> JWT | None:
     """Refresh IEC JWT token."""
     headers = {"accept": "application/json", "content-type": "application/x-www-form-urlencoded"}
     data = {
@@ -178,10 +188,9 @@ def refresh_token(token: JWT) -> JWT | None:
         "grant_type": "refresh_token",
         "scope": "openid email profile offline_access"
     }
-    response = requests.post(f"{IEC_OKTA_BASE_URL}/oauth2/default/v1/token", data=data, headers=headers, timeout=10)
-    if response.status_code == 200:
-        return JWT.from_dict(response.json())
-    return None
+    response = await send_post_request(session, f"{IEC_OKTA_BASE_URL}/oauth2/default/v1/token", data=data,
+                                       headers=headers, timeout=10)
+    return JWT.from_dict(response)
 
 
 def save_token_to_file(token: JWT, path: str = "token.json") -> None:

@@ -33,12 +33,12 @@ from mashumaro import DataClassDictMixin, field_options
 
 
 @dataclass
-class RemoteReadingRequest:
+class RemoteReadingRequest(DataClassDictMixin):
     """Remote Reading Request ."""
-    meterSerialNumber: str  # noqa: N815
-    meterCode: int  # noqa: N815
-    lastInvoiceDate: str  # noqa: N815
-    fromDate: str  # noqa: N815
+    meter_serial_number: str = field(metadata=field_options(alias="meterSerialNumber"))
+    meter_code: int = field(metadata=field_options(alias="meterCode"))
+    last_invoice_date: str = field(metadata=field_options(alias="lastInvoiceDate"))
+    from_date: str = field(metadata=field_options(alias="fromDate"))
     resolution: int
 
 

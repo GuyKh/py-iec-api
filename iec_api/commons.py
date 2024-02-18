@@ -1,4 +1,14 @@
 import re
+from json import JSONDecodeError
+from logging import getLogger
+from typing import Any
+
+from aiohttp import ClientError, ClientSession
+
+from iec_api.models.exceptions import IECError
+from iec_api.models.response_descriptor import ErrorResponseDescriptor
+
+logger = getLogger(__name__)
 
 
 def add_jwt_to_headers(headers, token) -> dict:
@@ -46,3 +56,72 @@ def is_valid_israeli_id(id_number: str | int) -> bool:
         (int(digit) if i % 2 == 0 else int(digit) * 2 if int(digit) * 2 < 10 else int(digit) * 2 - 9) for i, digit
         in enumerate(id_str)) % 10 == 0
 
+
+async def send_get_request(session: ClientSession, url: str, timeout: int,
+                           headers: dict | None = None) -> dict[str, Any]:
+    try:
+        if not headers:
+            headers = session.headers
+
+        resp = await session.get(
+            url=url,
+            headers=headers,
+            timeout=timeout
+        )
+        json_resp: dict = await resp.json(content_type=None)
+    except TimeoutError as ex:
+        raise IECError(-1, f"Failed to communicate with IEC API due to time out: ({str(ex)})")
+    except ClientError as ex:
+        raise IECError(-1,
+                       f"Failed to communicate with IEC API due to ClientError: ({str(ex)})"
+                       )
+    except JSONDecodeError as ex:
+        raise IECError(-1,
+                       f"Received invalid response from IEC API: {str(ex)}"
+                       )
+
+    if resp.status != 200:
+        logger.warning(f"Failed Login: (Code {resp.status}): {resp.reason}")
+        if len(json_resp) > 0:
+            login_error_response = ErrorResponseDescriptor.from_dict(json_resp)
+            raise IECError(login_error_response.code, login_error_response.error)
+        else:
+            raise IECError(resp.status, resp.reason)
+
+    return json_resp
+
+
+async def send_post_request(session: ClientSession, url: str, data: dict, timeout: int, headers: dict | None = None) \
+        -> dict[str, Any]:
+    try:
+        if not headers:
+            headers = session.headers
+
+        resp = await session.post(
+            url=url,
+            json=data,
+            headers=headers,
+            timeout=timeout
+        )
+
+        json_resp: dict = await resp.json(content_type=None)
+    except TimeoutError as ex:
+        raise IECError(-1, f"Failed to communicate with IEC API due to time out: ({str(ex)})")
+    except ClientError as ex:
+        raise IECError(-1,
+                       f"Failed to communicate with IEC API due to ClientError: ({str(ex)})"
+                       )
+    except JSONDecodeError as ex:
+        raise IECError(-1,
+                       f"Received invalid response from IEC API: {str(ex)}"
+                       )
+
+    if resp.status != 200:
+        logger.warning(f"Failed Login: (Code {resp.status}): {resp.reason}")
+        if len(json_resp) > 0:
+            login_error_response = ErrorResponseDescriptor.from_dict(json_resp)
+            raise IECError(login_error_response.code, login_error_response.error)
+        else:
+            raise IECError(resp.status, resp.reason)
+
+    return json_resp
