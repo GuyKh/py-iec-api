@@ -3,7 +3,6 @@ from dataclasses import dataclass, field
 from mashumaro import DataClassDictMixin, field_options
 
 from iec_api.models.meter_reading import MeterReading
-from iec_api.models.response_descriptor import ResponseDescriptor
 
 # GET https://iecapi.iec.co.il//api/billingCollection/invoices/{bp_number}/{contract_number}
 #

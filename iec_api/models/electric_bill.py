@@ -5,7 +5,6 @@ from dataclasses import dataclass, field
 from mashumaro import DataClassDictMixin, field_options
 
 from iec_api.models.invoice import Invoice
-from iec_api.models.response_descriptor import ResponseDescriptor
 
 # GET https://iecapi.iec.co.il//api/ElectricBillsDrawers/ElectricBills/{contract_id}/{bp_number}
 #

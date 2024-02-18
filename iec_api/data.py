@@ -18,7 +18,7 @@ from iec_api.const import (
     GET_REQUEST_READING_URL,
     HEADERS_WITH_AUTH,
 )
-from iec_api.models.contract import Contracts, Contract
+from iec_api.models.contract import Contract, Contracts
 from iec_api.models.customer import Customer
 from iec_api.models.device import Device, Devices
 from iec_api.models.device_type import DeviceType

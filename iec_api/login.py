@@ -4,7 +4,7 @@ import random
 import re
 import string
 from logging import getLogger
-from typing import Tuple, Optional
+from typing import Optional, Tuple
 
 import jwt
 import pkce
