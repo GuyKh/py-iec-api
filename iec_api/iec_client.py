@@ -105,7 +105,7 @@ class IecClient:
         Get consumer data response from IEC API.
         :return: Customer data
         """
-        self.check_token()
+        await self.check_token()
         customer = await data.get_customer(self._session, self._token)
         if customer:
             self._bp_number = customer.bp_number
@@ -118,7 +118,7 @@ class IecClient:
         :return: Contract object containing the contract information
         """
 
-        self.check_token()
+        await self.check_token()
 
         if not bp_number:
             bp_number = self._bp_number
@@ -140,7 +140,7 @@ class IecClient:
         :return: list of Contract objects
         """
 
-        self.check_token()
+        await self.check_token()
 
         if not bp_number:
             bp_number = self._bp_number
@@ -166,7 +166,7 @@ class IecClient:
         Returns:
             MeterReadings: The response containing the meter readings.
         """
-        self.check_token()
+        await self.check_token()
         if not bp_number:
             bp_number = self._bp_number
 
@@ -192,7 +192,7 @@ class IecClient:
         Returns:
             Invoices: The Invoices/Electric Bills for the user with the contract_id
         """
-        self.check_token()
+        await self.check_token()
 
         if not bp_number:
             bp_number = self._bp_number
@@ -218,7 +218,7 @@ class IecClient:
         Returns:
             list[Device]: List of devices
         """
-        self.check_token()
+        await self.check_token()
 
         if not bp_number:
             bp_number = self._bp_number
@@ -237,7 +237,7 @@ class IecClient:
         Returns:
             list[Device]: List of devices
         """
-        self.check_token()
+        await self.check_token()
 
         if not bp_number:
             bp_number = self._bp_number
@@ -265,7 +265,7 @@ class IecClient:
         Returns:
             RemoteReadingResponse: The response containing the remote reading.
         """
-        self.check_token()
+        await self.check_token()
         return await data.get_remote_reading(self._session, self._token, meter_serial_number, meter_code,
                                              last_invoice_date, from_date, resolution)
 
@@ -279,7 +279,7 @@ class IecClient:
         Returns:
             DeviceType
         """
-        self.check_token()
+        await self.check_token()
 
         if not bp_number:
             bp_number = self._bp_number
@@ -303,7 +303,7 @@ class IecClient:
         Returns:
             Billing Invoices data
         """
-        self.check_token()
+        await self.check_token()
 
         if not bp_number:
             bp_number = self._bp_number
@@ -317,7 +317,7 @@ class IecClient:
 
         return await data.get_billing_invoices(self._session, self._token, bp_number, contract_id)
 
-    def check_token(self):
+    async def check_token(self):
         """
         Check the validity of the jwt.py token and refresh in the case of expired signature errors.
         """
@@ -334,14 +334,14 @@ class IecClient:
         except jwt.exceptions.ExpiredSignatureError:
             should_relogin = True
 
-        if should_refresh:
-            logger.debug("jwt.py token is about to expire, refreshing token")
-            self.logged_in = False
-            self.refresh_token()
-
         if should_relogin:
             logger.debug("jwt.py token expired, retrying login")
             self.logged_in = False
+
+        if should_refresh:
+            logger.debug("jwt.py token is about to expire, refreshing token")
+            self.logged_in = False
+            await self.refresh_token()
 
     def get_token_remaining_time_to_expiration(self):
         decoded_token = jwt.decode(self._token.id_token, options={"verify_signature": False}, algorithms=["RS256"])

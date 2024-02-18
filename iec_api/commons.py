@@ -99,7 +99,7 @@ async def send_post_request(session: ClientSession, url: str, data: dict, timeou
 
         resp = await session.post(
             url=url,
-            json=data,
+            data=data,
             headers=headers,
             timeout=timeout
         )
