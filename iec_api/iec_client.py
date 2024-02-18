@@ -9,7 +9,7 @@ from iec_api import data, login
 from iec_api.commons import is_valid_israeli_id
 from iec_api.const import DEFAULT_MINUTES_BEFORE_TO_REFRESH
 from iec_api.models.contract import Contract
-from iec_api.models.customer import Customer, Account
+from iec_api.models.customer import Account, Customer
 from iec_api.models.device import Device, Devices
 from iec_api.models.device_type import DeviceType
 from iec_api.models.electric_bill import Invoices

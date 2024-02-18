@@ -44,7 +44,7 @@ def _get_url(url, headers):
 T = TypeVar("T")
 
 
-def _get_response_with_descriptor(token: JWT, url: str) -> T:
+def _get_response_with_descriptor(jwt_token: JWT, request_url: str) -> T:
     """
     A function to retrieve a response with a descriptor using a JWT token and a URL.
 
@@ -55,21 +55,19 @@ def _get_response_with_descriptor(token: JWT, url: str) -> T:
     Returns:
         T: The response with a descriptor, with its type specified by the return type annotation.
     """
-    headers = add_jwt_to_headers(HEADERS_WITH_AUTH, token.id_token)
+    headers = add_jwt_to_headers(HEADERS_WITH_AUTH, jwt_token.id_token)
+    response = _get_url(request_url, headers)
 
-    response = _get_url(url, headers)
     if response.status_code != 200:
-        print(f"Failed Login: (Code {response.status_code}): {response.reason}")
-        if len(response.content) > 0:
+        if response.content:
             login_error_response = ErrorResponseDescriptor.from_dict(response.json())
             raise IECError(login_error_response.code, login_error_response.error)
         else:
             raise IECError(response.status_code, response.reason)
 
-    logger.debug("Response: %s", response.json())
-    response_with_descriptor: ResponseWithDescriptor[T] = ResponseWithDescriptor[T].from_dict(response.json())
+    response_with_descriptor = ResponseWithDescriptor[T].from_dict(response.json())
 
-    if response_with_descriptor.response_descriptor.is_success is False:
+    if not response_with_descriptor.response_descriptor.is_success:
         raise IECError(response_with_descriptor.response_descriptor.code,
                        response_with_descriptor.response_descriptor.description)
     return response_with_descriptor.data
