@@ -25,15 +25,16 @@ HEADERS_WITH_AUTH['Cookie'] = ('ARRAffinity=?; '
                                ' GCLB=?')
 
 IEC_API_BASE_URL = "https://iecapi.iec.co.il//api/"
+GET_ACCOUNTS_URL = IEC_API_BASE_URL + "outages/accounts"
 GET_CONSUMER_URL = IEC_API_BASE_URL + "customer"
 GET_REQUEST_READING_URL = IEC_API_BASE_URL + "Consumption/RemoteReadingRange"
 GET_ELECTRIC_BILL_URL = IEC_API_BASE_URL + "ElectricBillsDrawers/ElectricBills/{contract_id}/{bp_number}"
-GET_CONTRACTS_URL = IEC_API_BASE_URL + "customer/contract/{bp_number}"
+GET_CONTRACTS_URL = IEC_API_BASE_URL + "customer/contract/{contract_id}"
 GET_DEFAULT_CONTRACT_URL = GET_CONTRACTS_URL + "?count=1"
 GET_LAST_METER_READING_URL = IEC_API_BASE_URL + "Device/LastMeterReading/{contract_id}/{bp_number}"
 AUTHENTICATE_URL = IEC_API_BASE_URL + "Authentication/{id}/1/-1?customErrorPage=true"
 GET_DEVICES_URL = IEC_API_BASE_URL + "Device/{bp_number}"
-GET_DEVICES_BY_CONTRACT_ID_URL = IEC_API_BASE_URL + "Device/{bp_number}/{contract_id}"
+GET_DEVICES_BY_CONTRACT_ID_URL = GET_DEVICES_URL + "/{contract_id}"
 GET_DEVICE_TYPE_URL = IEC_API_BASE_URL + "Device/type/{bp_number}/{contract_id}/false"
 GET_BILLING_INVOICES = IEC_API_BASE_URL + "billingCollection/invoices/{bp_number}/{contract_id}"
 

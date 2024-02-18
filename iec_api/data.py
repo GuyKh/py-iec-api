@@ -1,11 +1,13 @@
 import json
 import logging
+from datetime import datetime
 from typing import TypeVar
 
 import requests
 
 from iec_api.commons import add_jwt_to_headers
 from iec_api.const import (
+    GET_ACCOUNTS_URL,
     GET_BILLING_INVOICES,
     GET_CONSUMER_URL,
     GET_CONTRACTS_URL,
@@ -18,6 +20,7 @@ from iec_api.const import (
     GET_REQUEST_READING_URL,
     HEADERS_WITH_AUTH,
 )
+from iec_api.models.account import Account
 from iec_api.models.contract import Contract, Contracts
 from iec_api.models.customer import Customer
 from iec_api.models.device import Device, Devices
@@ -64,7 +67,18 @@ def _get_response_with_descriptor(token: JWT, url: str) -> T:
             raise IECError(response.status_code, response.reason)
 
     logger.debug("Response: %s", response.json())
-    return ResponseWithDescriptor[T].from_dict(response.json())
+    response_with_descriptor: ResponseWithDescriptor[T] = ResponseWithDescriptor[T].from_dict(response.json())
+
+    if response_with_descriptor.response_descriptor.is_success is False:
+        raise IECError(response_with_descriptor.response_descriptor.code,
+                       response_with_descriptor.response_descriptor.description)
+    return response_with_descriptor.data
+
+
+def get_accounts(token: JWT) -> list[Account]:
+    """Get Accounts response from IEC API."""
+    return _get_response_with_descriptor(token, GET_ACCOUNTS_URL)
+
 
 
 def get_customer(token: JWT) -> Customer:
@@ -85,11 +99,12 @@ def get_customer(token: JWT) -> Customer:
     return Customer.from_dict(response.json())
 
 
-def get_remote_reading(token: JWT, meter_serial_number: str, meter_code: int, last_invoice_date: str, from_date: str,
-                       resolution: int) -> RemoteReadingResponse:
+def get_remote_reading(token: JWT, meter_serial_number: str, meter_code: int, last_invoice_date: datetime,
+                       from_date: datetime, resolution: int = 1) -> RemoteReadingResponse:
     headers = add_jwt_to_headers(HEADERS_WITH_AUTH, token.id_token)
     req = RemoteReadingRequest(meterSerialNumber=meter_serial_number, meterCode=meter_code,
-                               lastInvoiceDate=last_invoice_date, fromDate=from_date, resolution=resolution)
+                               lastInvoiceDate=last_invoice_date.strftime('%Y-%m-%d'),
+                               fromDate=from_date.strftime('%Y-%m-%d'), resolution=resolution)
 
     logger.debug("HTTP POST: %s", GET_REQUEST_READING_URL)
     response = requests.post(url=GET_REQUEST_READING_URL, data=json.dumps(req), headers=headers, timeout=10)
@@ -143,6 +158,7 @@ def get_devices(token: JWT, bp_number: str) -> list[Device]:
             raise IECError(login_error_response.code, login_error_response.error)
         else:
             raise IECError(response.status_code, response.reason)
+
 
     logger.debug("Response: %s", response.json())
     return [Device.from_dict(device) for device in response.json()]

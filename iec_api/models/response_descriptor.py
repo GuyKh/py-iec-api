@@ -31,4 +31,4 @@ class ResponseWithDescriptor(Generic[T], DataClassDictMixin):
     """Response With Descriptor"""
 
     data: T
-    response_descriptor: ResponseDescriptor
+    response_descriptor: ResponseDescriptor = field(metadata=field_options(alias="reponseDescriptor"))

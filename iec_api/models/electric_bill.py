@@ -34,7 +34,7 @@ from iec_api.models.invoice import Invoice
 #         ]
 #     },
 #     "reponseDescriptor": {
-#         "isSuccess": false,
+#         "isSuccess": true,
 #         "code": null,
 #         "description": null
 #     }

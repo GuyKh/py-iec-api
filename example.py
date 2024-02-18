@@ -1,6 +1,7 @@
 """ Main IEC Python API module. """
 
 import os
+from datetime import datetime, timedelta
 from logging import config, getLogger
 
 from iec_api.iec_client import IecClient
@@ -16,7 +17,7 @@ logger = getLogger(__name__)
 if __name__ == "__main__":  # pragma: no cover
     try:
         # Example of usage
-        client = IecClient("123456782")
+        client = IecClient(200461929)
 
         token_json_file = "token.json"
         if os.path.exists(token_json_file):
@@ -36,21 +37,25 @@ if __name__ == "__main__":  # pragma: no cover
         #exit(1)
 
         # client.manual_login()
-        customer = client.get_customer()
-        print(customer)
+        account = client.get_default_account()
+        print(account)
 
-        contracts = client.get_contracts()
-        for contract in contracts:
-            print(contract)
+        contract = client.get_default_contract()
+        print(contract)
 
-        reading = client.get_last_meter_reading(customer.bp_number, contracts[0].contract_id)
-        print(reading)
+        device = client.get_devices()[0]
+        print(device)
 
-        print(client.get_devices_by_contract_id())
-        print(client.get_electric_bill())
-        print(client.get_device_type())
-        print(client.get_devices())
-        print(client.get_billing_invoices())
+        # Get Remote Readings from the last three days
+        for i in range(2, -1, -1):
+            selected_date: datetime = (datetime.now() - timedelta(days=i))
+            remote_readings = client.get_remote_reading(device.device_number, int(device.device_code), selected_date,
+                                                        selected_date)
+
+            print("Got " + str(len(remote_readings.data)) + " readings for " + selected_date.strftime("%Y-%m-%d"))
+            for remote_reading in remote_readings.data:
+                print(remote_reading.date, remote_reading.value)
+
     except IECError as err:
         logger.error("IEC Error: (Code %d): %s", err.code, err.error)
 

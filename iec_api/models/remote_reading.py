@@ -28,6 +28,7 @@
 # }
 
 from dataclasses import dataclass, field
+from datetime import datetime
 
 from mashumaro import DataClassDictMixin, field_options
 
@@ -54,11 +55,11 @@ class FutureConsumptionInfo(DataClassDictMixin):
 
 
 @dataclass
-class RemoteReadingData(DataClassDictMixin):
+class RemoteReading(DataClassDictMixin):
     """Remote Reading Data dataclass."""
 
     status: int
-    date: str
+    date: datetime
     value: float
 
 
@@ -80,4 +81,4 @@ class RemoteReadingResponse(DataClassDictMixin):
     )
     meter_start_date: str = field(metadata=field_options(alias="meterStartDate"))
     total_import: float = field(metadata=field_options(alias="totalImport"))
-    data: RemoteReadingData
+    data: list[RemoteReading]

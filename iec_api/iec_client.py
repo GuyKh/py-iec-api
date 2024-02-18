@@ -9,7 +9,7 @@ from iec_api import data, login
 from iec_api.commons import is_valid_israeli_id
 from iec_api.const import DEFAULT_MINUTES_BEFORE_TO_REFRESH
 from iec_api.models.contract import Contract
-from iec_api.models.customer import Customer
+from iec_api.models.customer import Customer, Account
 from iec_api.models.device import Device, Devices
 from iec_api.models.device_type import DeviceType
 from iec_api.models.electric_bill import Invoices
@@ -102,6 +102,24 @@ class IecClient:
         if customer:
             self._bp_number = customer.bp_number
         return customer
+
+    def get_accounts(self) -> list[Account]:
+        """
+        Get consumer data response from IEC API.
+        :return: Customer data
+        """
+        self.check_token()
+        accounts = data.get_accounts(self._token)
+        if len(accounts) > 0:
+            self._bp_number = accounts[0].account_number
+        return accounts
+
+    def get_default_account(self) -> Account:
+        """
+        Get consumer data response from IEC API.
+        :return: Customer data
+        """
+        return self.get_accounts()[0]
 
     def get_default_contract(self, bp_number: str = None) -> Optional[Contract]:
         """
@@ -244,8 +262,8 @@ class IecClient:
 
         return data.get_devices_by_contract_id(self._token, bp_number, contract_id)
 
-    def get_remote_reading(self, meter_serial_number: str, meter_code: int, last_invoice_date: str, from_date: str,
-                           resolution: int) -> RemoteReadingResponse:
+    def get_remote_reading(self, meter_serial_number: str, meter_code: int, last_invoice_date: datetime,
+                           from_date: datetime, resolution: int = 1) -> RemoteReadingResponse:
         """
         Retrieves a remote reading for a specific meter using the provided parameters.
         Args:

@@ -4,7 +4,7 @@ from typing import Optional
 from mashumaro import DataClassDictMixin, field_options
 
 #
-# GET https://iecapi.iec.co.il//api/Device/{bp_number}
+# GET https://iecapi.iec.co.il//api/Device/{contract_id}
 #
 # [
 #     {
