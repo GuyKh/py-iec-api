@@ -51,8 +51,8 @@ async def get_remote_reading(session: ClientSession, token: JWT, meter_serial_nu
     req = RemoteReadingRequest(meter_serial_number, meter_code,
                                last_invoice_date, from_date, resolution)
 
-    response = await send_post_request(session, url=GET_REQUEST_READING_URL, data=RemoteReadingRequest.to_dict(req),
-                                       timeout=10)
+    response = await send_post_request(session, url=GET_REQUEST_READING_URL,
+                                       json_data=RemoteReadingRequest.to_dict(req), timeout=10)
 
     logger.debug("Response: %s", response)
     return RemoteReadingResponse.from_dict(response)
@@ -108,7 +108,7 @@ async def get_devices(session: ClientSession, token: JWT, bp_number: str) -> lis
     response = await _get_url(session, url=GET_DEVICES_URL.format(bp_number=bp_number))
 
     logger.debug("Response: %s", response)
-    devices: list[dict] = response
+    devices: list[dict[str, Any]] = response
 
     return [Device.from_dict(device) for device in devices]
 

@@ -1,3 +1,4 @@
+import json
 import re
 from json import JSONDecodeError
 from logging import getLogger
@@ -63,6 +64,7 @@ async def send_get_request(session: ClientSession, url: str, timeout: int,
         if not headers:
             headers = session.headers
 
+        logger.debug("HTTP GET: %s", url)
         resp = await session.get(
             url=url,
             headers=headers,
@@ -80,6 +82,7 @@ async def send_get_request(session: ClientSession, url: str, timeout: int,
                        f"Received invalid response from IEC API: {str(ex)}"
                        )
 
+    logger.debug("HTTP GET Response: %s", json_resp)
     if resp.status != 200:
         logger.warning(f"Failed Login: (Code {resp.status}): {resp.reason}")
         if len(json_resp) > 0:
@@ -91,18 +94,30 @@ async def send_get_request(session: ClientSession, url: str, timeout: int,
     return json_resp
 
 
-async def send_post_request(session: ClientSession, url: str, data: dict, timeout: int, headers: dict | None = None) \
+async def send_post_request(session: ClientSession, url: str, timeout: int, headers: dict | None = None, data: dict = None, json_data: dict = None) \
         -> dict[str, Any]:
     try:
         if not headers:
             headers = session.headers
 
-        resp = await session.post(
-            url=url,
-            data=data,
-            headers=headers,
-            timeout=timeout
-        )
+        logger.debug("HTTP POST: %s", url)
+        logger.debug("HTTP Content: %s", data)
+
+        if data:
+            resp = await session.post(
+                url=url,
+                data=json.dumps(data),
+                headers=headers,
+                timeout=timeout
+            )
+        else:
+            if json_data:
+                resp = await session.post(
+                    url=url,
+                    json=json_data,
+                    headers=headers,
+                    timeout=timeout
+                )
 
         json_resp: dict = await resp.json(content_type=None)
     except TimeoutError as ex:
@@ -115,6 +130,8 @@ async def send_post_request(session: ClientSession, url: str, data: dict, timeou
         raise IECError(-1,
                        f"Received invalid response from IEC API: {str(ex)}"
                        )
+
+    logger.debug("HTTP POST Response: %s", json_resp)
 
     if resp.status != 200:
         logger.warning(f"Failed Login: (Code {resp.status}): {resp.reason}")

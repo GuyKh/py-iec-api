@@ -1,4 +1,6 @@
 """ IEC Login Module. """
+import asyncio
+import concurrent.futures
 import json
 import random
 import re
@@ -57,7 +59,7 @@ async def get_first_factor_id(session: ClientSession, user_id: str):
     data = {"username": f"{user_id}@iec.co.il"}
     headers = {"accept": "application/json", "content-type": "application/json"}
 
-    response = await send_post_request(session, f"{IEC_OKTA_BASE_URL}/api/v1/authn", data=data, headers=headers,
+    response = await send_post_request(session, f"{IEC_OKTA_BASE_URL}/api/v1/authn", json_data=data, headers=headers,
                                        timeout=10)
     return response.get("stateToken", ""), response.get("_embedded", {}).get("factors", {})[0].get("id")
 
@@ -83,7 +85,7 @@ async def send_otp_code(session: ClientSession, factor_id: object, state_token: 
 
     response = await send_post_request(
         session,
-        f"{IEC_OKTA_BASE_URL}/api/v1/authn/factors/{factor_id}/verify", data=data,
+        f"{IEC_OKTA_BASE_URL}/api/v1/authn/factors/{factor_id}/verify", json_data=data,
         headers=headers, timeout=10
     )
     if response.get("status") == "SUCCESS":
@@ -163,13 +165,15 @@ async def verify_otp_code(session: ClientSession, factor_id: str, state_token: s
 async def manual_authorization(session: ClientSession, id_number: str | int) -> JWT | None:  # pragma: no cover
     """Get authorization token from IEC API."""
     if not id_number:
-        id_number = input("Enter your ID Number: ")
+        with concurrent.futures.ThreadPoolExecutor() as pool:
+            id_number = await asyncio.get_event_loop().run_in_executor(pool, input, "Enter your ID Number: ")
     state_token, factor_id, session_token = await first_login(session, str(id_number))
     if not state_token:
         logger.error("Failed to send OTP")
         return None
 
-    otp_code = input("Enter your OTP code: ")
+    with concurrent.futures.ThreadPoolExecutor() as pool:
+        otp_code = await asyncio.get_event_loop().run_in_executor(pool, input, "Enter your OTP code: ")
     code = await authorize_session(session, otp_code)
     jwt_token = await verify_otp_code(session, factor_id, state_token, code)
     logger.debug(f"Access token: {jwt_token.access_token}\n"

@@ -1,6 +1,7 @@
 """ Main IEC Python API module. """
 
 import asyncio
+import concurrent.futures
 import os
 from logging import config, getLogger
 
@@ -31,11 +32,13 @@ async def main():
         else:
             try:
                 await client.login_with_id()
-                otp = input("Enter the OTP received: ")
+                with concurrent.futures.ThreadPoolExecutor() as pool:
+                    otp = await asyncio.get_event_loop().run_in_executor(pool, input, "Enter the OTP received: ")
                 await client.verify_otp(otp)
                 client.save_token(token_json_file)
             except IECLoginError as err:
                 logger.error("Failed Login: (Code %d): %s", err.code, err.error)
+                raise
 
         # refresh token example
         # token = await client.refresh_token()
@@ -63,5 +66,4 @@ async def main():
 
 
 if __name__ == "__main__":  # pragma: no cover
-    loop = asyncio.get_event_loop()
-    loop.run_until_complete(main())
+    loop = asyncio.run(main())

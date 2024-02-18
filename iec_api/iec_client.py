@@ -45,7 +45,6 @@ class IecClient:
         self._token: JWT = JWT(access_token="", refresh_token="", token_type="", expires_in=0,
                                scope="", id_token="")  # Token for authentication
         self._user_id: str = str(user_id)  # User ID associated with the instance
-        self._login_response: str | None = None  # Response from the login attempt
         self._bp_number: str | None = None  # BP Number associated with the instance
         self._contract_id: str | None = None  # Contract ID associated with the instance
         self._mins_before_token_refresh = mins_before_token_refresh  # Minutes before requiring JWT token to refresh
@@ -57,8 +56,7 @@ class IecClient:
         """
         Login with ID and wait for OTP
         """
-        state_token, factor_id, session_token = self._login_response = await login.first_login(self._session,
-                                                                                               self._user_id)
+        state_token, factor_id, session_token = await login.first_login(self._session, self._user_id)
         self._state_token = state_token
         self._factor_id = factor_id
         self._session_token = session_token

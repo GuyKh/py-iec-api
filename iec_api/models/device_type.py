@@ -34,7 +34,7 @@ from iec_api.models.response_descriptor import ResponseDescriptor
 class DeviceType(DataClassDictMixin):
     """Device dataclass."""
 
-    device_number: str = field(metadata=field_options(alias="deviceNumber"))
+    device_number: str | None = field(metadata=field_options(alias="deviceNumber"))
     device_balance: int | None = field(metadata=field_options(alias="deviceBalance"))
     device_type: int = field(metadata=field_options(alias="deviceType"))
     estimated_days_by_week: int | None = field(metadata=field_options(alias="estimatedDaysByWeek"))
