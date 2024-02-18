@@ -50,11 +50,3 @@ class Invoices(DataClassDictMixin):
     )
     last_date_to_pay: str = field(metadata=field_options(alias="lastDateToPay"))
     invoices: list[Invoice]
-
-
-@dataclass
-class GetElectricBillResponse(DataClassDictMixin):
-    data: Invoices
-    response_descriptor: ResponseDescriptor = field(
-        metadata=field_options(alias="reponseDescriptor")
-    )

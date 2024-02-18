@@ -1,6 +1,6 @@
 """ Response Descriptor """
 from dataclasses import dataclass, field
-from typing import Optional
+from typing import Generic, Optional, TypeVar
 
 from mashumaro import DataClassDictMixin, field_options
 
@@ -21,3 +21,14 @@ class ErrorResponseDescriptor(DataClassDictMixin):
     error: str = field(metadata=field_options(alias="Error"))
     code: int = field(metadata=field_options(alias="Code"))
     rid: str = field(metadata=field_options(alias="Rid"))
+
+
+T = TypeVar("T")
+
+
+@dataclass
+class ResponseWithDescriptor(Generic[T], DataClassDictMixin):
+    """Response With Descriptor"""
+
+    data: T
+    response_descriptor: ResponseDescriptor

@@ -71,11 +71,3 @@ class Contracts(DataClassDictMixin):
     contracts: list[Contract]
     contract_amount: int = field(metadata=field_options(alias="contractAmount"))
     total_to_pay: float = field(metadata=field_options(alias="totalToPay"))
-
-
-@dataclass
-class GetContractResponse(DataClassDictMixin):
-    data: Contracts
-    response_descriptor: ResponseDescriptor = field(
-        metadata=field_options(alias="reponseDescriptor")
-    )

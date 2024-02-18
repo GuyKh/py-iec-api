@@ -6,6 +6,7 @@ from mashumaro import DataClassDictMixin, field_options
 
 from iec_api.models.response_descriptor import ResponseDescriptor
 
+
 # GET https://iecapi.iec.co.il//api/Device/LastMeterReading/{contract_id}/{bp_number}
 #
 # # {
@@ -62,10 +63,3 @@ class MeterReadings(DataClassDictMixin):
 
     contract_account: str = field(metadata=field_options(alias="contractAccount"))
     last_meters: list[LastMeters] = field(metadata=field_options(alias="lastMeters"))
-
-@dataclass
-class GetLastMeterReadingResponse(DataClassDictMixin):
-    """Get Last Meter Reading Response dataclass."""
-
-    data: MeterReadings
-    response_descriptor: ResponseDescriptor = field(metadata=field_options(alias="reponseDescriptor"))

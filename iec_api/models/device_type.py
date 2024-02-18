@@ -46,11 +46,3 @@ class DeviceType(DataClassDictMixin):
     balance_date: Optional[str] = field(metadata=field_options(alias="balanceDate"))
     is_active: bool = field(metadata=field_options(alias="isActive"))
     number_of_devices: int = field(metadata=field_options(alias="numberOfDevices"))
-
-
-@dataclass
-class DeviceTypeResponse(DataClassDictMixin):
-    """Device Type Response dataclass."""
-
-    data: DeviceType
-    response_descriptor: ResponseDescriptor = field(metadata=field_options(alias="reponseDescriptor"))
