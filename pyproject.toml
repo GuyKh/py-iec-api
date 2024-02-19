@@ -20,7 +20,7 @@ requests = "^2.31.0"
 pkce = "^1.0.3"
 
 [tool.poetry.dev-dependencies]
-pytest = "8.0.0"
+pytest = "8.0.1"
 pytest-cov = "^4.1.0"
 ruff = "^0.2.0"
 
