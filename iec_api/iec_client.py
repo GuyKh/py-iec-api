@@ -52,45 +52,9 @@ class IecClient:
         if automatically_login:
             self.login_with_id()  # Attempt to log in automatically if specified
 
-    def login_with_id(self):
-        """
-        Login with ID and wait for OTP
-        """
-        state_token, factor_id, session_token = self._login_response = login.first_login(self._user_id)
-        self._state_token = state_token
-        self._factor_id = factor_id
-        self._session_token = session_token
-
-    def verify_otp(self, otp_code: str | int) -> bool:
-        """
-        Verify the OTP code and return the token
-        :param otp_code: The OTP code to be verified
-        :return: The token
-        """
-        jwt_token = login.verify_otp_code(self._factor_id, self._state_token, str(otp_code))
-        self._token = jwt_token
-        self.logged_in = True
-        return True
-
-    def manual_login(self):
-        """
-        Logs the user in by obtaining an authorization token, setting the authorization header,
-        and updating the login status and token attribute.
-        """
-        token = login.manual_authorization(self._user_id)
-        self.logged_in = True
-        self._token = token
-
-    def override_token(self, token):
-        """
-        Set the token and mark the user as logged in.
-        :param token: The new token to be set.
-        :return: None
-        """
-        logger.debug("Overriding jwt.py token: %s", token)
-        self._token = JWT(access_token="", refresh_token="", token_type="", expires_in=0, scope="", id_token=token)
-        self._token.id_token = token
-        self.logged_in = True
+    # -------------
+    # Data methods:
+    # -------------
 
     def get_customer(self) -> Customer:
         """
@@ -110,8 +74,10 @@ class IecClient:
         """
         self.check_token()
         accounts = data.get_accounts(self._token)
+
         if len(accounts) > 0:
             self._bp_number = accounts[0].account_number
+
         return accounts
 
     def get_default_account(self) -> Account:
@@ -136,8 +102,8 @@ class IecClient:
         assert bp_number, "BP number must be provided"
 
         get_contract_response = data.get_contracts(self._token, bp_number)
-        if get_contract_response and get_contract_response.data:
-            contracts = get_contract_response.data.contracts
+        if get_contract_response and get_contract_response:
+            contracts = get_contract_response.contracts
             if contracts and len(contracts) > 0:
                 self._contract_id = contracts[0].contract_id
             return contracts[0]
@@ -158,8 +124,8 @@ class IecClient:
         assert bp_number, "BP number must be provided"
 
         get_contract_response = data.get_contracts(self._token, bp_number)
-        if get_contract_response and get_contract_response.data:
-            contracts = get_contract_response.data.contracts
+        if get_contract_response and get_contract_response:
+            contracts = get_contract_response.contracts
             if contracts and len(contracts) > 0:
                 self._contract_id = contracts[0].contract_id
             return contracts
@@ -188,8 +154,8 @@ class IecClient:
         assert contract_id, "Contract ID must be provided"
 
         response = data.get_last_meter_reading(self._token, bp_number, contract_id)
-        if response and response.data:
-            return response.data
+        if response:
+            return response
         return None
 
     def get_electric_bill(self, bp_number: Optional[str] = None, contract_id: Optional[str] = None) \
@@ -216,27 +182,27 @@ class IecClient:
         assert contract_id, "Contract ID must be provided"
 
         response = data.get_electric_bill(self._token, bp_number, contract_id)
-        if response.data:
-            return response.data
+        if response:
+            return response
         return None
 
-    def get_devices(self, bp_number: Optional[str] = None) -> Optional[list[Device]]:
+    def get_devices(self, contract_id: Optional[str] = None) -> Optional[list[Device]]:
         """
         Get a list of devices for the user
         Args:
             self: The instance of the class.
-            bp_number (str): The BP number of the meter.
+            contract_id (str): The Contract ID of the meter.
         Returns:
             list[Device]: List of devices
         """
         self.check_token()
 
-        if not bp_number:
-            bp_number = self._bp_number
+        if not contract_id:
+            contract_id = self._contract_id
 
-        assert bp_number, "BP number must be provided"
+        assert contract_id, "Contract Id must be provided"
 
-        return data.get_devices(self._token, bp_number)
+        return data.get_devices(self._token, contract_id)
 
     def get_devices_by_contract_id(self, bp_number: Optional[str] = None, contract_id: Optional[str] = None) -> Devices:
         """
@@ -263,7 +229,7 @@ class IecClient:
         return data.get_devices_by_contract_id(self._token, bp_number, contract_id)
 
     def get_remote_reading(self, meter_serial_number: str, meter_code: int, last_invoice_date: datetime,
-                           from_date: datetime, resolution: int = 1) -> RemoteReadingResponse:
+                           from_date: datetime, resolution: int = 1) -> Optional[RemoteReadingResponse]:
         """
         Retrieves a remote reading for a specific meter using the provided parameters.
         Args:
@@ -274,7 +240,7 @@ class IecClient:
             from_date (str): The start date for the remote reading.
             resolution (int): The resolution of the remote reading.
         Returns:
-            RemoteReadingResponse: The response containing the remote reading.
+            RemoteReadingResponse: The response containing the remote reading or None if not found
         """
         self.check_token()
         return data.get_remote_reading(self._token, meter_serial_number, meter_code,
@@ -329,7 +295,67 @@ class IecClient:
 
         return data.get_billing_invoices(self._token, bp_number, contract_id)
 
-    def check_token(self):
+    # ----------------
+    # Login/Token Flow
+    # ----------------
+
+    def login_with_id(self):
+        """
+        Login with ID and wait for OTP
+        """
+        state_token, factor_id, session_token = self._login_response = login.first_login(self._user_id)
+        self._state_token = state_token
+        self._factor_id = factor_id
+        self._session_token = session_token
+
+    def verify_otp(self, otp_code: str | int) -> bool:
+        """
+        Verify the OTP code and return the token
+        :param otp_code: The OTP code to be verified
+        :return: The token
+        """
+        jwt_token = login.verify_otp_code(self._factor_id, self._state_token, str(otp_code))
+        self._token = jwt_token
+        self.logged_in = True
+        return True
+
+    def manual_login(self):
+        """
+        Logs the user in by obtaining an authorization token, setting the authorization header,
+        and updating the login status and token attribute.
+        """
+        token = login.manual_authorization(self._user_id)
+        self.logged_in = True
+        self._token = token
+
+    def get_token(self) -> JWT:
+        """
+        Return the JWT token.
+        """
+        return self._token
+
+    def load_jwt_token(self, token: JWT):
+        """
+        Set the token and mark the user as logged in.
+        :param token: The new token to be set.
+        :return: None
+        """
+        self._token = token
+        if self.check_token():
+            self.logged_in = True
+
+    def override_id_token(self, id_token):
+        """
+        Set the token and mark the user as logged in.
+        :param id_token: The new token to be set.
+        :return: None
+        """
+        logger.debug("Overriding jwt.py token: %s", id_token)
+        self._token = JWT(access_token="", refresh_token="", token_type="", expires_in=0, scope="", id_token=id_token)
+        self._token.id_token = id_token
+        self.logged_in = True
+
+    def check_token(self) -> bool:
         """
         Check the validity of the jwt.py token and refresh in the case of expired signature errors.
         """
@@ -355,6 +381,8 @@ class IecClient:
             logger.debug("jwt.py token expired, retrying login")
             self.logged_in = False
 
+        return self.logged_in
+
     def get_token_remaining_time_to_expiration(self):
         decoded_token = jwt.decode(self._token.id_token, options={"verify_signature": False}, algorithms=["RS256"])
         return decoded_token['exp'] - int(time.time())
@@ -364,16 +392,17 @@ class IecClient:
         Refresh IEC JWT token.
         """
         self._token = login.refresh_token(self._token)
-        self.logged_in = True
+        if self._token:
+            self.logged_in = True
 
-    def load_token(self, file_path: str = "token.json"):
+    def load_token_from_file(self, file_path: str = "token.json"):
         """
         Load token from file.
         """
         self._token = login.load_token_from_file(file_path)
         self.logged_in = True
 
-    def save_token(self, file_path: str = "token.json"):
+    def save_token_to_file(self, file_path: str = "token.json"):
         """
         Save token to file.
         """

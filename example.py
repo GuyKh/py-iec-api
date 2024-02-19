@@ -17,17 +17,17 @@ logger = getLogger(__name__)
 if __name__ == "__main__":  # pragma: no cover
     try:
         # Example of usage
-        client = IecClient(200461929)
+        client = IecClient(123456789)
 
         token_json_file = "token.json"
         if os.path.exists(token_json_file):
-            client.load_token(token_json_file)
+            client.load_token_from_file(token_json_file)
         else:
             try:
                 client.login_with_id()
                 otp = input("Enter the OTP received: ")
                 token = client.verify_otp(otp)
-                client.save_token(token_json_file)
+                client.save_token_to_file(token_json_file)
             except IECLoginError as err:
                 logger.error("Failed Login: (Code %d): %s", err.code, err.error)
 
@@ -43,6 +43,9 @@ if __name__ == "__main__":  # pragma: no cover
         contract = client.get_default_contract()
         print(contract)
 
+        print("Refreshing")
+        client.refresh_token()
+        print(client.get_token().id_token)
         device = client.get_devices()[0]
         print(device)
 
@@ -58,5 +61,3 @@ if __name__ == "__main__":  # pragma: no cover
 
     except IECError as err:
         logger.error("IEC Error: (Code %d): %s", err.code, err.error)
-
-

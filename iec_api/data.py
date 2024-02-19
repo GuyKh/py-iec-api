@@ -1,7 +1,7 @@
 import json
 import logging
 from datetime import datetime
-from typing import TypeVar
+from typing import Optional, TypeVar
 
 import requests
 
@@ -44,13 +44,13 @@ def _get_url(url, headers):
 T = TypeVar("T")
 
 
-def _get_response_with_descriptor(jwt_token: JWT, request_url: str) -> T:
+def _get_response_with_descriptor(jwt_token: JWT, request_url: str) -> dict | list[dict]:
     """
     A function to retrieve a response with a descriptor using a JWT token and a URL.
 
     Args:
-        token (JWT): The JWT token used for authentication.
-        url (str): The URL to send the request to.
+        jwt_token (JWT): The JWT token used for authentication.
+        request_url (str): The URL to send the request to.
 
     Returns:
         T: The response with a descriptor, with its type specified by the return type annotation.
@@ -70,23 +70,25 @@ def _get_response_with_descriptor(jwt_token: JWT, request_url: str) -> T:
     if not response_with_descriptor.response_descriptor.is_success:
         raise IECError(response_with_descriptor.response_descriptor.code,
                        response_with_descriptor.response_descriptor.description)
+
     return response_with_descriptor.data
 
 
 def get_accounts(token: JWT) -> list[Account]:
     """Get Accounts response from IEC API."""
-    return _get_response_with_descriptor(token, GET_ACCOUNTS_URL)
+    accounts = _get_response_with_descriptor(token, GET_ACCOUNTS_URL)
+
+    accounts = [Account.from_dict(account) for account in accounts]
+    return accounts
 
 
-
-def get_customer(token: JWT) -> Customer:
+def get_customer(token: JWT) -> Optional[Customer]:
     """Get customer data response from IEC API."""
     headers = add_jwt_to_headers(HEADERS_WITH_AUTH, token.id_token)
     # sending get request and saving the response as response object
     response = _get_url(url=GET_CONSUMER_URL, headers=headers)
 
     if response.status_code != 200:
-        print(f"Failed Login: (Code {response.status_code}): {response.reason}")
         if len(response.content) > 0:
             login_error_response = ErrorResponseDescriptor.from_dict(response.json())
             raise IECError(login_error_response.code, login_error_response.error)
@@ -98,17 +100,23 @@ def get_customer(token: JWT) -> Customer:
 
 
 def get_remote_reading(token: JWT, meter_serial_number: str, meter_code: int, last_invoice_date: datetime,
-                       from_date: datetime, resolution: int = 1) -> RemoteReadingResponse:
+                       from_date: datetime, resolution: int = 1) -> Optional[RemoteReadingResponse]:
     headers = add_jwt_to_headers(HEADERS_WITH_AUTH, token.id_token)
-    req = RemoteReadingRequest(meterSerialNumber=meter_serial_number, meterCode=meter_code,
-                               lastInvoiceDate=last_invoice_date.strftime('%Y-%m-%d'),
-                               fromDate=from_date.strftime('%Y-%m-%d'), resolution=resolution)
+    req = RemoteReadingRequest(meter_serial_number=meter_serial_number, meter_code=meter_code,
+                               last_invoice_date=last_invoice_date.strftime('%Y-%m-%d'),
+                               from_date=from_date.strftime('%Y-%m-%d'), resolution=resolution)
 
     logger.debug("HTTP POST: %s", GET_REQUEST_READING_URL)
-    response = requests.post(url=GET_REQUEST_READING_URL, data=json.dumps(req), headers=headers, timeout=10)
 
+    data = req.to_dict()
+    json_data = json.dumps(data)
+    response = requests.post(url=GET_REQUEST_READING_URL, data=json_data, headers=headers, timeout=10)
+
+    logger.debug("Response [%s]: %s", response.status_code, response.json())
     if response.status_code != 200:
-        print(f"Failed Login: (Code {response.status_code}): {response.reason}")
+        if response.status_code == 400:
+            return None
+
         if len(response.content) > 0:
             login_error_response = ErrorResponseDescriptor.from_dict(response.json())
             raise IECError(login_error_response.code, login_error_response.error)
@@ -121,25 +129,33 @@ def get_remote_reading(token: JWT, meter_serial_number: str, meter_code: int, la
 
 def get_electric_bill(token: JWT, bp_number: str, contract_id: str) -> Invoices:
     """Get Electric Bill data response from IEC API."""
-    return _get_response_with_descriptor(token,
-                                         GET_ELECTRIC_BILL_URL.format(contract_id=contract_id, bp_number=bp_number))
+    invoice_dict = _get_response_with_descriptor(token,
+                                                 GET_ELECTRIC_BILL_URL.format(contract_id=contract_id,
+                                                                              bp_number=bp_number))
+    return Invoices.from_dict(invoice_dict)
 
 
 def get_default_contract(token: JWT, bp_number: str) -> Contract:
     """Get Contract data response from IEC API."""
-    all_contracts = _get_response_with_descriptor(token, GET_DEFAULT_CONTRACT_URL.format(bp_number=bp_number))
+    all_contracts_dict = _get_response_with_descriptor(token, GET_DEFAULT_CONTRACT_URL.format(bp_number=bp_number))
+
+    all_contracts = [Contract.from_dict(contract) for contract in all_contracts_dict]
     return all_contracts[0]
 
 
 def get_contracts(token: JWT, bp_number: str) -> Contracts:
     """Get all user's Contracts from IEC API."""
-    return _get_response_with_descriptor(token, GET_CONTRACTS_URL.format(bp_number=bp_number))
+    contracts_dict = _get_response_with_descriptor(token, GET_CONTRACTS_URL.format(bp_number=bp_number))
+    return Contracts.from_dict(contracts_dict)
 
 
 def get_last_meter_reading(token: JWT, bp_number: str, contract_id: str) -> MeterReadings:
     """Get Last Meter Reading data response from IEC API."""
-    return _get_response_with_descriptor(token, GET_LAST_METER_READING_URL.format(contract_id=contract_id,
-                                                                                  bp_number=bp_number))
+    meter_readings_dict = _get_response_with_descriptor(token,
+                                                        GET_LAST_METER_READING_URL.format(contract_id=contract_id,
+                                                                                          bp_number=bp_number))
+
+    return MeterReadings.from_dict(meter_readings_dict)
 
 
 def get_devices(token: JWT, bp_number: str) -> list[Device]:
@@ -150,13 +166,11 @@ def get_devices(token: JWT, bp_number: str) -> list[Device]:
                         headers=headers)
 
     if response.status_code != 200:
-        print(f"Failed Login: (Code {response.status_code}): {response.reason}")
         if len(response.content) > 0:
             login_error_response = ErrorResponseDescriptor.from_dict(response.json())
             raise IECError(login_error_response.code, login_error_response.error)
         else:
             raise IECError(response.status_code, response.reason)
-
 
     logger.debug("Response: %s", response.json())
     return [Device.from_dict(device) for device in response.json()]
@@ -164,8 +178,9 @@ def get_devices(token: JWT, bp_number: str) -> list[Device]:
 
 def get_devices_by_contract_id(token: JWT, bp_number: str, contract_id: str) -> Devices:
     """Get Device data response from IEC API."""
-    return _get_response_with_descriptor(token, GET_DEVICES_BY_CONTRACT_ID_URL.format(bp_number=bp_number,
-                                                                                      contract_id=contract_id))
+    devices_dict = _get_response_with_descriptor(token, GET_DEVICES_BY_CONTRACT_ID_URL.format(bp_number=bp_number,
+                                                                                              contract_id=contract_id))
+    return Devices.from_dict(devices_dict)
 
 
 def get_device_type(token: JWT, bp_number: str, contract_id: str) -> DeviceType:
@@ -176,7 +191,6 @@ def get_device_type(token: JWT, bp_number: str, contract_id: str) -> DeviceType:
                         headers=headers)
 
     if response.status_code != 200:
-        print(f"Failed Login: (Code {response.status_code}): {response.reason}")
         if len(response.content) > 0:
             login_error_response = ErrorResponseDescriptor.from_dict(response.json())
             raise IECError(login_error_response.code, login_error_response.error)
@@ -188,5 +202,6 @@ def get_device_type(token: JWT, bp_number: str, contract_id: str) -> DeviceType:
 
 def get_billing_invoices(token: JWT, bp_number: str, contract_id: str) -> GetInvoicesBody:
     """Get Device Type data response from IEC API."""
-    return _get_response_with_descriptor(token, GET_BILLING_INVOICES.format(bp_number=bp_number,
-                                                                            contract_id=contract_id))
+    get_invoices_body_dict = _get_response_with_descriptor(token, GET_BILLING_INVOICES.format(bp_number=bp_number,
+                                                                                              contract_id=contract_id))
+    return GetInvoicesBody.from_dict(get_invoices_body_dict)

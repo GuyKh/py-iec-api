@@ -40,7 +40,7 @@ directory = "htmlcov"
 
 [tool.ruff]
 line-length = 120
-select = ["E", "F", "W", "I", "N"]
+lint.select = ["E", "F", "W", "I", "N"]
 target-version = "py311"
 
 [build-system]
