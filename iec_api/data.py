@@ -112,7 +112,6 @@ def get_remote_reading(token: JWT, meter_serial_number: str, meter_code: int, la
     json_data = json.dumps(data)
     response = requests.post(url=GET_REQUEST_READING_URL, data=json_data, headers=headers, timeout=10)
 
-    logger.debug("Response [%s]: %s", response.status_code, response.json())
     if response.status_code != 200:
         if response.status_code == 400:
             return None
