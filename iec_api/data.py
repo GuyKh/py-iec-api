@@ -30,7 +30,7 @@ from iec_api.models.exceptions import IECError
 from iec_api.models.invoice import GetInvoicesBody
 from iec_api.models.jwt import JWT
 from iec_api.models.meter_reading import MeterReadings
-from iec_api.models.remote_reading import RemoteReadingRequest, RemoteReadingResponse
+from iec_api.models.remote_reading import ReadingResolution, RemoteReadingRequest, RemoteReadingResponse
 from iec_api.models.response_descriptor import ErrorResponseDescriptor, ResponseWithDescriptor
 
 logger = logging.getLogger(__name__)
@@ -99,8 +99,10 @@ def get_customer(token: JWT) -> Optional[Customer]:
     return Customer.from_dict(response.json())
 
 
-def get_remote_reading(token: JWT, meter_serial_number: str, meter_code: int, last_invoice_date: datetime,
-                       from_date: datetime, resolution: int = 1) -> Optional[RemoteReadingResponse]:
+def get_remote_reading(token: JWT, meter_serial_number: str,
+                       meter_code: int, last_invoice_date: datetime,
+                       from_date: datetime,
+                       resolution: ReadingResolution = ReadingResolution.DAILY) -> Optional[RemoteReadingResponse]:
     headers = add_jwt_to_headers(HEADERS_WITH_AUTH, token.id_token)
     req = RemoteReadingRequest(meter_serial_number=meter_serial_number, meter_code=meter_code,
                                last_invoice_date=last_invoice_date.strftime('%Y-%m-%d'),
@@ -108,12 +110,10 @@ def get_remote_reading(token: JWT, meter_serial_number: str, meter_code: int, la
 
     logger.debug("HTTP POST: %s", GET_REQUEST_READING_URL)
 
-    data = req.to_dict()
-    json_data = json.dumps(data)
-    response = requests.post(url=GET_REQUEST_READING_URL, data=json_data, headers=headers, timeout=10)
+    response = requests.post(url=GET_REQUEST_READING_URL, data=json.dumps(req.to_dict()), headers=headers, timeout=10)
 
     if response.status_code != 200:
-        if response.status_code == 400:
+        if response.status_code == 404:
             return None
 
         if len(response.content) > 0:

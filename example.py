@@ -32,32 +32,31 @@ if __name__ == "__main__":  # pragma: no cover
                 logger.error("Failed Login: (Code %d): %s", err.code, err.error)
 
         # refresh token example
-        #token = client.refresh_token()
-        #client.save_token(token_json_file)
-        #exit(1)
+        # client.refresh_token()
+        # client.check_token()
+        # client.save_token_to_file()
 
-        # client.manual_login()
         account = client.get_default_account()
         print(account)
 
         contract = client.get_default_contract()
         print(contract)
 
-        print("Refreshing")
-        client.refresh_token()
-        print(client.get_token().id_token)
         device = client.get_devices()[0]
         print(device)
 
         # Get Remote Readings from the last three days
-        for i in range(2, -1, -1):
-            selected_date: datetime = (datetime.now() - timedelta(days=i))
-            remote_readings = client.get_remote_reading(device.device_number, int(device.device_code), selected_date,
-                                                        selected_date)
 
+        selected_date: datetime = (datetime.now() - timedelta(days=30))
+        remote_readings = client.get_remote_reading(device.device_number, int(device.device_code), selected_date,
+                                                    selected_date)
+
+        if remote_readings:
             print("Got " + str(len(remote_readings.data)) + " readings for " + selected_date.strftime("%Y-%m-%d"))
             for remote_reading in remote_readings.data:
                 print(remote_reading.date, remote_reading.value)
+        else:
+            print("Got no readings")
 
     except IECError as err:
         logger.error("IEC Error: (Code %d): %s", err.code, err.error)

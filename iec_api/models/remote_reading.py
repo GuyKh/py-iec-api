@@ -29,8 +29,15 @@
 
 from dataclasses import dataclass, field
 from datetime import datetime
+from enum import IntEnum
 
 from mashumaro import DataClassDictMixin, field_options
+
+
+class ReadingResolution(IntEnum):
+    DAILY = 1
+    WEEKLY = 2
+    MONTHLY = 3
 
 
 @dataclass
@@ -40,7 +47,7 @@ class RemoteReadingRequest(DataClassDictMixin):
     meter_code: int = field(metadata=field_options(alias="meterCode"))
     last_invoice_date: str = field(metadata=field_options(alias="lastInvoiceDate"))
     from_date: str = field(metadata=field_options(alias="fromDate"))
-    resolution: int = field(metadata=field_options(alias="resolution"))
+    resolution: ReadingResolution = field(metadata=field_options(alias="resolution"))
 
 
 @dataclass

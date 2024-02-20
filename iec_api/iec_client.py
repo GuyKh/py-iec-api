@@ -1,5 +1,4 @@
 import datetime
-import time
 from logging import getLogger
 from typing import Optional
 
@@ -7,16 +6,16 @@ import jwt
 
 from iec_api import data, login
 from iec_api.commons import is_valid_israeli_id
-from iec_api.const import DEFAULT_MINUTES_BEFORE_TO_REFRESH
 from iec_api.models.contract import Contract
 from iec_api.models.customer import Account, Customer
 from iec_api.models.device import Device, Devices
 from iec_api.models.device_type import DeviceType
 from iec_api.models.electric_bill import Invoices
+from iec_api.models.exceptions import IECLoginError
 from iec_api.models.invoice import GetInvoicesBody
 from iec_api.models.jwt import JWT
 from iec_api.models.meter_reading import MeterReadings
-from iec_api.models.remote_reading import RemoteReadingResponse
+from iec_api.models.remote_reading import RemoteReadingResponse, ReadingResolution
 
 logger = getLogger(__name__)
 
@@ -24,8 +23,7 @@ logger = getLogger(__name__)
 class IecClient:
     """ IEC API Client. """
 
-    def __init__(self, user_id: str | int, automatically_login: bool = False,
-                 mins_before_token_refresh: int = DEFAULT_MINUTES_BEFORE_TO_REFRESH):
+    def __init__(self, user_id: str | int, automatically_login: bool = False):
         """
         Initializes the class with the provided user ID and optionally logs in automatically.
 
@@ -47,7 +45,6 @@ class IecClient:
         self._login_response: Optional[str] = None  # Response from the login attempt
         self._bp_number: Optional[str] = None  # BP Number associated with the instance
         self._contract_id: Optional[str] = None  # Contract ID associated with the instance
-        self._mins_before_token_refresh = mins_before_token_refresh  # Minutes before requiring JWT token to refresh
 
         if automatically_login:
             self.login_with_id()  # Attempt to log in automatically if specified
@@ -229,7 +226,7 @@ class IecClient:
         return data.get_devices_by_contract_id(self._token, bp_number, contract_id)
 
     def get_remote_reading(self, meter_serial_number: str, meter_code: int, last_invoice_date: datetime,
-                           from_date: datetime, resolution: int = 1) -> Optional[RemoteReadingResponse]:
+                           from_date: datetime, resolution: ReadingResolution = ReadingResolution.DAILY) -> Optional[RemoteReadingResponse]:
         """
         Retrieves a remote reading for a specific meter using the provided parameters.
         Args:
@@ -360,32 +357,21 @@ class IecClient:
         Check the validity of the jwt.py token and refresh in the case of expired signature errors.
         """
         should_refresh = False
-        should_relogin = False
 
         try:
-            remaining_to_expiration = self.get_token_remaining_time_to_expiration()
+            remaining_to_expiration = login.get_token_remaining_time_to_expiration(self._token)
             if remaining_to_expiration < 0:
-                should_relogin = True
-            if remaining_to_expiration < datetime.timedelta(minutes=self._mins_before_token_refresh).seconds:
                 should_refresh = True
 
-        except jwt.exceptions.ExpiredSignatureError:
-            should_relogin = True
+        except jwt.exceptions.ExpiredSignatureError as e:
+            raise IECLoginError(-1, "Expired JWT token") from e
 
         if should_refresh:
             logger.debug("jwt.py token is about to expire, refreshing token")
             self.logged_in = False
             self.refresh_token()
 
-        if should_relogin:
-            logger.debug("jwt.py token expired, retrying login")
-            self.logged_in = False
-
         return self.logged_in
-
-    def get_token_remaining_time_to_expiration(self):
-        decoded_token = jwt.decode(self._token.id_token, options={"verify_signature": False}, algorithms=["RS256"])
-        return decoded_token['exp'] - int(time.time())
 
     def refresh_token(self):
         """

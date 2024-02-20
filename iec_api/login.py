@@ -3,6 +3,7 @@ import json
 import random
 import re
 import string
+import time
 from logging import getLogger
 from typing import Optional, Tuple
 
@@ -190,9 +191,21 @@ def save_token_to_file(token: JWT, path: str = "token.json") -> None:
         json.dump(token.to_dict(), f)
 
 
+def decode_token(token: JWT) -> dict:
+    return jwt.decode(token.id_token, options={"verify_signature": False}, algorithms=["RS256"])
+
+
 def load_token_from_file(path: str = "token.json") -> JWT:
     """Load token from file."""
     with open(path, "r", encoding="utf-8") as f:
         jwt_data = JWT.from_dict(json.load(f))
-        jwt.decode(jwt_data.access_token, options={"verify_signature": False}, algorithms=["RS256"])
+
+        # decode token to verify validity
+        decode_token(jwt_data)
+
         return jwt_data
+
+
+def get_token_remaining_time_to_expiration(token: JWT):
+    decoded_token = decode_token(token)
+    return decoded_token['exp'] - int(time.time())
