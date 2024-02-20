@@ -7,7 +7,6 @@ from mashumaro.codecs import BasicDecoder
 
 from iec_api.models.response_descriptor import ResponseWithDescriptor
 
-
 # GET https://iecapi.iec.co.il//api/customer/contract/{bp_number}?count=1
 #
 #

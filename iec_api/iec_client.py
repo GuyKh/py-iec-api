@@ -15,7 +15,7 @@ from iec_api.models.exceptions import IECLoginError
 from iec_api.models.invoice import GetInvoicesBody
 from iec_api.models.jwt import JWT
 from iec_api.models.meter_reading import MeterReadings
-from iec_api.models.remote_reading import RemoteReadingResponse, ReadingResolution
+from iec_api.models.remote_reading import ReadingResolution, RemoteReadingResponse
 
 logger = getLogger(__name__)
 
@@ -225,8 +225,9 @@ class IecClient:
 
         return data.get_devices_by_contract_id(self._token, bp_number, contract_id)
 
-    def get_remote_reading(self, meter_serial_number: str, meter_code: int, last_invoice_date: datetime,
-                           from_date: datetime, resolution: ReadingResolution = ReadingResolution.DAILY) -> Optional[RemoteReadingResponse]:
+    def get_remote_reading(self, meter_serial_number: str, meter_code: int,
+                           last_invoice_date: datetime, from_date: datetime,
+                           resolution: ReadingResolution = ReadingResolution.DAILY) -> Optional[RemoteReadingResponse]:
         """
         Retrieves a remote reading for a specific meter using the provided parameters.
         Args:

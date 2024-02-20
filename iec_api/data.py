@@ -52,7 +52,7 @@ T = TypeVar("T")
 
 
 def _get_response_with_descriptor(jwt_token: JWT, request_url: str,
-                                  decoder: BasicDecoder[ResponseWithDescriptor[T]]) -> T | list[dict]:
+                                  decoder: BasicDecoder[ResponseWithDescriptor[T]]) -> T:
     """
     A function to retrieve a response with a descriptor using a JWT token and a URL.
 
