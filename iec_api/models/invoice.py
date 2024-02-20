@@ -1,9 +1,10 @@
 from dataclasses import dataclass, field
 
 from mashumaro import DataClassDictMixin, field_options
+from mashumaro.codecs import BasicDecoder
 
 from iec_api.models.meter_reading import MeterReading
-from iec_api.models.response_descriptor import ResponseDescriptor
+from iec_api.models.response_descriptor import ResponseWithDescriptor
 
 # GET https://iecapi.iec.co.il//api/billingCollection/invoices/{bp_number}/{contract_number}
 #
@@ -87,15 +88,10 @@ class Property(DataClassDictMixin):
 
 @dataclass
 class GetInvoicesBody(DataClassDictMixin):
-    """Get Invoices Repnonse Response dataclass."""
+    """Get Invoices Response dataclass."""
 
     property: Property
     invoices: list[Invoice]
 
 
-@dataclass
-class GetInvoicesResponse(DataClassDictMixin):
-    """Device Type Response dataclass."""
-
-    data: GetInvoicesBody
-    response_descriptor: ResponseDescriptor = field(metadata=field_options(alias="reponseDescriptor"))
+decoder = BasicDecoder(ResponseWithDescriptor[GetInvoicesBody])
