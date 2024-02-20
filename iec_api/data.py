@@ -4,6 +4,7 @@ from datetime import datetime
 from typing import Optional, TypeVar
 
 import requests
+from mashumaro.codecs import BasicDecoder
 
 from iec_api.commons import add_jwt_to_headers
 from iec_api.const import (
@@ -21,15 +22,21 @@ from iec_api.const import (
     HEADERS_WITH_AUTH,
 )
 from iec_api.models.account import Account
+from iec_api.models.account import decoder as account_decoder
 from iec_api.models.contract import Contract, Contracts
+from iec_api.models.contract import decoder as contract_decoder
 from iec_api.models.customer import Customer
 from iec_api.models.device import Device, Devices
+from iec_api.models.device import decoder as devices_decoder
 from iec_api.models.device_type import DeviceType
-from iec_api.models.electric_bill import Invoices
+from iec_api.models.electric_bill import ElectricBill
+from iec_api.models.electric_bill import decoder as electric_bill_decoder
 from iec_api.models.exceptions import IECError
 from iec_api.models.invoice import GetInvoicesBody
+from iec_api.models.invoice import decoder as invoice_decoder
 from iec_api.models.jwt import JWT
 from iec_api.models.meter_reading import MeterReadings
+from iec_api.models.meter_reading import decoder as meter_reading_decoder
 from iec_api.models.remote_reading import ReadingResolution, RemoteReadingRequest, RemoteReadingResponse
 from iec_api.models.response_descriptor import ErrorResponseDescriptor, ResponseWithDescriptor
 
@@ -44,7 +51,8 @@ def _get_url(url, headers):
 T = TypeVar("T")
 
 
-def _get_response_with_descriptor(jwt_token: JWT, request_url: str) -> dict | list[dict]:
+def _get_response_with_descriptor(jwt_token: JWT, request_url: str,
+                                  decoder: BasicDecoder[ResponseWithDescriptor[T]]) -> T | list[dict]:
     """
     A function to retrieve a response with a descriptor using a JWT token and a URL.
 
@@ -65,7 +73,7 @@ def _get_response_with_descriptor(jwt_token: JWT, request_url: str) -> dict | li
         else:
             raise IECError(response.status_code, response.reason)
 
-    response_with_descriptor = ResponseWithDescriptor[T].from_dict(response.json())
+    response_with_descriptor = decoder.decode(response.json())
 
     if not response_with_descriptor.response_descriptor.is_success:
         raise IECError(response_with_descriptor.response_descriptor.code,
@@ -76,10 +84,7 @@ def _get_response_with_descriptor(jwt_token: JWT, request_url: str) -> dict | li
 
 def get_accounts(token: JWT) -> list[Account]:
     """Get Accounts response from IEC API."""
-    accounts = _get_response_with_descriptor(token, GET_ACCOUNTS_URL)
-
-    accounts = [Account.from_dict(account) for account in accounts]
-    return accounts
+    return _get_response_with_descriptor(token, GET_ACCOUNTS_URL, account_decoder)
 
 
 def get_customer(token: JWT) -> Optional[Customer]:
@@ -126,35 +131,32 @@ def get_remote_reading(token: JWT, meter_serial_number: str,
     return RemoteReadingResponse.from_dict(response.json())
 
 
-def get_electric_bill(token: JWT, bp_number: str, contract_id: str) -> Invoices:
+def get_electric_bill(token: JWT, bp_number: str, contract_id: str) -> ElectricBill:
     """Get Electric Bill data response from IEC API."""
-    invoice_dict = _get_response_with_descriptor(token,
-                                                 GET_ELECTRIC_BILL_URL.format(contract_id=contract_id,
-                                                                              bp_number=bp_number))
-    return Invoices.from_dict(invoice_dict)
+    return _get_response_with_descriptor(token,
+                                         GET_ELECTRIC_BILL_URL.format(contract_id=contract_id,
+                                                                      bp_number=bp_number),
+                                         electric_bill_decoder)
 
 
 def get_default_contract(token: JWT, bp_number: str) -> Contract:
     """Get Contract data response from IEC API."""
-    all_contracts_dict = _get_response_with_descriptor(token, GET_DEFAULT_CONTRACT_URL.format(bp_number=bp_number))
-
-    all_contracts = [Contract.from_dict(contract) for contract in all_contracts_dict]
-    return all_contracts[0]
+    return _get_response_with_descriptor(token, GET_DEFAULT_CONTRACT_URL.format(bp_number=bp_number),
+                                         contract_decoder)
 
 
 def get_contracts(token: JWT, bp_number: str) -> Contracts:
     """Get all user's Contracts from IEC API."""
-    contracts_dict = _get_response_with_descriptor(token, GET_CONTRACTS_URL.format(bp_number=bp_number))
-    return Contracts.from_dict(contracts_dict)
+    return _get_response_with_descriptor(token, GET_CONTRACTS_URL.format(bp_number=bp_number),
+                                         contract_decoder)
 
 
 def get_last_meter_reading(token: JWT, bp_number: str, contract_id: str) -> MeterReadings:
     """Get Last Meter Reading data response from IEC API."""
-    meter_readings_dict = _get_response_with_descriptor(token,
-                                                        GET_LAST_METER_READING_URL.format(contract_id=contract_id,
-                                                                                          bp_number=bp_number))
-
-    return MeterReadings.from_dict(meter_readings_dict)
+    return _get_response_with_descriptor(token,
+                                         GET_LAST_METER_READING_URL.format(contract_id=contract_id,
+                                                                           bp_number=bp_number),
+                                         meter_reading_decoder)
 
 
 def get_devices(token: JWT, bp_number: str) -> list[Device]:
@@ -177,9 +179,9 @@ def get_devices(token: JWT, bp_number: str) -> list[Device]:
 
 def get_devices_by_contract_id(token: JWT, bp_number: str, contract_id: str) -> Devices:
     """Get Device data response from IEC API."""
-    devices_dict = _get_response_with_descriptor(token, GET_DEVICES_BY_CONTRACT_ID_URL.format(bp_number=bp_number,
-                                                                                              contract_id=contract_id))
-    return Devices.from_dict(devices_dict)
+    return _get_response_with_descriptor(token, GET_DEVICES_BY_CONTRACT_ID_URL.format(bp_number=bp_number,
+                                                                                      contract_id=contract_id),
+                                         devices_decoder)
 
 
 def get_device_type(token: JWT, bp_number: str, contract_id: str) -> DeviceType:
@@ -201,6 +203,6 @@ def get_device_type(token: JWT, bp_number: str, contract_id: str) -> DeviceType:
 
 def get_billing_invoices(token: JWT, bp_number: str, contract_id: str) -> GetInvoicesBody:
     """Get Device Type data response from IEC API."""
-    get_invoices_body_dict = _get_response_with_descriptor(token, GET_BILLING_INVOICES.format(bp_number=bp_number,
-                                                                                              contract_id=contract_id))
-    return GetInvoicesBody.from_dict(get_invoices_body_dict)
+    return _get_response_with_descriptor(token, GET_BILLING_INVOICES.format(bp_number=bp_number,
+                                                                            contract_id=contract_id),
+                                         invoice_decoder)

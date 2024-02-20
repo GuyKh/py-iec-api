@@ -2,6 +2,10 @@ from dataclasses import dataclass, field
 from typing import Optional
 
 from mashumaro import DataClassDictMixin, field_options
+from mashumaro.codecs import BasicDecoder
+
+from iec_api.models.response_descriptor import ResponseWithDescriptor
+
 
 #
 # GET https://iecapi.iec.co.il//api/Device/{contract_id}
@@ -78,3 +82,6 @@ class Devices(DataClassDictMixin):
     """Devices dataclass."""
     counter_devices: Optional[list[CounterDevice]] = field(metadata=field_options(alias="counterDevices"))
     mr_type: str = field(metadata=field_options(alias="mrType"))
+
+
+decoder = BasicDecoder(ResponseWithDescriptor[Devices])

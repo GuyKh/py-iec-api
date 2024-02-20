@@ -2,6 +2,9 @@ from dataclasses import dataclass, field
 from typing import Optional
 
 from mashumaro import DataClassDictMixin, field_options
+from mashumaro.codecs import BasicDecoder
+
+from iec_api.models.response_descriptor import ResponseWithDescriptor
 
 # GET https://iecapi.iec.co.il//api/outages/accounts
 #
@@ -37,3 +40,6 @@ class Account(DataClassDictMixin):
     government_number: str = field(metadata=field_options(alias="governmentNumber"))
     name: str
     view_type_code: int = field(metadata=field_options(alias="viewTypeCode"))
+
+
+decoder = BasicDecoder(ResponseWithDescriptor[list[Account]])

@@ -10,7 +10,7 @@ from iec_api.models.contract import Contract
 from iec_api.models.customer import Account, Customer
 from iec_api.models.device import Device, Devices
 from iec_api.models.device_type import DeviceType
-from iec_api.models.electric_bill import Invoices
+from iec_api.models.electric_bill import ElectricBill
 from iec_api.models.exceptions import IECLoginError
 from iec_api.models.invoice import GetInvoicesBody
 from iec_api.models.jwt import JWT
@@ -156,7 +156,7 @@ class IecClient:
         return None
 
     def get_electric_bill(self, bp_number: Optional[str] = None, contract_id: Optional[str] = None) \
-            -> Optional[Invoices]:
+            -> Optional[ElectricBill]:
         """
         Retrieves a remote reading for a specific meter using the provided parameters.
         Args:
@@ -164,7 +164,7 @@ class IecClient:
             bp_number (str): The BP number of the meter.
             contract_id (str): The contract ID associated with the meter.
         Returns:
-            Invoices: The Invoices/Electric Bills for the user with the contract_id
+            ElectricBill: The Invoices/Electric Bills for the user with the contract_id
         """
         self.check_token()
 

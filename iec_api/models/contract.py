@@ -3,6 +3,10 @@
 from dataclasses import dataclass, field
 
 from mashumaro import DataClassDictMixin, field_options
+from mashumaro.codecs import BasicDecoder
+
+from iec_api.models.response_descriptor import ResponseWithDescriptor
+
 
 # GET https://iecapi.iec.co.il//api/customer/contract/{bp_number}?count=1
 #
@@ -69,3 +73,6 @@ class Contracts(DataClassDictMixin):
     contracts: list[Contract]
     contract_amount: int = field(metadata=field_options(alias="contractAmount"))
     total_to_pay: float = field(metadata=field_options(alias="totalToPay"))
+
+
+decoder = BasicDecoder(ResponseWithDescriptor[Contracts])

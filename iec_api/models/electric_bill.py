@@ -3,8 +3,10 @@
 from dataclasses import dataclass, field
 
 from mashumaro import DataClassDictMixin, field_options
+from mashumaro.codecs import BasicDecoder
 
 from iec_api.models.invoice import Invoice
+from iec_api.models.response_descriptor import ResponseWithDescriptor
 
 # GET https://iecapi.iec.co.il//api/ElectricBillsDrawers/ElectricBills/{contract_id}/{bp_number}
 #
@@ -42,10 +44,13 @@ from iec_api.models.invoice import Invoice
 
 
 @dataclass
-class Invoices(DataClassDictMixin):
+class ElectricBill(DataClassDictMixin):
     total_amount_to_pay: float = field(metadata=field_options(alias="totalAmountToPay"))
     total_invoices_to_pay: int = field(
         metadata=field_options(alias="totalInvoicesToPay")
     )
     last_date_to_pay: str = field(metadata=field_options(alias="lastDateToPay"))
     invoices: list[Invoice]
+
+
+decoder = BasicDecoder(ResponseWithDescriptor[ElectricBill])
