@@ -3,8 +3,9 @@
 from dataclasses import dataclass, field
 
 from mashumaro import DataClassDictMixin, field_options
+from mashumaro.codecs import BasicDecoder
 
-from iec_api.models.response_descriptor import ResponseDescriptor
+from iec_api.models.response_descriptor import ResponseWithDescriptor
 
 # GET https://iecapi.iec.co.il//api/customer/contract/{bp_number}?count=1
 #
@@ -73,9 +74,4 @@ class Contracts(DataClassDictMixin):
     total_to_pay: float = field(metadata=field_options(alias="totalToPay"))
 
 
-@dataclass
-class GetContractResponse(DataClassDictMixin):
-    data: Contracts
-    response_descriptor: ResponseDescriptor = field(
-        metadata=field_options(alias="reponseDescriptor")
-    )
+decoder = BasicDecoder(ResponseWithDescriptor[Contracts])
