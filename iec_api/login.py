@@ -3,8 +3,9 @@ import json
 import random
 import re
 import string
+import time
 from logging import getLogger
-from typing import Tuple
+from typing import Optional, Tuple
 
 import jwt
 import pkce
@@ -59,7 +60,7 @@ def get_first_factor_id(user_id: str):
     return response.json().get("stateToken", ""), response.json().get("_embedded", {}).get("factors", {})[0].get("id")
 
 
-def send_otp_code(factor_id: object, state_token: object, pass_code: object = None) -> str | None:
+def send_otp_code(factor_id: object, state_token: object, pass_code: object = None) -> Optional[str]:
     """
     Send OTP code for factor verification and return the session token if successful.
 
@@ -69,7 +70,7 @@ def send_otp_code(factor_id: object, state_token: object, pass_code: object = No
         pass_code (object, optional): The pass code for verification. Defaults to None.
 
     Returns:
-        str | None: The session token if verification is successful, otherwise None.
+        Optional[str]: The session token if verification is successful, otherwise None.
     """
     data = {"stateToken": state_token}
     if pass_code:
@@ -150,7 +151,7 @@ def verify_otp_code(factor_id: str, state_token: str, otp_code: str) -> JWT:
         raise IECLoginError(-1, "Failed at OTP verification")
 
 
-def manual_authorization(id_number) -> JWT | None:  # pragma: no cover
+def manual_authorization(id_number) -> Optional[JWT]:  # pragma: no cover
     """Get authorization token from IEC API."""
     if not id_number:
         id_number = input("Enter your ID Number: ")
@@ -168,7 +169,7 @@ def manual_authorization(id_number) -> JWT | None:  # pragma: no cover
     return jwt_token
 
 
-def refresh_token(token: JWT) -> JWT | None:
+def refresh_token(token: JWT) -> Optional[JWT]:
     """Refresh IEC JWT token."""
     headers = {"accept": "application/json", "content-type": "application/x-www-form-urlencoded"}
     data = {
@@ -190,9 +191,21 @@ def save_token_to_file(token: JWT, path: str = "token.json") -> None:
         json.dump(token.to_dict(), f)
 
 
+def decode_token(token: JWT) -> dict:
+    return jwt.decode(token.id_token, options={"verify_signature": False}, algorithms=["RS256"])
+
+
 def load_token_from_file(path: str = "token.json") -> JWT:
     """Load token from file."""
     with open(path, "r", encoding="utf-8") as f:
         jwt_data = JWT.from_dict(json.load(f))
-        jwt.decode(jwt_data.access_token, options={"verify_signature": False}, algorithms=["RS256"])
+
+        # decode token to verify validity
+        decode_token(jwt_data)
+
         return jwt_data
+
+
+def get_token_remaining_time_to_expiration(token: JWT):
+    decoded_token = decode_token(token)
+    return decoded_token['exp'] - int(time.time())

@@ -28,18 +28,26 @@
 # }
 
 from dataclasses import dataclass, field
+from datetime import datetime
+from enum import IntEnum
 
 from mashumaro import DataClassDictMixin, field_options
 
 
+class ReadingResolution(IntEnum):
+    DAILY = 1
+    WEEKLY = 2
+    MONTHLY = 3
+
+
 @dataclass
-class RemoteReadingRequest:
+class RemoteReadingRequest(DataClassDictMixin):
     """Remote Reading Request ."""
-    meterSerialNumber: str  # noqa: N815
-    meterCode: int  # noqa: N815
-    lastInvoiceDate: str  # noqa: N815
-    fromDate: str  # noqa: N815
-    resolution: int
+    meter_serial_number: str = field(metadata=field_options(alias="meterSerialNumber"))
+    meter_code: int = field(metadata=field_options(alias="meterCode"))
+    last_invoice_date: str = field(metadata=field_options(alias="lastInvoiceDate"))
+    from_date: str = field(metadata=field_options(alias="fromDate"))
+    resolution: ReadingResolution = field(metadata=field_options(alias="resolution"))
 
 
 @dataclass
@@ -54,11 +62,11 @@ class FutureConsumptionInfo(DataClassDictMixin):
 
 
 @dataclass
-class RemoteReadingData(DataClassDictMixin):
+class RemoteReading(DataClassDictMixin):
     """Remote Reading Data dataclass."""
 
     status: int
-    date: str
+    date: datetime
     value: float
 
 
@@ -80,4 +88,4 @@ class RemoteReadingResponse(DataClassDictMixin):
     )
     meter_start_date: str = field(metadata=field_options(alias="meterStartDate"))
     total_import: float = field(metadata=field_options(alias="totalImport"))
-    data: RemoteReadingData
+    data: list[RemoteReading]
