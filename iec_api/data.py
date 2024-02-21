@@ -28,6 +28,7 @@ from iec_api.models.customer import Customer
 from iec_api.models.device import Device, Devices
 from iec_api.models.device import decoder as devices_decoder
 from iec_api.models.device_type import DeviceType
+from iec_api.models.device_type import decoder as device_type_decoder
 from iec_api.models.electric_bill import ElectricBill
 from iec_api.models.electric_bill import decoder as electric_bill_decoder
 from iec_api.models.exceptions import IECError
@@ -192,18 +193,9 @@ def get_devices_by_contract_id(token: JWT, bp_number: str, contract_id: str) -> 
 
 def get_device_type(token: JWT, bp_number: str, contract_id: str) -> DeviceType:
     """Get Device Type data response from IEC API."""
-    headers = add_jwt_to_headers(HEADERS_WITH_AUTH, token.id_token)
-    # sending get request and saving the response as response object
-    response = _get_url(url=GET_DEVICE_TYPE_URL.format(bp_number=bp_number, contract_id=contract_id), headers=headers)
-
-    if response.status_code != 200:
-        if len(response.content) > 0:
-            login_error_response = ErrorResponseDescriptor.from_dict(response.json())
-            raise IECError(login_error_response.code, login_error_response.error)
-        else:
-            raise IECError(response.status_code, response.reason)
-
-    return DeviceType.from_dict(response.json())
+    return _get_response_with_descriptor(
+        token, GET_DEVICE_TYPE_URL.format(bp_number=bp_number, contract_id=contract_id), device_type_decoder
+    )
 
 
 def get_billing_invoices(token: JWT, bp_number: str, contract_id: str) -> GetInvoicesBody:
