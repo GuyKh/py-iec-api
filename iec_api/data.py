@@ -174,7 +174,6 @@ async def get_device_type(session: ClientSession, token: JWT, bp_number: str, co
     # sending get request and saving the response as response object
     return await _get_response_with_descriptor(
         session, token, GET_DEVICE_TYPE_URL.format(bp_number=bp_number, contract_id=contract_id), device_type_decoder
-    )
 
 
 async def get_billing_invoices(session: ClientSession, token: JWT, bp_number: str, contract_id: str) -> GetInvoicesBody:
