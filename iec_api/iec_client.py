@@ -21,7 +21,7 @@ logger = getLogger(__name__)
 
 
 class IecClient:
-    """ IEC API Client. """
+    """IEC API Client."""
 
     def __init__(self, user_id: str | int, automatically_login: bool = False):
         """
@@ -39,8 +39,9 @@ class IecClient:
         self._factor_id: Optional[str] = None  # Factor ID for multifactor authentication
         self._session_token: Optional[str] = None  # Token for maintaining the user's session
         self.logged_in: bool = False  # Flag to indicate if the user is logged in
-        self._token: JWT = JWT(access_token="", refresh_token="", token_type="", expires_in=0,
-                               scope="", id_token="")  # Token for authentication
+        self._token: JWT = JWT(
+            access_token="", refresh_token="", token_type="", expires_in=0, scope="", id_token=""
+        )  # Token for authentication
         self._user_id: str = str(user_id)  # User ID associated with the instance
         self._login_response: Optional[str] = None  # Response from the login attempt
         self._bp_number: Optional[str] = None  # BP Number associated with the instance
@@ -128,8 +129,9 @@ class IecClient:
             return contracts
         return []
 
-    def get_last_meter_reading(self, bp_number: Optional[str] = None,
-                               contract_id: Optional[str] = None) -> Optional[MeterReadings]:
+    def get_last_meter_reading(
+        self, bp_number: Optional[str] = None, contract_id: Optional[str] = None
+    ) -> Optional[MeterReadings]:
         """
         Retrieves a last meter reading for a specific contract and user.
         Args:
@@ -155,8 +157,9 @@ class IecClient:
             return response
         return None
 
-    def get_electric_bill(self, bp_number: Optional[str] = None, contract_id: Optional[str] = None) \
-            -> Optional[ElectricBill]:
+    def get_electric_bill(
+        self, bp_number: Optional[str] = None, contract_id: Optional[str] = None
+    ) -> Optional[ElectricBill]:
         """
         Retrieves a remote reading for a specific meter using the provided parameters.
         Args:
@@ -225,9 +228,15 @@ class IecClient:
 
         return data.get_devices_by_contract_id(self._token, bp_number, contract_id)
 
-    def get_remote_reading(self, meter_serial_number: str, meter_code: int,
-                           last_invoice_date: datetime, from_date: datetime,
-                           resolution: ReadingResolution = ReadingResolution.DAILY) -> Optional[RemoteReadingResponse]:
+    def get_remote_reading(
+        self,
+        meter_serial_number: str,
+        meter_code: int,
+        last_invoice_date: datetime,
+        from_date: datetime,
+        resolution: ReadingResolution = ReadingResolution.DAILY,
+        contract_id: Optional[str] = None,
+    ) -> Optional[RemoteReadingResponse]:
         """
         Retrieves a remote reading for a specific meter using the provided parameters.
         Args:
@@ -237,12 +246,16 @@ class IecClient:
             last_invoice_date (str): The date of the last invoice.
             from_date (str): The start date for the remote reading.
             resolution (int): The resolution of the remote reading.
+            contract_id (str): The contract id.
         Returns:
             RemoteReadingResponse: The response containing the remote reading or None if not found
         """
         self.check_token()
-        return data.get_remote_reading(self._token, meter_serial_number, meter_code,
-                                       last_invoice_date, from_date, resolution)
+        if not contract_id:
+            contract_id = self._contract_id
+        return data.get_remote_reading(
+            self._token, contract_id, meter_serial_number, meter_code, last_invoice_date, from_date, resolution
+        )
 
     def get_device_type(self, bp_number: Optional[str] = None, contract_id: Optional[str] = None) -> DeviceType:
         """
@@ -268,8 +281,9 @@ class IecClient:
 
         return data.get_device_type(self._token, bp_number, contract_id)
 
-    def get_billing_invoices(self, bp_number: Optional[str] = None, contract_id: Optional[str] = None) \
-            -> GetInvoicesBody:
+    def get_billing_invoices(
+        self, bp_number: Optional[str] = None, contract_id: Optional[str] = None
+    ) -> GetInvoicesBody:
         """
         Get a list of devices for the user
         Args:
@@ -368,7 +382,7 @@ class IecClient:
             raise IECLoginError(-1, "Expired JWT token") from e
 
         if should_refresh:
-            logger.debug("jwt.py token is about to expire, refreshing token")
+            logger.debug("jwt.py token expired, refreshing token")
             self.logged_in = False
             self.refresh_token()
 
