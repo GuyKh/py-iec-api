@@ -24,7 +24,7 @@ logger = getLogger(__name__)
 class IecClient:
     """IEC API Client."""
 
-    def __init__(self, session: ClientSession, user_id: str | int, automatically_login: bool = False):
+    def __init__(self, session: ClientSession, user_id: str | int):
         """
         Initializes the class with the provided user ID and optionally logs in automatically.
 
@@ -49,9 +49,6 @@ class IecClient:
         self._login_response: Optional[str] = None  # Response from the login attempt
         self._bp_number: Optional[str] = None  # BP Number associated with the instance
         self._contract_id: Optional[str] = None  # Contract ID associated with the instance
-
-        if automatically_login:
-            self.login_with_id()  # Attempt to log in automatically if specified
 
     # -------------
     # Data methods:
