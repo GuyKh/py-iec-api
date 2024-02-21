@@ -12,8 +12,8 @@ from iec_api.const import (
     GET_CONSUMER_URL,
     GET_CONTRACTS_URL,
     GET_DEFAULT_CONTRACT_URL,
+    GET_DEVICE_BY_DEVICE_ID_URL,
     GET_DEVICE_TYPE_URL,
-    GET_DEVICES_BY_CONTRACT_ID_URL,
     GET_DEVICES_URL,
     GET_ELECTRIC_BILL_URL,
     GET_LAST_METER_READING_URL,
@@ -167,11 +167,11 @@ def get_last_meter_reading(token: JWT, bp_number: str, contract_id: str) -> Mete
     )
 
 
-def get_devices(token: JWT, bp_number: str) -> list[Device]:
+def get_devices(token: JWT, contract_id: str) -> list[Device]:
     """Get Device data response from IEC API."""
     headers = add_jwt_to_headers(HEADERS_WITH_AUTH, token.id_token)
     # sending get request and saving the response as response object
-    response = _get_url(url=GET_DEVICES_URL.format(bp_number=bp_number), headers=headers)
+    response = _get_url(url=GET_DEVICES_URL.format(contract_id=contract_id), headers=headers)
 
     if response.status_code != 200:
         if len(response.content) > 0:
@@ -184,10 +184,10 @@ def get_devices(token: JWT, bp_number: str) -> list[Device]:
     return [Device.from_dict(device) for device in response.json()]
 
 
-def get_devices_by_contract_id(token: JWT, bp_number: str, contract_id: str) -> Devices:
+def get_device_by_device_id(token: JWT, contract_id: str, device_id: str) -> Devices:
     """Get Device data response from IEC API."""
     return _get_response_with_descriptor(
-        token, GET_DEVICES_BY_CONTRACT_ID_URL.format(bp_number=bp_number, contract_id=contract_id), devices_decoder
+        token, GET_DEVICE_BY_DEVICE_ID_URL.format(device_id=device_id, contract_id=contract_id), devices_decoder
     )
 
 

@@ -8,9 +8,7 @@ from iec_api.iec_client import IecClient
 from iec_api.login import IECLoginError
 from iec_api.models.exceptions import IECError
 
-ROOT_DIR = os.path.dirname(
-    os.path.abspath(__file__)
-)
+ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
 config.fileConfig(ROOT_DIR + "/logging.conf", disable_existing_loggers=False)
 logger = getLogger(__name__)
 
@@ -45,11 +43,15 @@ if __name__ == "__main__":  # pragma: no cover
         device = client.get_devices()[0]
         print(device)
 
+        device_details = client.get_device_by_device_id(device.device_number)
+        print(device_details)
+
         # Get Remote Readings from the last three days
 
-        selected_date: datetime = (datetime.now() - timedelta(days=30))
-        remote_readings = client.get_remote_reading(device.device_number, int(device.device_code), selected_date,
-                                                    selected_date)
+        selected_date: datetime = datetime.now() - timedelta(days=30)
+        remote_readings = client.get_remote_reading(
+            device.device_number, int(device.device_code), selected_date, selected_date
+        )
 
         if remote_readings:
             print("Got " + str(len(remote_readings.data)) + " readings for " + selected_date.strftime("%Y-%m-%d"))
