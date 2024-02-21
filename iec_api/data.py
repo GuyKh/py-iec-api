@@ -1,4 +1,3 @@
-import json
 import logging
 from datetime import datetime
 from typing import Optional, TypeVar
@@ -108,6 +107,7 @@ def get_customer(token: JWT) -> Optional[Customer]:
 
 def get_remote_reading(
     token: JWT,
+    contract_id: str,
     meter_serial_number: str,
     meter_code: int,
     last_invoice_date: datetime,
@@ -117,15 +117,16 @@ def get_remote_reading(
     headers = add_jwt_to_headers(HEADERS_WITH_AUTH, token.id_token)
     req = RemoteReadingRequest(
         meter_serial_number=meter_serial_number,
-        meter_code=meter_code,
+        meter_code=str(meter_code),
         last_invoice_date=last_invoice_date.strftime("%Y-%m-%d"),
         from_date=from_date.strftime("%Y-%m-%d"),
         resolution=resolution,
     )
 
-    logger.debug("HTTP POST: %s", GET_REQUEST_READING_URL)
+    url = GET_REQUEST_READING_URL.format(contract_id=contract_id)
+    logger.debug(f"HTTP POST: {url}\nData:{req.to_dict()}")
 
-    response = requests.post(url=GET_REQUEST_READING_URL, data=json.dumps(req.to_dict()), headers=headers, timeout=10)
+    response = requests.post(url=url, json=req.to_dict(), headers=headers, timeout=10)
 
     if response.status_code != 200:
         if response.status_code == 404:
