@@ -227,7 +227,8 @@ class IecClient:
 
     def get_remote_reading(self, meter_serial_number: str, meter_code: int,
                            last_invoice_date: datetime, from_date: datetime,
-                           resolution: ReadingResolution = ReadingResolution.DAILY) -> Optional[RemoteReadingResponse]:
+                           resolution: ReadingResolution = ReadingResolution.DAILY,
+                           contract_id: Optional[str] = None) -> Optional[RemoteReadingResponse]:
         """
         Retrieves a remote reading for a specific meter using the provided parameters.
         Args:
@@ -237,11 +238,14 @@ class IecClient:
             last_invoice_date (str): The date of the last invoice.
             from_date (str): The start date for the remote reading.
             resolution (int): The resolution of the remote reading.
+            contract_id (str): The contract id.
         Returns:
             RemoteReadingResponse: The response containing the remote reading or None if not found
         """
         self.check_token()
-        return data.get_remote_reading(self._token, meter_serial_number, meter_code,
+        if not contract_id:
+            contract_id = self._contract_id
+        return data.get_remote_reading(self._token, contract_id, meter_serial_number, meter_code,
                                        last_invoice_date, from_date, resolution)
 
     def get_device_type(self, bp_number: Optional[str] = None, contract_id: Optional[str] = None) -> DeviceType:
