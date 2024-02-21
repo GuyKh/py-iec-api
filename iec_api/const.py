@@ -24,7 +24,7 @@ HEADERS_WITH_AUTH["Cookie"] = "ARRAffinity=?; " "ARRAffinitySameSite=?;" " GCLB=
 IEC_API_BASE_URL = "https://iecapi.iec.co.il//api/"
 GET_ACCOUNTS_URL = IEC_API_BASE_URL + "outages/accounts"
 GET_CONSUMER_URL = IEC_API_BASE_URL + "customer"
-GET_REQUEST_READING_URL = IEC_API_BASE_URL + "Consumption/RemoteReadingRange"
+GET_REQUEST_READING_URL = IEC_API_BASE_URL + "Consumption/RemoteReadingRange/{contract_id}"
 GET_ELECTRIC_BILL_URL = IEC_API_BASE_URL + "ElectricBillsDrawers/ElectricBills/{contract_id}/{bp_number}"
 GET_CONTRACTS_URL = IEC_API_BASE_URL + "customer/contract/{bp_number}"
 GET_DEFAULT_CONTRACT_URL = GET_CONTRACTS_URL + "?count=1"
