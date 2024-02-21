@@ -62,9 +62,13 @@ async def main():
         device = devices[0]
         print(device)
 
+        device_details = await client.get_device_by_device_id(device.device_number)
+        print(device_details)
+
         # Get Remote Readings from the last three days
 
         selected_date: datetime = datetime.now() - timedelta(days=30)
+
         remote_readings = await client.get_remote_reading(
             device.device_number, int(device.device_code), selected_date, selected_date
         )
@@ -76,7 +80,6 @@ async def main():
         else:
             print("Got no readings")
 
-        print(await client.get_devices_by_bp_number())
         print(await client.get_electric_bill())
         print(await client.get_device_type())
         print(await client.get_billing_invoices())

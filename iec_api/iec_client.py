@@ -208,31 +208,24 @@ class IecClient:
 
         return await data.get_devices(self._session, self._token, contract_id)
 
-    async def get_devices_by_bp_number(
-        self, bp_number: Optional[str] = None, contract_id: Optional[str] = None
-    ) -> Devices:
+    async def get_device_by_device_id(self, device_id: str, contract_id: Optional[str] = None) -> Devices:
         """
         Get a list of devices for the user
         Args:
             self: The instance of the class.
-            bp_number (str): The BP number of the user.
+            device_id (str): The Device code.
             contract_id (str): The Contract ID of the user.
         Returns:
             list[Device]: List of devices
         """
         await self.check_token()
 
-        if not bp_number:
-            bp_number = self._bp_number
-
-        assert bp_number, "BP number must be provided"
-
         if not contract_id:
             contract_id = self._contract_id
 
         assert contract_id, "Contract ID must be provided"
 
-        return await data.get_devices_by_bp_number(self._session, self._token, bp_number, contract_id)
+        return await data.get_device_by_device_id(self._session, self._token, contract_id, device_id)
 
     async def get_remote_reading(
         self,
