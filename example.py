@@ -15,7 +15,7 @@ logger = getLogger(__name__)
 if __name__ == "__main__":  # pragma: no cover
     try:
         # Example of usage
-        client = IecClient(200461929)
+        client = IecClient(123456789)
 
         token_json_file = "token.json"
         if os.path.exists(token_json_file):
