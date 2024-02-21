@@ -1,4 +1,3 @@
-import json
 import logging
 from datetime import datetime
 from typing import Optional, TypeVar
@@ -118,7 +117,7 @@ def get_remote_reading(
     headers = add_jwt_to_headers(HEADERS_WITH_AUTH, token.id_token)
     req = RemoteReadingRequest(
         meter_serial_number=meter_serial_number,
-        meter_code=meter_code,
+        meter_code=str(meter_code),
         last_invoice_date=last_invoice_date.strftime("%Y-%m-%d"),
         from_date=from_date.strftime("%Y-%m-%d"),
         resolution=resolution,
