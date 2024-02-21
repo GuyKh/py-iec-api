@@ -12,8 +12,8 @@ from iec_api.const import (
     GET_CONSUMER_URL,
     GET_CONTRACTS_URL,
     GET_DEFAULT_CONTRACT_URL,
+    GET_DEVICE_BY_DEVICE_ID_URL,
     GET_DEVICE_TYPE_URL,
-    GET_DEVICES_BY_BP_NUMBER_URL,
     GET_DEVICES_URL,
     GET_ELECTRIC_BILL_URL,
     GET_LAST_METER_READING_URL,
@@ -159,13 +159,10 @@ async def get_devices(session: ClientSession, token: JWT, contract_id: str) -> l
     return [Device.from_dict(device) for device in response]
 
 
-async def get_devices_by_bp_number(session: ClientSession, token: JWT, bp_number: str, contract_id: str) -> Devices:
+async def get_device_by_device_id(session: ClientSession, token: JWT, contract_id: str, device_id: str) -> Devices:
     """Get Device data response from IEC API."""
-    return await _get_response_with_descriptor(
-        session,
-        token,
-        GET_DEVICES_BY_BP_NUMBER_URL.format(bp_number=bp_number, contract_id=contract_id),
-        devices_decoder,
+    return _get_response_with_descriptor(
+        token, GET_DEVICE_BY_DEVICE_ID_URL.format(device_id=device_id, contract_id=contract_id), devices_decoder
     )
 
 
@@ -174,6 +171,7 @@ async def get_device_type(session: ClientSession, token: JWT, bp_number: str, co
     # sending get request and saving the response as response object
     return await _get_response_with_descriptor(
         session, token, GET_DEVICE_TYPE_URL.format(bp_number=bp_number, contract_id=contract_id), device_type_decoder
+    )
 
 
 async def get_billing_invoices(session: ClientSession, token: JWT, bp_number: str, contract_id: str) -> GetInvoicesBody:
