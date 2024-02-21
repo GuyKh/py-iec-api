@@ -2,6 +2,9 @@ from dataclasses import dataclass, field
 from typing import Optional
 
 from mashumaro import DataClassDictMixin, field_options
+from mashumaro.codecs import BasicDecoder
+
+from iec_api.models.response_descriptor import ResponseWithDescriptor
 
 #
 # GET https://iecapi.iec.co.il//api/Device/type/{bp_number}/{contract_id}/false
@@ -44,3 +47,6 @@ class DeviceType(DataClassDictMixin):
     balance_date: Optional[str] = field(metadata=field_options(alias="balanceDate"))
     is_active: bool = field(metadata=field_options(alias="isActive"))
     number_of_devices: int = field(metadata=field_options(alias="numberOfDevices"))
+
+
+decoder = BasicDecoder(ResponseWithDescriptor[DeviceType])
