@@ -51,8 +51,9 @@ def _get_url(url, headers):
 T = TypeVar("T")
 
 
-def _get_response_with_descriptor(jwt_token: JWT, request_url: str,
-                                  decoder: BasicDecoder[ResponseWithDescriptor[T]]) -> T:
+def _get_response_with_descriptor(
+    jwt_token: JWT, request_url: str, decoder: BasicDecoder[ResponseWithDescriptor[T]]
+) -> T:
     """
     A function to retrieve a response with a descriptor using a JWT token and a URL.
 
@@ -75,9 +76,10 @@ def _get_response_with_descriptor(jwt_token: JWT, request_url: str,
 
     response_with_descriptor = decoder.decode(response.json())
 
-    if not response_with_descriptor.response_descriptor.is_success:
-        raise IECError(response_with_descriptor.response_descriptor.code,
-                       response_with_descriptor.response_descriptor.description)
+    if not response_with_descriptor.data and not response_with_descriptor.response_descriptor.is_success:
+        raise IECError(
+            response_with_descriptor.response_descriptor.code, response_with_descriptor.response_descriptor.description
+        )
 
     return response_with_descriptor.data
 
@@ -104,14 +106,23 @@ def get_customer(token: JWT) -> Optional[Customer]:
     return Customer.from_dict(response.json())
 
 
-def get_remote_reading(token: JWT, contract_id: str, meter_serial_number: str,
-                       meter_code: int, last_invoice_date: datetime,
-                       from_date: datetime,
-                       resolution: ReadingResolution = ReadingResolution.DAILY) -> Optional[RemoteReadingResponse]:
+def get_remote_reading(
+    token: JWT,
+    contract_id: str,
+    meter_serial_number: str,
+    meter_code: int,
+    last_invoice_date: datetime,
+    from_date: datetime,
+    resolution: ReadingResolution = ReadingResolution.DAILY,
+) -> Optional[RemoteReadingResponse]:
     headers = add_jwt_to_headers(HEADERS_WITH_AUTH, token.id_token)
-    req = RemoteReadingRequest(meter_serial_number=meter_serial_number, meter_code=str(meter_code),
-                               last_invoice_date=last_invoice_date.strftime('%Y-%m-%d'),
-                               from_date=from_date.strftime('%Y-%m-%d'), resolution=resolution)
+    req = RemoteReadingRequest(
+        meter_serial_number=meter_serial_number,
+        meter_code=meter_code,
+        last_invoice_date=last_invoice_date.strftime("%Y-%m-%d"),
+        from_date=from_date.strftime("%Y-%m-%d"),
+        resolution=resolution,
+    )
 
     url = GET_REQUEST_READING_URL.format(contract_id=contract_id)
     logger.debug(f"HTTP POST: {url}\nData:{req.to_dict()}")
@@ -134,38 +145,33 @@ def get_remote_reading(token: JWT, contract_id: str, meter_serial_number: str,
 
 def get_electric_bill(token: JWT, bp_number: str, contract_id: str) -> ElectricBill:
     """Get Electric Bill data response from IEC API."""
-    return _get_response_with_descriptor(token,
-                                         GET_ELECTRIC_BILL_URL.format(contract_id=contract_id,
-                                                                      bp_number=bp_number),
-                                         electric_bill_decoder)
+    return _get_response_with_descriptor(
+        token, GET_ELECTRIC_BILL_URL.format(contract_id=contract_id, bp_number=bp_number), electric_bill_decoder
+    )
 
 
 def get_default_contract(token: JWT, bp_number: str) -> Contract:
     """Get Contract data response from IEC API."""
-    return _get_response_with_descriptor(token, GET_DEFAULT_CONTRACT_URL.format(bp_number=bp_number),
-                                         contract_decoder)
+    return _get_response_with_descriptor(token, GET_DEFAULT_CONTRACT_URL.format(bp_number=bp_number), contract_decoder)
 
 
 def get_contracts(token: JWT, bp_number: str) -> Contracts:
     """Get all user's Contracts from IEC API."""
-    return _get_response_with_descriptor(token, GET_CONTRACTS_URL.format(bp_number=bp_number),
-                                         contract_decoder)
+    return _get_response_with_descriptor(token, GET_CONTRACTS_URL.format(bp_number=bp_number), contract_decoder)
 
 
 def get_last_meter_reading(token: JWT, bp_number: str, contract_id: str) -> MeterReadings:
     """Get Last Meter Reading data response from IEC API."""
-    return _get_response_with_descriptor(token,
-                                         GET_LAST_METER_READING_URL.format(contract_id=contract_id,
-                                                                           bp_number=bp_number),
-                                         meter_reading_decoder)
+    return _get_response_with_descriptor(
+        token, GET_LAST_METER_READING_URL.format(contract_id=contract_id, bp_number=bp_number), meter_reading_decoder
+    )
 
 
 def get_devices(token: JWT, bp_number: str) -> list[Device]:
     """Get Device data response from IEC API."""
     headers = add_jwt_to_headers(HEADERS_WITH_AUTH, token.id_token)
     # sending get request and saving the response as response object
-    response = _get_url(url=GET_DEVICES_URL.format(bp_number=bp_number),
-                        headers=headers)
+    response = _get_url(url=GET_DEVICES_URL.format(bp_number=bp_number), headers=headers)
 
     if response.status_code != 200:
         if len(response.content) > 0:
@@ -180,17 +186,16 @@ def get_devices(token: JWT, bp_number: str) -> list[Device]:
 
 def get_devices_by_contract_id(token: JWT, bp_number: str, contract_id: str) -> Devices:
     """Get Device data response from IEC API."""
-    return _get_response_with_descriptor(token, GET_DEVICES_BY_CONTRACT_ID_URL.format(bp_number=bp_number,
-                                                                                      contract_id=contract_id),
-                                         devices_decoder)
+    return _get_response_with_descriptor(
+        token, GET_DEVICES_BY_CONTRACT_ID_URL.format(bp_number=bp_number, contract_id=contract_id), devices_decoder
+    )
 
 
 def get_device_type(token: JWT, bp_number: str, contract_id: str) -> DeviceType:
     """Get Device Type data response from IEC API."""
     headers = add_jwt_to_headers(HEADERS_WITH_AUTH, token.id_token)
     # sending get request and saving the response as response object
-    response = _get_url(url=GET_DEVICE_TYPE_URL.format(bp_number=bp_number, contract_id=contract_id),
-                        headers=headers)
+    response = _get_url(url=GET_DEVICE_TYPE_URL.format(bp_number=bp_number, contract_id=contract_id), headers=headers)
 
     if response.status_code != 200:
         if len(response.content) > 0:
@@ -204,6 +209,6 @@ def get_device_type(token: JWT, bp_number: str, contract_id: str) -> DeviceType:
 
 def get_billing_invoices(token: JWT, bp_number: str, contract_id: str) -> GetInvoicesBody:
     """Get Device Type data response from IEC API."""
-    return _get_response_with_descriptor(token, GET_BILLING_INVOICES.format(bp_number=bp_number,
-                                                                            contract_id=contract_id),
-                                         invoice_decoder)
+    return _get_response_with_descriptor(
+        token, GET_BILLING_INVOICES.format(bp_number=bp_number, contract_id=contract_id), invoice_decoder
+    )
