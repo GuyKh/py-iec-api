@@ -18,6 +18,8 @@ mashumaro = "^3.12"
 pyjwt = "^2.8.0"
 requests = "^2.31.0"
 pkce = "^1.0.3"
+aiohttp = "^3.9.3"
+aiofiles = "^23.2.1"
 
 [tool.poetry.dev-dependencies]
 pytest = "8.0.1"
