@@ -27,7 +27,7 @@ logger = getLogger(__name__)
 class IecClient:
     """IEC API Client."""
 
-    def __init__(self, user_id: str | int, session: ClientSession = aiohttp.ClientSession()):
+    def __init__(self, user_id: str | int, session: Optional[ClientSession] = None):
         """
         Initializes the class with the provided user ID and optionally logs in automatically.
 
@@ -40,8 +40,11 @@ class IecClient:
         if not is_valid_israeli_id(user_id):
             raise ValueError("User ID must be a valid Israeli ID.")
 
+        if not session:
+            session = aiohttp.ClientSession()
+            atexit.register(self._shutdown)
+
         self._session = session
-        atexit.register(self._shutdown)
 
         self._state_token: Optional[str] = None  # Token for maintaining the state of the user's session
         self._factor_id: Optional[str] = None  # Factor ID for multifactor authentication
@@ -370,6 +373,8 @@ class IecClient:
         self._token = token
         if await self.check_token():
             self.logged_in = True
+        else:
+            raise IECLoginError(-1, "Invalid JWT token")
 
     async def override_id_token(self, id_token):
         """
