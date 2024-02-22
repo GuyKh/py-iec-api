@@ -1,7 +1,10 @@
+import asyncio
+import atexit
 import datetime
 from logging import getLogger
 from typing import Optional
 
+import aiohttp
 import jwt
 from aiohttp import ClientSession
 
@@ -24,7 +27,7 @@ logger = getLogger(__name__)
 class IecClient:
     """IEC API Client."""
 
-    def __init__(self, session: ClientSession, user_id: str | int):
+    def __init__(self, user_id: str | int, session: ClientSession = aiohttp.ClientSession()):
         """
         Initializes the class with the provided user ID and optionally logs in automatically.
 
@@ -38,6 +41,8 @@ class IecClient:
             raise ValueError("User ID must be a valid Israeli ID.")
 
         self._session = session
+        atexit.register(self._shutdown)
+
         self._state_token: Optional[str] = None  # Token for maintaining the state of the user's session
         self._factor_id: Optional[str] = None  # Factor ID for multifactor authentication
         self._session_token: Optional[str] = None  # Token for maintaining the user's session
@@ -49,6 +54,10 @@ class IecClient:
         self._login_response: Optional[str] = None  # Response from the login attempt
         self._bp_number: Optional[str] = None  # BP Number associated with the instance
         self._contract_id: Optional[str] = None  # Contract ID associated with the instance
+
+    def _shutdown(self):
+        if not self._session.closed:
+            asyncio.run(self._session.close())
 
     # -------------
     # Data methods:
