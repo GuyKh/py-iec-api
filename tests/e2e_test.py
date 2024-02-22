@@ -1,8 +1,6 @@
 import unittest
 from datetime import datetime, timedelta
 
-import aiohttp
-
 from iec_api.iec_client import IecClient
 from iec_api.models.jwt import JWT
 
@@ -18,11 +16,9 @@ class CommonsTest(unittest.IsolatedAsyncioTestCase):
     }
 
     async def test_e2e_with_existing_token(self):
-        user_id = 123456782
-        session = aiohttp.ClientSession(
-            connector=aiohttp.TCPConnector(ssl=False), timeout=aiohttp.ClientTimeout(total=10)
-        )
-        client = IecClient(session, user_id)
+        user_id = 1234567832
+
+        client = IecClient(user_id)
         await client.load_jwt_token(JWT.from_dict(self.jwt_token))
         await client.check_token()
         await client.refresh_token()
