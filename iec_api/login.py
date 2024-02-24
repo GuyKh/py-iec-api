@@ -43,10 +43,12 @@ async def authorize_session(session: ClientSession, session_token) -> str:
         str: The code obtained from the authorization response.
     """
     cmd_url = AUTHORIZE_URL.format(client_id=APP_CLIENT_ID, sessionToken=session_token, challenge=code_challenge)
-    authorize_response = await commons.send_get_request(session=session, url=cmd_url)
+    authorize_response = await commons.send_non_json_get_request(
+        session=session, url=cmd_url, encoding="unicode-escape"
+    )
     code = re.findall(
         r"<input type=\"hidden\" name=\"code\" value=\"(.+)\"/>",
-        authorize_response.get("Content").decode("unicode-escape").encode("latin1").decode("utf-8"),
+        authorize_response.encode("latin1").decode("utf-8"),
     )[0]
     return code
 

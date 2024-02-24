@@ -101,6 +101,35 @@ async def send_get_request(
     return json_resp
 
 
+async def send_non_json_get_request(
+    session: ClientSession,
+    url: str,
+    timeout: Optional[int] = 60,
+    headers: Optional[dict] = None,
+    encoding: Optional[str] = None,
+) -> str:
+    try:
+        if not headers:
+            headers = session.headers
+
+        if not timeout:
+            timeout = session.timeout
+
+        logger.debug("HTTP GET: %s", url)
+        resp = await session.get(url=url, headers=headers, timeout=timeout)
+        resp_content = await resp.text(encoding=encoding)
+    except TimeoutError as ex:
+        raise IECError(-1, f"Failed to communicate with IEC API due to time out: ({str(ex)})")
+    except ClientError as ex:
+        raise IECError(-1, f"Failed to communicate with IEC API due to ClientError: ({str(ex)})")
+    except JSONDecodeError as ex:
+        raise IECError(-1, f"Received invalid response from IEC API: {str(ex)}")
+
+    logger.debug("HTTP GET Response: %s", resp_content)
+
+    return resp_content
+
+
 async def send_post_request(
     session: ClientSession,
     url: str,
