@@ -8,7 +8,7 @@ from typing import Any, Optional
 from aiohttp import ClientError, ClientSession
 
 from iec_api.models.exceptions import IECError
-from iec_api.models.response_descriptor import ErrorResponseDescriptor
+from iec_api.models.response_descriptor import RESPONSE_DESCRIPTOR_FIELD, ErrorResponseDescriptor
 
 logger = getLogger(__name__)
 
@@ -91,9 +91,9 @@ async def send_get_request(
 
     logger.debug("HTTP GET Response: %s", json_resp)
     if resp.status != 200:
-        logger.warning(f"Failed Login: (Code {resp.status}): {resp.reason}")
-        if len(json_resp) > 0:
-            login_error_response = ErrorResponseDescriptor.from_dict(json_resp)
+        logger.warning(f"Failed call: (Code {resp.status}): {resp.reason}")
+        if len(json_resp) > 0 and json_resp.get(RESPONSE_DESCRIPTOR_FIELD) is not None:
+            login_error_response = ErrorResponseDescriptor.from_dict(json_resp.get(RESPONSE_DESCRIPTOR_FIELD))
             raise IECError(login_error_response.code, login_error_response.error)
         else:
             raise IECError(resp.status, resp.reason)
@@ -136,9 +136,9 @@ async def send_post_request(
     logger.debug("HTTP POST Response: %s", json_resp)
 
     if resp.status != 200:
-        logger.warning(f"Failed Login: (Code {resp.status}): {resp.reason}")
-        if len(json_resp) > 0:
-            login_error_response = ErrorResponseDescriptor.from_dict(json_resp)
+        logger.warning(f"Failed call: (Code {resp.status}): {resp.reason}")
+        if len(json_resp) > 0 and json_resp.get(RESPONSE_DESCRIPTOR_FIELD) is not None:
+            login_error_response = ErrorResponseDescriptor.from_dict(json_resp.get(RESPONSE_DESCRIPTOR_FIELD))
             raise IECError(login_error_response.code, login_error_response.error)
         else:
             raise IECError(resp.status, resp.reason)
