@@ -4,17 +4,13 @@ import asyncio
 import concurrent.futures
 import os
 from datetime import datetime, timedelta
-from logging import config, getLogger
 
 import aiohttp
+from loguru import logger
 
 from iec_api.iec_client import IecClient
 from iec_api.login import IECLoginError
 from iec_api.models.exceptions import IECError
-
-ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
-config.fileConfig(ROOT_DIR + "/" + "logging.conf", disable_existing_loggers=False)
-logger = getLogger(__name__)
 
 
 async def main():

@@ -4,13 +4,13 @@ import random
 import re
 import string
 import time
-from logging import getLogger
 from typing import Optional, Tuple
 
 import aiofiles
 import jwt
 import pkce
 from aiohttp import ClientSession
+from loguru import logger
 
 from iec_api import commons
 from iec_api.models.exceptions import IECLoginError
@@ -29,8 +29,6 @@ AUTHORIZE_URL = (
     "%20offline_access&redirect_uri=com.iecrn:/&state=123abc&nonce=abc123&code_challenge_method=S256"
     "&sessionToken={sessionToken}&code_challenge={challenge}"
 )
-
-logger = getLogger(__name__)
 
 
 async def authorize_session(session: ClientSession, session_token) -> str:

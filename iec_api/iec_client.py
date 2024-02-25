@@ -1,12 +1,12 @@
 import asyncio
 import atexit
 import datetime
-from logging import getLogger
 from typing import Optional
 
 import aiohttp
 import jwt
 from aiohttp import ClientSession
+from loguru import logger
 
 from iec_api import data, login
 from iec_api.commons import is_valid_israeli_id
@@ -20,8 +20,6 @@ from iec_api.models.invoice import GetInvoicesBody
 from iec_api.models.jwt import JWT
 from iec_api.models.meter_reading import MeterReadings
 from iec_api.models.remote_reading import ReadingResolution, RemoteReadingResponse
-
-logger = getLogger(__name__)
 
 
 class IecClient:

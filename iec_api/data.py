@@ -1,8 +1,8 @@
-import logging
 from datetime import datetime
 from typing import Optional, TypeVar
 
 from aiohttp import ClientSession
+from loguru import logger
 from mashumaro.codecs import BasicDecoder
 
 from iec_api import commons
@@ -40,8 +40,6 @@ from iec_api.models.meter_reading import decoder as meter_reading_decoder
 from iec_api.models.remote_reading import ReadingResolution, RemoteReadingRequest, RemoteReadingResponse
 from iec_api.models.response_descriptor import ResponseWithDescriptor
 
-logger = logging.getLogger(__name__)
-
 T = TypeVar("T")
 
 
@@ -58,7 +56,7 @@ async def _get_response_with_descriptor(
     Returns:
         T: The response with a descriptor, with its type specified by the return type annotation.
     """
-    headers = commons.add_jwt_to_headers(HEADERS_WITH_AUTH, jwt_token.id_token)
+    headers = commons.add_bearer_token_to_headers(HEADERS_WITH_AUTH, jwt_token.id_token)
     response = await commons.send_get_request(session=session, url=request_url, headers=headers)
 
     response_with_descriptor = decoder.decode(response)
@@ -78,7 +76,7 @@ async def get_accounts(session: ClientSession, token: JWT) -> list[Account]:
 
 async def get_customer(session: ClientSession, token: JWT) -> Optional[Customer]:
     """Get customer data response from IEC API."""
-    headers = commons.add_jwt_to_headers(HEADERS_WITH_AUTH, token.id_token)
+    headers = commons.add_bearer_token_to_headers(HEADERS_WITH_AUTH, token.id_token)
     # sending get request and saving the response as response object
     response = await commons.send_get_request(session=session, url=GET_CONSUMER_URL, headers=headers)
 
@@ -105,7 +103,7 @@ async def get_remote_reading(
     )
 
     url = GET_REQUEST_READING_URL.format(contract_id=contract_id)
-    headers = commons.add_jwt_to_headers(HEADERS_WITH_AUTH, token.id_token)
+    headers = commons.add_bearer_token_to_headers(HEADERS_WITH_AUTH, token.id_token)
     logger.debug(f"HTTP POST: {url}\nData:{req.to_dict()}")
 
     response = await commons.send_post_request(session=session, url=url, headers=headers, json_data=req.to_dict())
@@ -149,7 +147,7 @@ async def get_last_meter_reading(session: ClientSession, token: JWT, bp_number: 
 
 async def get_devices(session: ClientSession, token: JWT, contract_id: str) -> list[Device]:
     """Get Device data response from IEC API."""
-    headers = commons.add_jwt_to_headers(HEADERS_WITH_AUTH, token.id_token)
+    headers = commons.add_bearer_token_to_headers(HEADERS_WITH_AUTH, token.id_token)
     # sending get request and saving the response as response object
     response = await commons.send_get_request(
         session=session, url=GET_DEVICES_URL.format(contract_id=contract_id), headers=headers

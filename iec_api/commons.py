@@ -1,19 +1,18 @@
 import asyncio
+import http
 import re
 from concurrent.futures import ThreadPoolExecutor
 from json import JSONDecodeError
-from logging import getLogger
 from typing import Any, Optional
 
 from aiohttp import ClientError, ClientSession
+from loguru import logger
 
 from iec_api.models.exceptions import IECError
 from iec_api.models.response_descriptor import RESPONSE_DESCRIPTOR_FIELD, ErrorResponseDescriptor
 
-logger = getLogger(__name__)
 
-
-def add_jwt_to_headers(headers, token) -> dict:
+def add_bearer_token_to_headers(headers: dict[str, str], token: str) -> dict:
     """
     Add JWT token to the headers' dictionary.
     Args:
@@ -26,10 +25,10 @@ def add_jwt_to_headers(headers, token) -> dict:
     return headers
 
 
-PHONE_REGEX: str = "^(+972|0)5[0-9]{8}$"
+PHONE_REGEX = "^(+972|0)5[0-9]{8}$"
 
 
-def check_phone(phone):
+def check_phone(phone: str):
     """
     Check if the phone number is valid.
     Args:
@@ -90,7 +89,7 @@ async def send_get_request(
         raise IECError(-1, f"Received invalid response from IEC API: {str(ex)}")
 
     logger.debug("HTTP GET Response: %s", json_resp)
-    if resp.status != 200:
+    if resp.status != http.HTTPStatus.OK:
         logger.warning(f"Failed call: (Code {resp.status}): {resp.reason}")
         if len(json_resp) > 0 and json_resp.get(RESPONSE_DESCRIPTOR_FIELD) is not None:
             login_error_response = ErrorResponseDescriptor.from_dict(json_resp.get(RESPONSE_DESCRIPTOR_FIELD))
@@ -148,11 +147,7 @@ async def send_post_request(
         logger.debug("HTTP POST: %s", url)
         logger.debug("HTTP Content: %s", data or json_data)
 
-        if data:
-            resp = await session.post(url=url, data=data, headers=headers, timeout=timeout)
-        else:
-            if json_data:
-                resp = await session.post(url=url, json=json_data, headers=headers, timeout=timeout)
+        resp = await session.post(url=url, data=data, json=json_data, headers=headers, timeout=timeout)
 
         json_resp: dict = await resp.json(content_type=None)
     except TimeoutError as ex:
@@ -164,7 +159,7 @@ async def send_post_request(
 
     logger.debug("HTTP POST Response: %s", json_resp)
 
-    if resp.status != 200:
+    if resp.status != http.HTTPStatus.OK:
         logger.warning(f"Failed call: (Code {resp.status}): {resp.reason}")
         if len(json_resp) > 0 and json_resp.get(RESPONSE_DESCRIPTOR_FIELD) is not None:
             login_error_response = ErrorResponseDescriptor.from_dict(json_resp.get(RESPONSE_DESCRIPTOR_FIELD))
