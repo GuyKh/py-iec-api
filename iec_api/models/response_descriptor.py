@@ -23,6 +23,9 @@ class ErrorResponseDescriptor(DataClassDictMixin):
     rid: str = field(metadata=field_options(alias="Rid"))
 
 
+RESPONSE_DESCRIPTOR_FIELD = "reponseDescriptor"
+
+
 T = TypeVar("T")
 
 
@@ -31,4 +34,4 @@ class ResponseWithDescriptor(Generic[T], DataClassDictMixin):
     """Response With Descriptor"""
 
     data: T
-    response_descriptor: ResponseDescriptor = field(metadata=field_options(alias="reponseDescriptor"))
+    response_descriptor: ResponseDescriptor = field(metadata=field_options(alias=RESPONSE_DESCRIPTOR_FIELD))
