@@ -48,8 +48,8 @@ class RemoteReadingRequest(DataClassDictMixin):
 
     meter_serial_number: str = field(metadata=field_options(alias="meterSerialNumber"))
     meter_code: str = field(metadata=field_options(alias="meterCode"))
-    last_invoice_date: date = field(metadata=field_options(alias="lastInvoiceDate"))
-    from_date: date = field(metadata=field_options(alias="fromDate"))
+    last_invoice_date: str = field(metadata=field_options(alias="lastInvoiceDate"))
+    from_date: str = field(metadata=field_options(alias="fromDate"))
     resolution: ReadingResolution = field(metadata=field_options(alias="resolution"))
 
     class Config(BaseConfig):
