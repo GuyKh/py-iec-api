@@ -78,7 +78,7 @@ async def send_get_request(
         if not timeout:
             timeout = session.timeout
 
-        logger.debug("HTTP GET: %s", url)
+        logger.debug(f"HTTP GET: {url}")
         resp = await session.get(url=url, headers=headers, timeout=timeout)
         json_resp: dict = await resp.json(content_type=None)
     except TimeoutError as ex:
@@ -88,7 +88,7 @@ async def send_get_request(
     except JSONDecodeError as ex:
         raise IECError(-1, f"Received invalid response from IEC API: {str(ex)}")
 
-    logger.debug("HTTP GET Response: %s", json_resp)
+    logger.debug(f"HTTP GET Response: {json_resp}")
     if resp.status != http.HTTPStatus.OK:
         logger.warning(f"Failed call: (Code {resp.status}): {resp.reason}")
         if len(json_resp) > 0 and json_resp.get(RESPONSE_DESCRIPTOR_FIELD) is not None:
@@ -114,7 +114,9 @@ async def send_non_json_get_request(
         if not timeout:
             timeout = session.timeout
 
-        logger.debug("HTTP GET: %s", url)
+        logger.debug(
+            f"HTTP GET: {url}",
+        )
         resp = await session.get(url=url, headers=headers, timeout=timeout)
         resp_content = await resp.text(encoding=encoding)
     except TimeoutError as ex:
@@ -124,7 +126,7 @@ async def send_non_json_get_request(
     except JSONDecodeError as ex:
         raise IECError(-1, f"Received invalid response from IEC API: {str(ex)}")
 
-    logger.debug("HTTP GET Response: %s", resp_content)
+    logger.debug(f"HTTP GET Response: {resp_content}")
 
     return resp_content
 
@@ -144,8 +146,8 @@ async def send_post_request(
         if not timeout:
             headers = session.timeout
 
-        logger.debug("HTTP POST: %s", url)
-        logger.debug("HTTP Content: %s", data or json_data)
+        logger.debug(f"HTTP POST: {url}")
+        logger.debug("HTTP Content: {data or json_data}")
 
         resp = await session.post(url=url, data=data, json=json_data, headers=headers, timeout=timeout)
 
@@ -157,7 +159,7 @@ async def send_post_request(
     except JSONDecodeError as ex:
         raise IECError(-1, f"Received invalid response from IEC API: {str(ex)}")
 
-    logger.debug("HTTP POST Response: %s", json_resp)
+    logger.debug(f"HTTP POST Response: {json_resp}")
 
     if resp.status != http.HTTPStatus.OK:
         logger.warning(f"Failed call: (Code {resp.status}): {resp.reason}")
