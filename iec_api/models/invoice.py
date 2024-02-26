@@ -1,4 +1,5 @@
 from dataclasses import dataclass, field
+from datetime import datetime
 
 from mashumaro import DataClassDictMixin, field_options
 from mashumaro.codecs import BasicDecoder
@@ -55,9 +56,9 @@ from iec_api.models.response_descriptor import ResponseWithDescriptor
 
 @dataclass
 class Invoice(DataClassDictMixin):
-    full_date: str = field(metadata=field_options(alias="fullDate"))
-    from_date: str = field(metadata=field_options(alias="fromDate"))
-    to_date: str = field(metadata=field_options(alias="toDate"))
+    full_date: datetime = field(metadata=field_options(alias="fullDate"))
+    from_date: datetime = field(metadata=field_options(alias="fromDate"))
+    to_date: datetime = field(metadata=field_options(alias="toDate"))
     amount_origin: float = field(metadata=field_options(alias="amountOrigin"))
     amount_to_pay: float = field(metadata=field_options(alias="amountToPay"))
     amount_paid: float = field(metadata=field_options(alias="amountPaid"))
@@ -65,9 +66,7 @@ class Invoice(DataClassDictMixin):
     contract_number: int = field(metadata=field_options(alias="contractNumber"))
     order_number: int = field(metadata=field_options(alias="orderNumber"))
     last_date: str = field(metadata=field_options(alias="lastDate"))
-    invoice_payment_status: int = field(
-        metadata=field_options(alias="invoicePaymentStatus")
-    )
+    invoice_payment_status: int = field(metadata=field_options(alias="invoicePaymentStatus"))
     document_id: str = field(metadata=field_options(alias="documentID"))
     days_period: str = field(metadata=field_options(alias="daysPeriod"))
     has_direct_debit: bool = field(metadata=field_options(alias="hasDirectDebit"))
@@ -75,13 +74,15 @@ class Invoice(DataClassDictMixin):
 
     reading_code: int = field(metadata=field_options(alias="readingCode"), default=0)
     consumption: int = field(metadata=field_options(alias="consumption"), default=0)
-    meter_readings: list[MeterReading] = field(metadata=field_options(alias="meterReadings"),
-                                               default_factory=lambda: [])
+    meter_readings: list[MeterReading] = field(
+        metadata=field_options(alias="meterReadings"), default_factory=lambda: []
+    )
 
 
 @dataclass
 class Property(DataClassDictMixin):
     """Property Response dataclass."""
+
     area_id: str = field(metadata=field_options(alias="areaId"))
     district_id: int = field(metadata=field_options(alias="districtId"))
 
