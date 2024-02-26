@@ -1,6 +1,7 @@
 """ Meter Reading model. """
 
 from dataclasses import dataclass, field
+from datetime import datetime
 
 from mashumaro import DataClassDictMixin, field_options
 from mashumaro.codecs import BasicDecoder
@@ -43,14 +44,15 @@ class MeterReading(DataClassDictMixin):
 
     reading: int = field(metadata=field_options(alias="reading"))
     reading_code: str = field(metadata=field_options(alias="readingCode"))
-    reading_date: str = field(metadata=field_options(alias="readingDate"))
+    reading_date: datetime = field(metadata=field_options(alias="readingDate"))
     usage: str
     serial_number: str = field(metadata=field_options(alias="serialNumber"))
 
 
 @dataclass
 class LastMeters(DataClassDictMixin):
-    """ Last Meters"""
+    """Last Meters"""
+
     meter_readings: list[MeterReading] = field(metadata=field_options(alias="meterReadings"))
     serial_number: str = field(metadata=field_options(alias="serialNumber"))
     material_number: str = field(metadata=field_options(alias="materialNumber"))
