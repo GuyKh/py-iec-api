@@ -45,6 +45,7 @@ class ReadingResolution(IntEnum):
 @dataclass
 class RemoteReadingRequest(DataClassDictMixin):
     """Remote Reading Request ."""
+
     meter_serial_number: str = field(metadata=field_options(alias="meterSerialNumber"))
     meter_code: str = field(metadata=field_options(alias="meterCode"))
     last_invoice_date: str = field(metadata=field_options(alias="lastInvoiceDate"))
@@ -63,7 +64,7 @@ class FutureConsumptionInfo(DataClassDictMixin):
     current_date: Optional[date] = field(metadata=field_options(alias="currentDate"))
     future_consumption: Optional[float] = field(metadata=field_options(alias="futureConsumption"))
     total_import: Optional[float] = field(metadata=field_options(alias="totalImport"))
-    total_import_date: Optional[str] = field(metadata=field_options(alias="totalImportDate"))
+    total_import_date: Optional[date] = field(metadata=field_options(alias="totalImportDate"))
 
 
 @dataclass
@@ -80,17 +81,11 @@ class RemoteReadingResponse(DataClassDictMixin):
     """Remote Reading Response dataclass."""
 
     status: int
-    future_consumption_info: FutureConsumptionInfo = field(
-        metadata=field_options(alias="futureConsumptionInfo")
-    )
+    future_consumption_info: FutureConsumptionInfo = field(metadata=field_options(alias="futureConsumptionInfo"))
     from_date: Optional[date] = field(metadata=field_options(alias="fromDate"))
     to_date: Optional[date] = field(metadata=field_options(alias="toDate"))
-    total_consumption_for_period: Optional[float] = field(
-        metadata=field_options(alias="totalConsumptionForPeriod")
-    )
-    total_import_date_for_period: Optional[date] = field(
-        metadata=field_options(alias="totalImportDateForPeriod")
-    )
+    total_consumption_for_period: Optional[float] = field(metadata=field_options(alias="totalConsumptionForPeriod"))
+    total_import_date_for_period: Optional[date] = field(metadata=field_options(alias="totalImportDateForPeriod"))
     meter_start_date: Optional[date] = field(metadata=field_options(alias="meterStartDate"))
     total_import: Optional[float] = field(metadata=field_options(alias="totalImport"))
     data: list[RemoteReading]

@@ -1,4 +1,5 @@
 from dataclasses import dataclass, field
+from datetime import date
 from typing import Optional
 
 from mashumaro import DataClassDictMixin, field_options
@@ -59,6 +60,7 @@ class Device(DataClassDictMixin):
 @dataclass
 class ConnectionSize(DataClassDictMixin):
     """Connection dataclass."""
+
     size: int = field(metadata=field_options(alias="size"))
     phase: str = field(metadata=field_options(alias="phase"))
     representative_connection_size: str = field(metadata=field_options(alias="representativeConnectionSize"))
@@ -67,10 +69,11 @@ class ConnectionSize(DataClassDictMixin):
 @dataclass
 class CounterDevice(DataClassDictMixin):
     """Counter Device dataclass."""
+
     device: str = field(metadata=field_options(alias="device"))
     register: str = field(metadata=field_options(alias="register"))
     last_mr: str = field(metadata=field_options(alias="lastMR"))
-    last_mr_date: str = field(metadata=field_options(alias="lastMRDate"))
+    last_mr_date: date = field(metadata=field_options(alias="lastMRDate"))
     last_mr_type: str = field(metadata=field_options(alias="lastMRType"))
     last_mr_type_desc: str = field(metadata=field_options(alias="lastMRTypeDesc"))
     connection_size: ConnectionSize = field(metadata=field_options(alias="connectionSize"))
@@ -79,6 +82,7 @@ class CounterDevice(DataClassDictMixin):
 @dataclass
 class Devices(DataClassDictMixin):
     """Devices dataclass."""
+
     counter_devices: Optional[list[CounterDevice]] = field(metadata=field_options(alias="counterDevices"))
     mr_type: str = field(metadata=field_options(alias="mrType"))
 
