@@ -1,6 +1,7 @@
 """ Contract model. """
 
 from dataclasses import dataclass, field
+from datetime import date
 
 from mashumaro import DataClassDictMixin, field_options
 from mashumaro.codecs import BasicDecoder
@@ -47,13 +48,11 @@ from iec_api.models.response_descriptor import ResponseWithDescriptor
 class Contract(DataClassDictMixin):
     address: str
     contract_id: str = field(metadata=field_options(alias="contractId"))
-    due_date: str = field(metadata=field_options(alias="dueDate"))
+    due_date: date = field(metadata=field_options(alias="dueDate"))
     total_debt: float = field(metadata=field_options(alias="totalDebt"))
     frequency: int
     status: int
-    from_pativte_producer: bool = field(
-        metadata=field_options(alias="fromPativteProducer")
-    )
+    from_pativte_producer: bool = field(metadata=field_options(alias="fromPativteProducer"))
     city_code: str = field(metadata=field_options(alias="cityCode"))
     city_name: str = field(metadata=field_options(alias="cityName"))
     street_code: str = field(metadata=field_options(alias="streetCode"))
