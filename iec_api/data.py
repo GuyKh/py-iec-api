@@ -80,7 +80,7 @@ async def get_customer(session: ClientSession, token: JWT) -> Optional[Customer]
     # sending get request and saving the response as response object
     response = await commons.send_get_request(session=session, url=GET_CONSUMER_URL, headers=headers)
 
-    logger.debug("Response: %s", response)
+    logger.debug(f"Response: {response}")
     return Customer.from_dict(response)
 
 
@@ -104,7 +104,6 @@ async def get_remote_reading(
 
     url = GET_REQUEST_READING_URL.format(contract_id=contract_id)
     headers = commons.add_auth_bearer_to_headers(HEADERS_WITH_AUTH, token.id_token)
-    logger.debug(f"HTTP POST: {url}\nData:{req.to_dict()}")
 
     response = await commons.send_post_request(session=session, url=url, headers=headers, json_data=req.to_dict())
 
@@ -153,7 +152,7 @@ async def get_devices(session: ClientSession, token: JWT, contract_id: str) -> l
         session=session, url=GET_DEVICES_URL.format(contract_id=contract_id), headers=headers
     )
 
-    logger.debug("Response: %s", response)
+    logger.debug(f"Response: {response}")
     return [Device.from_dict(device) for device in response]
 
 

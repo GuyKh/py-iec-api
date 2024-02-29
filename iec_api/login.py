@@ -143,8 +143,8 @@ async def first_login(session: ClientSession, id_number: str) -> Tuple[str, str,
 
         return state_token, factor_id, session_token
     except Exception as error:
-        logger.warning("Failed at first login: %s", error)
-        raise IECLoginError(-1, "Failed at first login")
+        logger.warning(f"Failed at first login: {error}")
+        raise IECLoginError(-1, "Failed at first login") from error
 
 
 async def verify_otp_code(session: ClientSession, factor_id: str, state_token: str, otp_code: str) -> JWT:
@@ -166,8 +166,8 @@ async def verify_otp_code(session: ClientSession, factor_id: str, state_token: s
         jwt_token = await get_access_token(session, code)
         return jwt_token
     except Exception as error:
-        logger.warning("Failed at OTP verification: %s", error)
-        raise IECLoginError(-1, "Failed at OTP verification")
+        logger.warning(f"Failed at OTP verification: {error}")
+        raise IECLoginError(-1, "Failed at OTP verification") from error
 
 
 async def manual_authorization(session: ClientSession, id_number) -> Optional[JWT]:  # pragma: no cover
