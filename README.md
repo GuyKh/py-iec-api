@@ -11,7 +11,7 @@ client = iec.IecClient("123456789")
 try:
     await client.manual_login()  # login with user inputs
 except iec.exceptions.IECError as err:
-    logger.error("Failed Login: (Code %d): %s", err.code, err.error)
+    logger.error(f"Failed Login: (Code {err.code}): {err.error}")
     raise
 
 customer = await client.get_customer()

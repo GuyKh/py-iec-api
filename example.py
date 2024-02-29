@@ -4,24 +4,20 @@ import asyncio
 import concurrent.futures
 import os
 from datetime import datetime, timedelta
-from logging import config, getLogger
 
 import aiohttp
+from loguru import logger
 
 from iec_api.iec_client import IecClient
 from iec_api.login import IECLoginError
 from iec_api.models.exceptions import IECError
-
-ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
-config.fileConfig(ROOT_DIR + "/" + "logging.conf", disable_existing_loggers=False)
-logger = getLogger(__name__)
 
 
 async def main():
     session = aiohttp.ClientSession(connector=aiohttp.TCPConnector(ssl=False), timeout=aiohttp.ClientTimeout(total=10))
     try:
         # Example of usage
-        client = IecClient(123456789, session)
+        client = IecClient(200461929, session)
 
         token_json_file = "token.json"
         if os.path.exists(token_json_file):
@@ -34,7 +30,7 @@ async def main():
                 await client.verify_otp(otp)
                 await client.save_token_to_file(token_json_file)
             except IECLoginError as err:
-                logger.error("Failed Login: (Code %d): %s", err.code, err.error)
+                logger.error(f"Failed Login: (Code {err.code}): {err.error}")
                 raise
 
         # refresh token example
@@ -84,7 +80,7 @@ async def main():
         print(await client.get_device_type())
         print(await client.get_billing_invoices())
     except IECError as err:
-        logger.error("IEC Error: (Code %d): %s", err.code, err.error)
+        logger.error(f"IEC Error: (Code {err.code}): {err.error}")
     finally:
         await session.close()
 

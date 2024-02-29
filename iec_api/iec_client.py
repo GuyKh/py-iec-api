@@ -1,12 +1,12 @@
 import asyncio
 import atexit
 import datetime
-from logging import getLogger
 from typing import Optional
 
 import aiohttp
 import jwt
 from aiohttp import ClientSession
+from loguru import logger
 
 from iec_api import data, login
 from iec_api.commons import is_valid_israeli_id
@@ -20,8 +20,6 @@ from iec_api.models.invoice import GetInvoicesBody
 from iec_api.models.jwt import JWT
 from iec_api.models.meter_reading import MeterReadings
 from iec_api.models.remote_reading import ReadingResolution, RemoteReadingResponse
-
-logger = getLogger(__name__)
 
 
 class IecClient:
@@ -382,7 +380,7 @@ class IecClient:
         :param id_token: The new token to be set.
         :return: None
         """
-        logger.debug("Overriding jwt.py token: %s", id_token)
+        logger.debug(f"Overriding jwt.py token: {id_token}")
         self._token = JWT(access_token="", refresh_token="", token_type="", expires_in=0, scope="", id_token=id_token)
         self._token.id_token = id_token
         self.logged_in = True

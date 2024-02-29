@@ -4,13 +4,13 @@ import random
 import re
 import string
 import time
-from logging import getLogger
 from typing import Optional, Tuple
 
 import aiofiles
 import jwt
 import pkce
 from aiohttp import ClientSession
+from loguru import logger
 
 from iec_api import commons
 from iec_api.models.exceptions import IECLoginError
@@ -29,8 +29,6 @@ AUTHORIZE_URL = (
     "%20offline_access&redirect_uri=com.iecrn:/&state=123abc&nonce=abc123&code_challenge_method=S256"
     "&sessionToken={sessionToken}&code_challenge={challenge}"
 )
-
-logger = getLogger(__name__)
 
 
 async def authorize_session(session: ClientSession, session_token) -> str:
@@ -145,8 +143,8 @@ async def first_login(session: ClientSession, id_number: str) -> Tuple[str, str,
 
         return state_token, factor_id, session_token
     except Exception as error:
-        logger.warning("Failed at first login: %s", error)
-        raise IECLoginError(-1, "Failed at first login")
+        logger.warning(f"Failed at first login: {error}")
+        raise IECLoginError(-1, "Failed at first login") from error
 
 
 async def verify_otp_code(session: ClientSession, factor_id: str, state_token: str, otp_code: str) -> JWT:
@@ -168,8 +166,8 @@ async def verify_otp_code(session: ClientSession, factor_id: str, state_token: s
         jwt_token = await get_access_token(session, code)
         return jwt_token
     except Exception as error:
-        logger.warning("Failed at OTP verification: %s", error)
-        raise IECLoginError(-1, "Failed at OTP verification")
+        logger.warning(f"Failed at OTP verification: {error}")
+        raise IECLoginError(-1, "Failed at OTP verification") from error
 
 
 async def manual_authorization(session: ClientSession, id_number) -> Optional[JWT]:  # pragma: no cover
