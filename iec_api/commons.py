@@ -12,9 +12,9 @@ from iec_api.models.exceptions import IECError
 from iec_api.models.response_descriptor import RESPONSE_DESCRIPTOR_FIELD, ErrorResponseDescriptor
 
 
-def add_bearer_token_to_headers(headers: dict[str, str], token: str) -> dict:
+def add_auth_bearer_to_headers(headers: dict[str, str], token: str) -> dict[str, str]:
     """
-    Add JWT token to the headers' dictionary.
+    Add JWT bearer token to the Authorization header.
     Args:
     headers (dict): The headers dictionary to be modified.
     token (str): The JWT token to be added to the headers.
