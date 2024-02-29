@@ -19,6 +19,7 @@ requests = "^2.31.0"
 pkce = "^1.0.3"
 aiohttp = "^3.9.1"
 aiofiles = "^23.2.1"
+loguru = "^0.7.2"
 
 [tool.poetry.dev-dependencies]
 pytest = "8.0.2"

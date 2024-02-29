@@ -3,15 +3,13 @@ import http
 import re
 from concurrent.futures import ThreadPoolExecutor
 from json import JSONDecodeError
-from logging import getLogger
 from typing import Any, Optional
 
 from aiohttp import ClientError, ClientSession
+from loguru import logger
 
 from iec_api.models.exceptions import IECError
 from iec_api.models.response_descriptor import RESPONSE_DESCRIPTOR_FIELD, ErrorResponseDescriptor
-
-logger = getLogger(__name__)
 
 
 def add_auth_bearer_to_headers(headers: dict[str, str], token: str) -> dict[str, str]:
@@ -27,10 +25,10 @@ def add_auth_bearer_to_headers(headers: dict[str, str], token: str) -> dict[str,
     return headers
 
 
-PHONE_REGEX: str = "^(+972|0)5[0-9]{8}$"
+PHONE_REGEX = "^(+972|0)5[0-9]{8}$"
 
 
-def check_phone(phone):
+def check_phone(phone: str):
     """
     Check if the phone number is valid.
     Args:
@@ -80,7 +78,7 @@ async def send_get_request(
         if not timeout:
             timeout = session.timeout
 
-        logger.debug("HTTP GET: %s", url)
+        logger.debug(f"HTTP GET: {url}")
         resp = await session.get(url=url, headers=headers, timeout=timeout)
         json_resp: dict = await resp.json(content_type=None)
     except TimeoutError as ex:
@@ -90,7 +88,7 @@ async def send_get_request(
     except JSONDecodeError as ex:
         raise IECError(-1, f"Received invalid response from IEC API: {str(ex)}")
 
-    logger.debug("HTTP GET Response: %s", json_resp)
+    logger.debug(f"HTTP GET Response: {json_resp}")
     if resp.status != http.HTTPStatus.OK:
         logger.warning(f"Failed call: (Code {resp.status}): {resp.reason}")
         if len(json_resp) > 0 and json_resp.get(RESPONSE_DESCRIPTOR_FIELD) is not None:
@@ -116,7 +114,9 @@ async def send_non_json_get_request(
         if not timeout:
             timeout = session.timeout
 
-        logger.debug("HTTP GET: %s", url)
+        logger.debug(
+            f"HTTP GET: {url}",
+        )
         resp = await session.get(url=url, headers=headers, timeout=timeout)
         resp_content = await resp.text(encoding=encoding)
     except TimeoutError as ex:
@@ -126,7 +126,7 @@ async def send_non_json_get_request(
     except JSONDecodeError as ex:
         raise IECError(-1, f"Received invalid response from IEC API: {str(ex)}")
 
-    logger.debug("HTTP GET Response: %s", resp_content)
+    logger.debug(f"HTTP GET Response: {resp_content}")
 
     return resp_content
 
@@ -146,14 +146,10 @@ async def send_post_request(
         if not timeout:
             headers = session.timeout
 
-        logger.debug("HTTP POST: %s", url)
-        logger.debug("HTTP Content: %s", data or json_data)
+        logger.debug(f"HTTP POST: {url}")
+        logger.debug(f"HTTP Content: {data or json_data}")
 
-        if data:
-            resp = await session.post(url=url, data=data, headers=headers, timeout=timeout)
-        else:
-            if json_data:
-                resp = await session.post(url=url, json=json_data, headers=headers, timeout=timeout)
+        resp = await session.post(url=url, data=data, json=json_data, headers=headers, timeout=timeout)
 
         json_resp: dict = await resp.json(content_type=None)
     except TimeoutError as ex:
@@ -163,7 +159,7 @@ async def send_post_request(
     except JSONDecodeError as ex:
         raise IECError(-1, f"Received invalid response from IEC API: {str(ex)}")
 
-    logger.debug("HTTP POST Response: %s", json_resp)
+    logger.debug(f"HTTP POST Response: {json_resp}")
 
     if resp.status != http.HTTPStatus.OK:
         logger.warning(f"Failed call: (Code {resp.status}): {resp.reason}")
