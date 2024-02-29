@@ -17,7 +17,7 @@ async def main():
     session = aiohttp.ClientSession(connector=aiohttp.TCPConnector(ssl=False), timeout=aiohttp.ClientTimeout(total=10))
     try:
         # Example of usage
-        client = IecClient(309473080, session)
+        client = IecClient(123456782, session)
 
         token_json_file = "token.json"
         if not os.path.exists(token_json_file):
