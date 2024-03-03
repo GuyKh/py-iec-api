@@ -2,11 +2,10 @@
 from dataclasses import dataclass, field
 from datetime import datetime
 
-import pytz
 from mashumaro import DataClassDictMixin, field_options
 from mashumaro.codecs import BasicDecoder
 
-from iec_api.const import TIMEZONE
+from iec_api.commons import convert_to_tz_aware_datetime
 from iec_api.models.response_descriptor import ResponseWithDescriptor
 
 # GET https://iecapi.iec.co.il//api/Device/LastMeterReading/{contract_id}/{bp_number}
@@ -51,10 +50,7 @@ class MeterReading(DataClassDictMixin):
 
     @classmethod
     def __post_deserialize__(cls, obj: "MeterReading") -> "MeterReading":
-        if obj.reading_date.year > 2000:  # Fix '0001-01-01T00:00:00' values
-            obj.reading_date = TIMEZONE.localize(obj.reading_date)
-        else:
-            obj.reading_date = obj.reading_date.replace(tzinfo=pytz.utc)
+        obj.reading_date = convert_to_tz_aware_datetime(obj.reading_date)
         return obj
 
 
