@@ -1,8 +1,8 @@
 """ Meter Reading model. """
-
 from dataclasses import dataclass, field
 from datetime import datetime
 
+import pytz
 from mashumaro import DataClassDictMixin, field_options
 from mashumaro.codecs import BasicDecoder
 
@@ -51,7 +51,11 @@ class MeterReading(DataClassDictMixin):
 
     @classmethod
     def __post_deserialize__(cls, obj: "MeterReading") -> "MeterReading":
-        obj.reading_date = TIMEZONE.localize(obj.reading_date)
+        if obj.reading_date.year > 2000:  # Fix '0001-01-01T00:00:00' values
+            obj.reading_date = TIMEZONE.localize(obj.reading_date)
+        else:
+            obj.reading_date = obj.reading_date.replace(tzinfo=pytz.utc)
+
         return obj
 
 

@@ -1,13 +1,6 @@
 from dataclasses import dataclass, field
 from datetime import datetime
 
-from mashumaro import DataClassDictMixin, field_options
-from mashumaro.codecs import BasicDecoder
-
-from iec_api.const import TIMEZONE
-from iec_api.models.meter_reading import MeterReading
-from iec_api.models.response_descriptor import ResponseWithDescriptor
-
 # GET https://iecapi.iec.co.il//api/billingCollection/invoices/{bp_number}/{contract_number}
 #
 # {
@@ -53,6 +46,13 @@ from iec_api.models.response_descriptor import ResponseWithDescriptor
 #         "description": "OK"
 #     }
 # }
+import pytz
+from mashumaro import DataClassDictMixin, field_options
+from mashumaro.codecs import BasicDecoder
+
+from iec_api.const import TIMEZONE
+from iec_api.models.meter_reading import MeterReading
+from iec_api.models.response_descriptor import ResponseWithDescriptor
 
 
 @dataclass
@@ -81,9 +81,20 @@ class Invoice(DataClassDictMixin):
 
     @classmethod
     def __post_deserialize__(cls, obj: "Invoice") -> "Invoice":
-        obj.full_date = TIMEZONE.localize(obj.full_date)
-        obj.from_date = TIMEZONE.localize(obj.from_date)
-        obj.to_date = TIMEZONE.localize(obj.to_date)
+        if obj.full_date.year > 2000:  # Fix '0001-01-01T00:00:00' values
+            obj.full_date = TIMEZONE.localize(obj.full_date)
+        else:
+            obj.full_date = obj.full_date.replace(tzinfo=pytz.utc)
+
+        if obj.from_date.year > 2000:  # Fix '0001-01-01T00:00:00' values
+            obj.from_date = TIMEZONE.localize(obj.from_date)
+        else:
+            obj.from_date = obj.from_date.replace(tzinfo=pytz.utc)
+
+        if obj.to_date.year > 2000:  # Fix '0001-01-01T00:00:00' values
+            obj.to_date = TIMEZONE.localize(obj.to_date)
+        else:
+            obj.to_date = obj.to_date.replace(tzinfo=pytz.utc)
         return obj
 
 
