@@ -5,10 +5,11 @@ from concurrent.futures import ThreadPoolExecutor
 from json import JSONDecodeError
 from typing import Any, Optional
 
-from aiohttp import ClientError, ClientSession
+from aiohttp import ClientError, ClientResponse, ClientSession
 from loguru import logger
 
-from iec_api.models.exceptions import IECError
+from iec_api.models.exceptions import IECError, IECLoginError
+from iec_api.models.okta_errors import OktaError
 from iec_api.models.response_descriptor import RESPONSE_DESCRIPTOR_FIELD, ErrorResponseDescriptor
 
 
@@ -68,6 +69,21 @@ async def read_user_input(prompt: str) -> str:
         return await asyncio.get_event_loop().run_in_executor(executor, input, prompt)
 
 
+def parse_error_response(resp: ClientResponse, json_resp: dict[str, Any]):
+    """
+    A function to parse error responses from IEC or Okta Server
+    """
+    logger.warning(f"Failed call: (Code {resp.status}): {resp.reason}")
+    if len(json_resp) > 0:
+        if json_resp.get(RESPONSE_DESCRIPTOR_FIELD) is not None:
+            login_error_response = ErrorResponseDescriptor.from_dict(json_resp.get(RESPONSE_DESCRIPTOR_FIELD))
+            raise IECError(login_error_response.code, login_error_response.error)
+        elif json_resp.get("errorSummary") is not None:
+            login_error_response = OktaError.from_dict(json_resp)
+            raise IECLoginError(resp.status, resp.reason + ": " + login_error_response.error_summary)
+    raise IECError(resp.status, resp.reason)
+
+
 async def send_get_request(
     session: ClientSession, url: str, timeout: Optional[int] = 60, headers: Optional[dict] = None
 ) -> dict[str, Any]:
@@ -90,12 +106,7 @@ async def send_get_request(
 
     logger.debug(f"HTTP GET Response: {json_resp}")
     if resp.status != http.HTTPStatus.OK:
-        logger.warning(f"Failed call: (Code {resp.status}): {resp.reason}")
-        if len(json_resp) > 0 and json_resp.get(RESPONSE_DESCRIPTOR_FIELD) is not None:
-            login_error_response = ErrorResponseDescriptor.from_dict(json_resp.get(RESPONSE_DESCRIPTOR_FIELD))
-            raise IECError(login_error_response.code, login_error_response.error)
-        else:
-            raise IECError(resp.status, resp.reason)
+        parse_error_response(resp, json_resp)
 
     return json_resp
 
@@ -162,11 +173,5 @@ async def send_post_request(
     logger.debug(f"HTTP POST Response: {json_resp}")
 
     if resp.status != http.HTTPStatus.OK:
-        logger.warning(f"Failed call: (Code {resp.status}): {resp.reason}")
-        if len(json_resp) > 0 and json_resp.get(RESPONSE_DESCRIPTOR_FIELD) is not None:
-            login_error_response = ErrorResponseDescriptor.from_dict(json_resp.get(RESPONSE_DESCRIPTOR_FIELD))
-            raise IECError(login_error_response.code, login_error_response.error)
-        else:
-            raise IECError(resp.status, resp.reason)
-
+        parse_error_response(resp, json_resp)
     return json_resp
