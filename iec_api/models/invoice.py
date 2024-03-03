@@ -4,6 +4,7 @@ from datetime import datetime
 from mashumaro import DataClassDictMixin, field_options
 from mashumaro.codecs import BasicDecoder
 
+from iec_api.const import TIMEZONE
 from iec_api.models.meter_reading import MeterReading
 from iec_api.models.response_descriptor import ResponseWithDescriptor
 
@@ -77,6 +78,13 @@ class Invoice(DataClassDictMixin):
     meter_readings: list[MeterReading] = field(
         metadata=field_options(alias="meterReadings"), default_factory=lambda: []
     )
+
+    @classmethod
+    def __post_deserialize__(cls, obj: "Invoice") -> "Invoice":
+        obj.full_date = TIMEZONE.localize(obj.full_date)
+        obj.from_date = TIMEZONE.localize(obj.from_date)
+        obj.to_date = TIMEZONE.localize(obj.to_date)
+        return obj
 
 
 @dataclass

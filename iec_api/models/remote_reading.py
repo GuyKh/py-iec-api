@@ -35,6 +35,8 @@ from typing import Optional
 from mashumaro import DataClassDictMixin, field_options
 from mashumaro.config import BaseConfig
 
+from iec_api.const import TIMEZONE
+
 
 class ReadingResolution(IntEnum):
     DAILY = 1
@@ -74,6 +76,11 @@ class RemoteReading(DataClassDictMixin):
     status: int
     date: datetime
     value: float
+
+    @classmethod
+    def __post_deserialize__(cls, obj: "RemoteReading") -> "RemoteReading":
+        obj.date = TIMEZONE.localize(obj.date)
+        return obj
 
 
 @dataclass
