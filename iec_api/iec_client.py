@@ -404,7 +404,7 @@ class IecClient:
             self.logged_in = False
             await self.refresh_token()
 
-        return self.logged_in
+        return True
 
     async def refresh_token(self):
         """
