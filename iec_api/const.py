@@ -1,3 +1,5 @@
+import pytz
+
 HEADERS_NO_AUTH = {
     "authority": "iecapi.iec.co.il",
     "accept": "application/json, text/plain, */*",
@@ -21,6 +23,7 @@ HEADERS_WITH_AUTH = HEADERS_NO_AUTH.copy()  # Make a copy of the original dictio
 HEADERS_WITH_AUTH["Authorization"] = "Bearer 1234"
 HEADERS_WITH_AUTH["Cookie"] = "ARRAffinity=?; " "ARRAffinitySameSite=?;" " GCLB=?"
 
+TIMEZONE = pytz.timezone("Asia/Jerusalem")
 IEC_API_BASE_URL = "https://iecapi.iec.co.il//api/"
 GET_ACCOUNTS_URL = IEC_API_BASE_URL + "outages/accounts"
 GET_CONSUMER_URL = IEC_API_BASE_URL + "customer"

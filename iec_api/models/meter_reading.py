@@ -6,6 +6,7 @@ from datetime import datetime
 from mashumaro import DataClassDictMixin, field_options
 from mashumaro.codecs import BasicDecoder
 
+from iec_api.const import TIMEZONE
 from iec_api.models.response_descriptor import ResponseWithDescriptor
 
 # GET https://iecapi.iec.co.il//api/Device/LastMeterReading/{contract_id}/{bp_number}
@@ -47,6 +48,11 @@ class MeterReading(DataClassDictMixin):
     reading_date: datetime = field(metadata=field_options(alias="readingDate"))
     usage: str
     serial_number: str = field(metadata=field_options(alias="serialNumber"))
+
+    @classmethod
+    def __post_deserialize__(cls, obj: "MeterReading") -> "MeterReading":
+        obj.reading_date = TIMEZONE.localize(obj.reading_date)
+        return obj
 
 
 @dataclass
