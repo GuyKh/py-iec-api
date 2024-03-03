@@ -55,7 +55,6 @@ class MeterReading(DataClassDictMixin):
             obj.reading_date = TIMEZONE.localize(obj.reading_date)
         else:
             obj.reading_date = obj.reading_date.replace(tzinfo=pytz.utc)
-
         return obj
 
 

@@ -1,6 +1,15 @@
 from dataclasses import dataclass, field
 from datetime import datetime
 
+from mashumaro import DataClassDictMixin, field_options
+from mashumaro.codecs import BasicDecoder
+
+from iec_api.const import TIMEZONE
+from iec_api.models.meter_reading import MeterReading
+from iec_api.models.response_descriptor import ResponseWithDescriptor
+
+import pytz
+
 # GET https://iecapi.iec.co.il//api/billingCollection/invoices/{bp_number}/{contract_number}
 #
 # {
@@ -46,14 +55,6 @@ from datetime import datetime
 #         "description": "OK"
 #     }
 # }
-import pytz
-from mashumaro import DataClassDictMixin, field_options
-from mashumaro.codecs import BasicDecoder
-
-from iec_api.const import TIMEZONE
-from iec_api.models.meter_reading import MeterReading
-from iec_api.models.response_descriptor import ResponseWithDescriptor
-
 
 @dataclass
 class Invoice(DataClassDictMixin):
