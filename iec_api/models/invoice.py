@@ -1,11 +1,11 @@
 from dataclasses import dataclass, field
 from datetime import datetime
+from typing import Optional
 
-import pytz
 from mashumaro import DataClassDictMixin, field_options
 from mashumaro.codecs import BasicDecoder
 
-from iec_api.const import TIMEZONE
+from iec_api.commons import convert_to_tz_aware_datetime
 from iec_api.models.meter_reading import MeterReading
 from iec_api.models.response_descriptor import ResponseWithDescriptor
 
@@ -59,7 +59,7 @@ from iec_api.models.response_descriptor import ResponseWithDescriptor
 @dataclass
 class Invoice(DataClassDictMixin):
     full_date: datetime = field(metadata=field_options(alias="fullDate"))
-    from_date: datetime = field(metadata=field_options(alias="fromDate"))
+    from_date: Optional[datetime] = field(metadata=field_options(alias="fromDate"))
     to_date: datetime = field(metadata=field_options(alias="toDate"))
     amount_origin: float = field(metadata=field_options(alias="amountOrigin"))
     amount_to_pay: float = field(metadata=field_options(alias="amountToPay"))
@@ -82,20 +82,9 @@ class Invoice(DataClassDictMixin):
 
     @classmethod
     def __post_deserialize__(cls, obj: "Invoice") -> "Invoice":
-        if obj.full_date.year > 2000:  # Fix '0001-01-01T00:00:00' values
-            obj.full_date = TIMEZONE.localize(obj.full_date)
-        else:
-            obj.full_date = obj.full_date.replace(tzinfo=pytz.utc)
-
-        if obj.from_date.year > 2000:  # Fix '0001-01-01T00:00:00' values
-            obj.from_date = TIMEZONE.localize(obj.from_date)
-        else:
-            obj.from_date = obj.from_date.replace(tzinfo=pytz.utc)
-
-        if obj.to_date.year > 2000:  # Fix '0001-01-01T00:00:00' values
-            obj.to_date = TIMEZONE.localize(obj.to_date)
-        else:
-            obj.to_date = obj.to_date.replace(tzinfo=pytz.utc)
+        obj.full_date = convert_to_tz_aware_datetime(obj.full_date)
+        obj.from_date = convert_to_tz_aware_datetime(obj.from_date)
+        obj.to_date = convert_to_tz_aware_datetime(obj.to_date)
         return obj
 
 

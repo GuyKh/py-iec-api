@@ -2,12 +2,15 @@ import asyncio
 import http
 import re
 from concurrent.futures import ThreadPoolExecutor
+from datetime import datetime
 from json import JSONDecodeError
 from typing import Any, Optional
 
+import pytz
 from aiohttp import ClientError, ClientResponse, ClientSession
 from loguru import logger
 
+from iec_api.const import TIMEZONE
 from iec_api.models.exceptions import IECError, IECLoginError
 from iec_api.models.okta_errors import OktaError
 from iec_api.models.response_descriptor import RESPONSE_DESCRIPTOR_FIELD, ErrorResponseDescriptor
@@ -175,3 +178,19 @@ async def send_post_request(
     if resp.status != http.HTTPStatus.OK:
         parse_error_response(resp, json_resp)
     return json_resp
+
+
+def convert_to_tz_aware_datetime(dt: Optional[datetime]) -> Optional[datetime]:
+    """
+    Convert a datetime object to a timezone aware datetime object.
+    Args:
+        dt (Optional[datetime]): The datetime object to be converted.
+    Returns:
+        Optional[datetime]: The timezone aware datetime object, or None if dt is None.
+    """
+    if dt is None:
+        return None
+    elif dt.year > 2000:  # Fix '0001-01-01T00:00:00' values
+        return TIMEZONE.localize(dt)
+    else:
+        return dt.replace(tzinfo=pytz.utc)

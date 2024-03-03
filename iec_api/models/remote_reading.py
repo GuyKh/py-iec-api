@@ -31,11 +31,10 @@ from datetime import date, datetime
 from enum import IntEnum
 from typing import Optional
 
-import pytz
 from mashumaro import DataClassDictMixin, field_options
 from mashumaro.config import BaseConfig
 
-from iec_api.const import TIMEZONE
+from iec_api.commons import convert_to_tz_aware_datetime
 
 
 class ReadingResolution(IntEnum):
@@ -79,10 +78,7 @@ class RemoteReading(DataClassDictMixin):
 
     @classmethod
     def __post_deserialize__(cls, obj: "RemoteReading") -> "RemoteReading":
-        if obj.date.year > 2000:  # Fix '0001-01-01T00:00:00' values
-            obj.date = TIMEZONE.localize(obj.date)
-        else:
-            obj.date = obj.date.replace(tzinfo=pytz.utc)
+        obj.date = convert_to_tz_aware_datetime(obj.date)
         return obj
 
 
