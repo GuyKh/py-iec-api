@@ -1,3 +1,4 @@
+import base64
 from datetime import datetime
 from typing import Optional, TypeVar
 
@@ -16,6 +17,7 @@ from iec_api.const import (
     GET_DEVICE_TYPE_URL,
     GET_DEVICES_URL,
     GET_ELECTRIC_BILL_URL,
+    GET_KWH_TARIFF_URL,
     GET_LAST_METER_READING_URL,
     GET_REQUEST_READING_URL,
     HEADERS_WITH_AUTH,
@@ -179,3 +181,11 @@ async def get_billing_invoices(session: ClientSession, token: JWT, bp_number: st
     return await _get_response_with_descriptor(
         session, token, GET_BILLING_INVOICES.format(bp_number=bp_number, contract_id=contract_id), invoice_decoder
     )
+
+
+async def get_kwh_tariff(session: ClientSession) -> float:
+    """Get Device Type data response from IEC API."""
+    response = await commons.send_get_request(session=session, url=GET_KWH_TARIFF_URL)
+    kwh_tariff_str = response["components"][1]["table"][1][2]["value"]
+
+    return float(base64.b64decode(kwh_tariff_str).decode("utf-8"))
