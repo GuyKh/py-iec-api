@@ -1,6 +1,6 @@
 import asyncio
 import atexit
-import datetime
+from datetime import datetime, timedelta
 from typing import Optional
 
 import aiohttp
@@ -35,6 +35,8 @@ class IecClient:
         automatically_login (bool): Whether to automatically log in the user. Default is False.
         """
 
+        self._kwh_tariff: Optional[float] = None
+        self._kwh_tariff_fetch_time: Optional[datetime.datetime] = None
         if not is_valid_israeli_id(user_id):
             raise ValueError("User ID must be a valid Israeli ID.")
 
@@ -320,6 +322,14 @@ class IecClient:
         assert contract_id, "Contract ID must be provided"
 
         return await data.get_billing_invoices(self._session, self._token, bp_number, contract_id)
+
+    async def get_kwh_tariff(self) -> float:
+        if not self._kwh_tariff or self._kwh_tariff_fetch_time < datetime.now() - timedelta(hours=1):
+            logger.debug("Tariff is missing or expired, fetching kwh tariff from IEC API")
+            self._kwh_tariff_fetch_time = datetime.now()
+            self._kwh_tariff = await data.get_kwh_tariff(self._session)
+
+        return self._kwh_tariff
 
     # ----------------
     # Login/Token Flow
