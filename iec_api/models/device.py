@@ -73,7 +73,7 @@ class CounterDevice(DataClassDictMixin):
     device: str = field(metadata=field_options(alias="device"))
     register: str = field(metadata=field_options(alias="register"))
     last_mr: str = field(metadata=field_options(alias="lastMR"))
-    last_mr_date: date = field(metadata=field_options(alias="lastMRDate"))
+    last_mr_date: Optional[date] = field(metadata=field_options(alias="lastMRDate"))
     last_mr_type: str = field(metadata=field_options(alias="lastMRType"))
     last_mr_type_desc: str = field(metadata=field_options(alias="lastMRTypeDesc"))
     connection_size: ConnectionSize = field(metadata=field_options(alias="connectionSize"))

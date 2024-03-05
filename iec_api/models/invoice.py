@@ -58,16 +58,16 @@ from iec_api.models.response_descriptor import ResponseWithDescriptor
 
 @dataclass
 class Invoice(DataClassDictMixin):
-    full_date: datetime = field(metadata=field_options(alias="fullDate"))
+    full_date: Optional[datetime] = field(metadata=field_options(alias="fullDate"))
     from_date: Optional[datetime] = field(metadata=field_options(alias="fromDate"))
-    to_date: datetime = field(metadata=field_options(alias="toDate"))
+    to_date: Optional[datetime] = field(metadata=field_options(alias="toDate"))
     amount_origin: float = field(metadata=field_options(alias="amountOrigin"))
     amount_to_pay: float = field(metadata=field_options(alias="amountToPay"))
     amount_paid: float = field(metadata=field_options(alias="amountPaid"))
     invoice_id: int = field(metadata=field_options(alias="invoiceId"))
     contract_number: int = field(metadata=field_options(alias="contractNumber"))
     order_number: int = field(metadata=field_options(alias="orderNumber"))
-    last_date: str = field(metadata=field_options(alias="lastDate"))
+    last_date: Optional[str] = field(metadata=field_options(alias="lastDate"))
     invoice_payment_status: int = field(metadata=field_options(alias="invoicePaymentStatus"))
     document_id: str = field(metadata=field_options(alias="documentID"))
     days_period: str = field(metadata=field_options(alias="daysPeriod"))
