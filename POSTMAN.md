@@ -2,12 +2,12 @@
 
 I've done a lot of work exposing and automating the work for you if you want to manually use Postman to call IEC API.
 
-You can download and import the [IEC Postman Collection]() and follow this guide:
+You can download and import the [IEC Postman Collection](https://github.com/GuyKh/py-iec-api/blob/main/IEC.postman_collection.json) and follow this guide:
 
 # Step 1: Setup your UserID
 In the Collection Variable configuration - adjust your `user_id` variable to match your User ID (תעודת זהות).
 
-# Step 2: Obtaining an `id_token``
+# Step 2: Obtaining an `id_token`
 You can do this in multiple ways:
 
 ## Step 2A: Get refresh_token from [HomeAssistant Custom Component](https://github.com/GuyKh/iec-custom-component)
