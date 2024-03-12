@@ -25,3 +25,7 @@ reading = await client.get_last_meter_reading(customer.bp_number, contracts[0].c
 print(reading)
 
 ```
+
+
+## Postman
+To use the API manually through Postman - read [Postman Collection Guide](POSTMAN.md)
