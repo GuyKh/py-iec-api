@@ -7,6 +7,7 @@ from mashumaro.codecs import BasicDecoder
 
 from iec_api.commons import convert_to_tz_aware_datetime
 from iec_api.models.meter_reading import MeterReading
+from iec_api.models.models_commons import FormattedDate
 from iec_api.models.response_descriptor import ResponseWithDescriptor
 
 # GET https://iecapi.iec.co.il//api/billingCollection/invoices/{bp_number}/{contract_number}
@@ -67,7 +68,9 @@ class Invoice(DataClassDictMixin):
     invoice_id: int = field(metadata=field_options(alias="invoiceId"))
     contract_number: int = field(metadata=field_options(alias="contractNumber"))
     order_number: int = field(metadata=field_options(alias="orderNumber"))
-    last_date: Optional[str] = field(metadata=field_options(alias="lastDate"))
+    last_date: Optional[str] = field(
+        metadata=field_options(alias="lastDate", serialization_strategy=FormattedDate("%d/%M/%Y"))
+    )
     invoice_payment_status: int = field(metadata=field_options(alias="invoicePaymentStatus"))
     document_id: str = field(metadata=field_options(alias="documentID"))
     days_period: str = field(metadata=field_options(alias="daysPeriod"))
