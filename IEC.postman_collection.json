@@ -1,0 +1,1885 @@
+{
+	"info": {
+		"_postman_id": "62a0f341-92dc-4773-8b35-79a61f13d251",
+		"name": "IEC",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "305946"
+	},
+	"item": [
+		{
+			"name": "OAuth",
+			"item": [
+				{
+					"name": "Step 1: Factor ID",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Parse the response JSON",
+									"let jsonData = JSON.parse(pm.response.text());",
+									"",
+									"// Set the variables in the environment (optional)",
+									"pm.collectionVariables.set(\"stateToken\", jsonData.stateToken);",
+									"pm.collectionVariables.set(\"factorId\", jsonData._embedded.factors[0].id);",
+									"",
+									"console.log(\"StateToken: \" + jsonData.stateToken)",
+									"console.log(\"FactorId: \" + jsonData._embedded.factors[0].id)"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disabledSystemHeaders": {
+							"accept": true
+						}
+					},
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"username\": \"{{user_id}}@iec.co.il\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://iec-ext.okta.com/api/v1/authn",
+							"protocol": "https",
+							"host": [
+								"iec-ext",
+								"okta",
+								"com"
+							],
+							"path": [
+								"api",
+								"v1",
+								"authn"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Step 1: Factor ID",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json",
+										"type": "text"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"username\": \"{{user_id}}@iec.co.il\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "https://iec-ext.okta.com/api/v1/authn",
+									"protocol": "https",
+									"host": [
+										"iec-ext",
+										"okta",
+										"com"
+									],
+									"path": [
+										"api",
+										"v1",
+										"authn"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Date",
+									"value": "Wed, 06 Mar 2024 06:55:14 GMT"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Transfer-Encoding",
+									"value": "chunked"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								},
+								{
+									"key": "Server",
+									"value": "nginx"
+								},
+								{
+									"key": "Vary",
+									"value": "Accept-Encoding"
+								},
+								{
+									"key": "x-okta-request-id",
+									"value": "1ec08ee3afef3e70ca9afc63a194eb6b"
+								},
+								{
+									"key": "x-xss-protection",
+									"value": "0"
+								},
+								{
+									"key": "p3p",
+									"value": "CP=\"HONK\""
+								},
+								{
+									"key": "set-cookie",
+									"value": "sid=\"\";Version=1;Path=/;Max-Age=0"
+								},
+								{
+									"key": "set-cookie",
+									"value": "autolaunch_triggered=\"\"; Expires=Thu, 01-Jan-1970 00:00:10 GMT; Path=/"
+								},
+								{
+									"key": "set-cookie",
+									"value": "JSESSIONID=B902566721AFACE35677C5FB5C0A257D; Path=/; Secure; HttpOnly"
+								},
+								{
+									"key": "content-security-policy",
+									"value": "default-src 'self' IEC-ext.okta.com *.oktacdn.com; connect-src 'self' IEC-ext.okta.com IEC-ext-admin.okta.com *.oktacdn.com *.mixpanel.com *.mapbox.com *.mtls.okta.com IEC-ext.kerberos.okta.com https://oinmanager.okta.com data: data.pendo.io pendo-static-5634101834153984.storage.googleapis.com pendo-static-5391521872216064.storage.googleapis.com; script-src 'unsafe-inline' 'unsafe-eval' 'self' IEC-ext.okta.com *.oktacdn.com; style-src 'unsafe-inline' 'self' IEC-ext.okta.com *.oktacdn.com; frame-src 'self' IEC-ext.okta.com IEC-ext-admin.okta.com login.okta.com; img-src 'self' IEC-ext.okta.com *.oktacdn.com *.tiles.mapbox.com *.mapbox.com data: data.pendo.io pendo-static-5634101834153984.storage.googleapis.com pendo-static-5391521872216064.storage.googleapis.com blob:; font-src 'self' IEC-ext.okta.com data: *.oktacdn.com fonts.gstatic.com; frame-ancestors 'self'"
+								},
+								{
+									"key": "x-rate-limit-limit",
+									"value": "600"
+								},
+								{
+									"key": "x-rate-limit-remaining",
+									"value": "582"
+								},
+								{
+									"key": "x-rate-limit-reset",
+									"value": "1709708143"
+								},
+								{
+									"key": "cache-control",
+									"value": "no-cache, no-store"
+								},
+								{
+									"key": "pragma",
+									"value": "no-cache"
+								},
+								{
+									"key": "expires",
+									"value": "0"
+								},
+								{
+									"key": "accept-ch",
+									"value": "Sec-CH-UA-Platform-Version"
+								},
+								{
+									"key": "x-content-type-options",
+									"value": "nosniff"
+								},
+								{
+									"key": "Strict-Transport-Security",
+									"value": "max-age=315360000; includeSubDomains"
+								},
+								{
+									"key": "Content-Encoding",
+									"value": "gzip"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"stateToken\": \"00bfZMTQkZMEoSq56Y4iXjtIXzK4xQXVrfeyu9QTYm\",\n    \"expiresAt\": \"2024-03-06T07:55:14.000Z\",\n    \"status\": \"UNAUTHENTICATED\",\n    \"_embedded\": {\n        \"factors\": [\n            {\n                \"id\": \"password\",\n                \"factorType\": \"password\",\n                \"provider\": \"OKTA\",\n                \"vendorName\": \"OKTA\",\n                \"profile\": {},\n                \"_links\": {\n                    \"verify\": {\n                        \"href\": \"https://iec-ext.okta.com/api/v1/authn/factors/password/verify\",\n                        \"hints\": {\n                            \"allow\": [\n                                \"POST\"\n                            ]\n                        }\n                    }\n                }\n            }\n        ],\n        \"policy\": {\n            \"allowRememberDevice\": false,\n            \"rememberDeviceLifetimeInMinutes\": 0,\n            \"rememberDeviceByDefault\": false,\n            \"factorsPolicyInfo\": {}\n        }\n    },\n    \"_links\": {\n        \"cancel\": {\n            \"href\": \"https://iec-ext.okta.com/api/v1/authn/cancel\",\n            \"hints\": {\n                \"allow\": [\n                    \"POST\"\n                ]\n            }\n        }\n    }\n}"
+						}
+					]
+				},
+				{
+					"name": "Step 2: Send OTP",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"let jsonData = JSON.parse(pm.response.text());",
+									"",
+									"if (jsonData.status == \"SUCCESS\"){",
+									"    pm.collectionVariables.set(\"sessionToken\", jsonData.sessionToken);",
+									"    console.log(\"SessionToken = \" + jsonData.sessionToken)",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disabledSystemHeaders": {
+							"accept": true
+						}
+					},
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"stateToken\": \"{{stateToken}}\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://iec-ext.okta.com/api/v1/authn/factors/{{factorId}}/verify",
+							"protocol": "https",
+							"host": [
+								"iec-ext",
+								"okta",
+								"com"
+							],
+							"path": [
+								"api",
+								"v1",
+								"authn",
+								"factors",
+								"{{factorId}}",
+								"verify"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Step 3: Verify OTP",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"let jsonData = JSON.parse(pm.response.text());",
+									"",
+									"if (jsonData.status == \"SUCCESS\"){",
+									"    pm.collectionVariables.set(\"sessionToken\", jsonData.sessionToken);",
+									"    console.log(\"SessionToken = \" + jsonData.sessionToken)",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disabledSystemHeaders": {
+							"accept": true
+						}
+					},
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"stateToken\": \"{{stateToken}}\",\n    \"passCode\": \"{{otpCode}}\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://iec-ext.okta.com/api/v1/authn/factors/{{factorId}}/verify",
+							"protocol": "https",
+							"host": [
+								"iec-ext",
+								"okta",
+								"com"
+							],
+							"path": [
+								"api",
+								"v1",
+								"authn",
+								"factors",
+								"{{factorId}}",
+								"verify"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Step 4: Authorize Session",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"// Generate a random string for the verifier",
+									"let verifier = \"\"",
+									"while (verifier.length < 128) {",
+									"    verifier += Math.random().toString(36).substring(2, 15)",
+									"}",
+									"verifier = verifier.substring(0, 128)",
+									"",
+									"// Derive the code challenge using the SHA-256 hash algorithm (base64url encoded)",
+									"let codeChallenge = btoa(crypto.subtle.digest('SHA-256', new TextEncoder().encode(verifier)))",
+									"  .replace(/=/g, '')",
+									"  .replace(/\\+/g, '-')",
+									"  .replace(/\\//g, '_');",
+									"",
+									"// Store the verifier and code challenge in environment variables",
+									"pm.environment.set(\"VERIFIER\", verifier);",
+									"pm.environment.set(\"CODE_CHALLENGE\", codeChallenge);"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Get the response body as a text",
+									"let responseBody = pm.response.text();",
+									"",
+									"// Use regular expression to find the code",
+									"let regex = /<input type=\"hidden\" name=\"code\" value=\"(.+?)\"\\/>/;",
+									"let match = regex.exec(responseBody);",
+									"",
+									"// Extract the code if found, otherwise set to an empty string",
+									"let code = match ? match[0] : \"\";",
+									"",
+									"// Optional: Set the code in an environment variable",
+									"pm.collectionVariables.set(\"oauthCode\", code);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true,
+						"disabledSystemHeaders": {
+							"accept": true
+						}
+					},
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text",
+								"disabled": true
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text",
+								"disabled": true
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://iec-ext.okta.com/oauth2/default/v1/authorize?client_id={{appClientId}}&response_type=id_token+code&response_mode=form_post&scope=openid email profile offline_access&redirect_uri=com.iecrn:/&state=123abc&nonce=abc123&code_challenge_method=S256&sessionToken={{sessionToken}}&code_challenge={{CODE_CHALLENGE}}",
+							"protocol": "https",
+							"host": [
+								"iec-ext",
+								"okta",
+								"com"
+							],
+							"path": [
+								"oauth2",
+								"default",
+								"v1",
+								"authorize"
+							],
+							"query": [
+								{
+									"key": "client_id",
+									"value": "{{appClientId}}"
+								},
+								{
+									"key": "response_type",
+									"value": "id_token+code"
+								},
+								{
+									"key": "response_mode",
+									"value": "form_post"
+								},
+								{
+									"key": "scope",
+									"value": "openid email profile offline_access"
+								},
+								{
+									"key": "redirect_uri",
+									"value": "com.iecrn:/"
+								},
+								{
+									"key": "state",
+									"value": "123abc"
+								},
+								{
+									"key": "nonce",
+									"value": "abc123"
+								},
+								{
+									"key": "code_challenge_method",
+									"value": "S256"
+								},
+								{
+									"key": "sessionToken",
+									"value": "{{sessionToken}}"
+								},
+								{
+									"key": "code_challenge",
+									"value": "{{CODE_CHALLENGE}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Step 5: Get AccessToken",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Parse the response JSON",
+									"let jsonData = JSON.parse(pm.response.text());",
+									"",
+									"// Set the variables in the environment (optional)",
+									"pm.collectionVariables.set(\"accessToken\", jsonData.access_token);",
+									"pm.collectionVariables.set(\"idToken\", jsonData.id_token);",
+									"pm.collectionVariables.set(\"refreshToken\", refresh_token);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disabledSystemHeaders": {
+							"accept": true
+						}
+					},
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "    {\n        \"client_id\": {{appClientId}},\n        \"code_verifier\": {{VERIFIER}},\n        \"grant_type\": \"authorization_code\",\n        \"redirect_uri\": \"com.iecrn:/\",\n        \"code\": {{oauthCode}}\n    }",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://iec-ext.okta.com/oauth2/default/v1/token",
+							"protocol": "https",
+							"host": [
+								"iec-ext",
+								"okta",
+								"com"
+							],
+							"path": [
+								"oauth2",
+								"default",
+								"v1",
+								"token"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Refresh Token",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Parse the response JSON",
+									"let jsonData = JSON.parse(pm.response.text());",
+									"",
+									"// Set the variables in the environment (optional)",
+									"pm.collectionVariables.set(\"accessToken\", jsonData.access_token);",
+									"pm.collectionVariables.set(\"idToken\", jsonData.id_token);",
+									"pm.collectionVariables.set(\"refreshToken\", jsonData.refresh_token);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disabledSystemHeaders": {
+							"accept": true
+						}
+					},
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "client_id",
+									"value": "{{appClientId}}",
+									"type": "text"
+								},
+								{
+									"key": "redirect_uri",
+									"value": "com.iecrn:/",
+									"type": "text"
+								},
+								{
+									"key": "refresh_token",
+									"value": "{{refreshToken}}",
+									"type": "text"
+								},
+								{
+									"key": "grant_type",
+									"value": "refresh_token",
+									"type": "text"
+								},
+								{
+									"key": "scope",
+									"value": "openid email profile offline_access",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "https://iec-ext.okta.com/oauth2/default/v1/token",
+							"protocol": "https",
+							"host": [
+								"iec-ext",
+								"okta",
+								"com"
+							],
+							"path": [
+								"oauth2",
+								"default",
+								"v1",
+								"token"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Refresh Token",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "urlencoded",
+									"urlencoded": [
+										{
+											"key": "client_id",
+											"value": "{{appClientId}}",
+											"type": "text"
+										},
+										{
+											"key": "redirect_uri",
+											"value": "com.iecrn:/",
+											"type": "text"
+										},
+										{
+											"key": "refresh_token",
+											"value": "{{refreshToken}}",
+											"type": "text"
+										},
+										{
+											"key": "grant_type",
+											"value": "refresh_token",
+											"type": "text"
+										},
+										{
+											"key": "scope",
+											"value": "openid email profile offline_access",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "https://iec-ext.okta.com/oauth2/default/v1/token",
+									"protocol": "https",
+									"host": [
+										"iec-ext",
+										"okta",
+										"com"
+									],
+									"path": [
+										"oauth2",
+										"default",
+										"v1",
+										"token"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Date",
+									"value": "Wed, 06 Mar 2024 09:42:05 GMT"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Transfer-Encoding",
+									"value": "chunked"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								},
+								{
+									"key": "Server",
+									"value": "nginx"
+								},
+								{
+									"key": "x-okta-request-id",
+									"value": "5a9ef8f189a3106d8ad298391cfb33cd"
+								},
+								{
+									"key": "x-xss-protection",
+									"value": "0"
+								},
+								{
+									"key": "p3p",
+									"value": "CP=\"HONK\""
+								},
+								{
+									"key": "set-cookie",
+									"value": "sid=\"\";Version=1;Path=/;Max-Age=0"
+								},
+								{
+									"key": "set-cookie",
+									"value": "autolaunch_triggered=\"\"; Expires=Thu, 01-Jan-1970 00:00:10 GMT; Path=/"
+								},
+								{
+									"key": "set-cookie",
+									"value": "JSESSIONID=6FF2E741178CE9E8BFFAA22AF59BBAF0; Path=/; Secure; HttpOnly"
+								},
+								{
+									"key": "content-security-policy",
+									"value": "default-src 'self' IEC-ext.okta.com *.oktacdn.com; connect-src 'self' IEC-ext.okta.com IEC-ext-admin.okta.com *.oktacdn.com *.mixpanel.com *.mapbox.com *.mtls.okta.com IEC-ext.kerberos.okta.com https://oinmanager.okta.com data: data.pendo.io pendo-static-5634101834153984.storage.googleapis.com pendo-static-5391521872216064.storage.googleapis.com; script-src 'unsafe-inline' 'unsafe-eval' 'self' IEC-ext.okta.com *.oktacdn.com; style-src 'unsafe-inline' 'self' IEC-ext.okta.com *.oktacdn.com; frame-src 'self' IEC-ext.okta.com IEC-ext-admin.okta.com login.okta.com; img-src 'self' IEC-ext.okta.com *.oktacdn.com *.tiles.mapbox.com *.mapbox.com data: data.pendo.io pendo-static-5634101834153984.storage.googleapis.com pendo-static-5391521872216064.storage.googleapis.com blob:; font-src 'self' IEC-ext.okta.com data: *.oktacdn.com fonts.gstatic.com; frame-ancestors 'self'"
+								},
+								{
+									"key": "x-rate-limit-limit",
+									"value": "1200"
+								},
+								{
+									"key": "x-rate-limit-remaining",
+									"value": "1199"
+								},
+								{
+									"key": "x-rate-limit-reset",
+									"value": "1709718185"
+								},
+								{
+									"key": "cache-control",
+									"value": "no-cache, no-store"
+								},
+								{
+									"key": "pragma",
+									"value": "no-cache"
+								},
+								{
+									"key": "expires",
+									"value": "0"
+								},
+								{
+									"key": "accept-ch",
+									"value": "Sec-CH-UA-Platform-Version"
+								},
+								{
+									"key": "x-content-type-options",
+									"value": "nosniff"
+								},
+								{
+									"key": "Strict-Transport-Security",
+									"value": "max-age=315360000; includeSubDomains"
+								},
+								{
+									"key": "X-Robots-Tag",
+									"value": "noindex,nofollow"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"token_type\": \"Bearer\",\n    \"expires_in\": 3600,\n    \"access_token\": \"eyJraWQiOiJyNkhxQ0t6akJJUlRyVEVDRE9NWHdSVWx2cEJLSHJqa2xpbUVOR1Bua2drIiwiYWxnIjoiUlMyNTYifQ.eyJ2ZXIiOjEsImp0aSI6IkFULjhvUFR5SXdENkU5bXItdk5QSlEzaktoNkx5UmEyMWt0dUV6cE9oR0FUUDAub2FyMnMzZTBrZ3kyUmtNblYycDciLCJpc3MiOiJodHRwczovL0lFQy1leHQub2t0YS5jb20vb2F1dGgyL2RlZmF1bHQiLCJhdWQiOiJhcGk6Ly9kZWZhdWx0IiwiaWF0IjoxNzA5NzE4MTI1LCJleHAiOjE3MDk3MjE3MjUsImNpZCI6IjBvYXFmNnpyN3lFY1FacXF0MnA3IiwidWlkIjoiMDB1M2p6dWF5b2UxMmxCdHIycDciLCJzY3AiOlsib2ZmbGluZV9hY2Nlc3MiLCJlbWFpbCIsInByb2ZpbGUiLCJvcGVuaWQiXSwiYXV0aF90aW1lIjoxNzA5NDc4NDUwLCJzdWIiOiIzMDY4OTM1MzhAaWVjLmNvLmlsIn0.DJxUTEfCsJFMfh5SR3P0DsaODn79eRVITLk9dmt90dLjSTTOszYedTBGG75Hd4H52OBvlWanUiJ1xk9htrG7_pDjrC9Uy0d83VGpd95-WIJbdM_nDMcFSSGulggcHPk-vbs0pBgKQfsyS-UID9XMAOnr7sEGOzWvTaMtF1ykiqrPNVAbE2xVUFOLDdLG-VFncK99NVKq6nlqD6ET7h05o1RkfFMu5XM2GZL1iPqhWVLZGDGesJ2WLUeQa3H53GqCUfp5JwMPBw69TkO0AKNn3c33jr7MLGi3NN0tOEtzWFWdaW4krA_ylFtR5NNBBvg_QQjJHJm4SyTG1jWcQIVByA\",\n    \"scope\": \"offline_access email profile openid\",\n    \"refresh_token\": \"55rSzGfPGY3i9iONu_J_FGfYhWdZFhzM_FNLazK8yBM\",\n    \"id_token\": \"eyJraWQiOiJyNkhxQ0t6akJJUlRyVEVDRE9NWHdSVWx2cEJLSHJqa2xpbUVOR1Bua2drIiwiYWxnIjoiUlMyNTYifQ.eyJzdWIiOiIwMHUzanp1YXlvZTEybEJ0cjJwNyIsIm5hbWUiOiLXk9eZ157XmNeo15kg15LXldec16bXntefIiwiZW1haWwiOiJkaW1hQGdvbHRzbWFuLm5ldCIsInZlciI6MSwiaXNzIjoiaHR0cHM6Ly9JRUMtZXh0Lm9rdGEuY29tL29hdXRoMi9kZWZhdWx0IiwiYXVkIjoiMG9hcWY2enI3eUVjUVpxcXQycDciLCJpYXQiOjE3MDk3MTgxMjUsImV4cCI6MTcwOTcyMTcyNSwianRpIjoiSUQuSWJadkxMNXhwWjFCTUk1bUFCeElTaUg0eE8zc3pTVUZ4RVo3ZTZ4My11QSIsImFtciI6WyJtZmEiLCJvdHAiXSwiaWRwIjoiMDBvOXJ0bmkwc05QMUc4MkMycDYiLCJwcmVmZXJyZWRfdXNlcm5hbWUiOiIzMDY4OTM1MzhAaWVjLmNvLmlsIiwiYXV0aF90aW1lIjoxNzA5NDc4NDUwLCJhdF9oYXNoIjoiczZfNHlEa1RzZTVZMmFWZ0gwSnJuZyJ9.ezszO7G0IzJlnKNXBMzJNYDw9d-c5gj33RyjikVKypkrEV70Gk-3PKfpdvzR771XtirxSNjYO1GYQH8UX_Xew1Wfa0-lqPcXXmgr-SAIOCE-y8Xi7gK22MH4GEBcRiqPzErJie9OzMxGOdpUZZW0xvIEvPjhIYV6D61QecaHF3ignNM8Sp4_TTGcatJCBrTbBPq3rAFrz3Dhc8b6Jk1YhJxDkcq69ObSZXRNXpWVY_PpNqSFowj_zxDvEUK5BvQKywWnmoIvWyx7cB07YY9BFAgT1rIuZtDJAjNIyudftC5oesi9dD7UVMHVIfSBU3qiFwfHaCbfThoL0D0sIyA0MQ\"\n}"
+						}
+					]
+				}
+			],
+			"auth": {
+				"type": "noauth"
+			},
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				}
+			]
+		},
+		{
+			"name": "Account",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// Parse the response JSON",
+							"let jsonData = JSON.parse(pm.response.text());",
+							"",
+							"// Set the variables in the environment (optional)",
+							"pm.collectionVariables.set(\"bp_number\", jsonData.data[0].accountNumber);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "authority",
+						"value": "iecapi.iec.co.il"
+					},
+					{
+						"key": "accept",
+						"value": "application/json, text/plain, */*"
+					},
+					{
+						"key": "accept-language",
+						"value": "en,he;q=0.9"
+					},
+					{
+						"key": "dnt",
+						"value": "1"
+					},
+					{
+						"key": "origin",
+						"value": "https://www.iec.co.il"
+					},
+					{
+						"key": "referer",
+						"value": "https://www.iec.co.il/"
+					},
+					{
+						"key": "sec-ch-ua",
+						"value": "\"Chromium\";v=\"121\", \"Not A(Brand\";v=\"99\""
+					},
+					{
+						"key": "sec-ch-ua-mobile",
+						"value": "?0"
+					},
+					{
+						"key": "sec-ch-ua-platform",
+						"value": "\"macOS\""
+					},
+					{
+						"key": "sec-fetch-dest",
+						"value": "empty"
+					},
+					{
+						"key": "sec-fetch-mode",
+						"value": "cors"
+					},
+					{
+						"key": "sec-fetch-site",
+						"value": "same-site"
+					},
+					{
+						"key": "user-agent",
+						"value": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36"
+					},
+					{
+						"key": "x-iec-idt",
+						"value": "1"
+					},
+					{
+						"key": "x-iec-webview",
+						"value": "1"
+					}
+				],
+				"url": {
+					"raw": "https://iecapi.iec.co.il//api/outages/accounts",
+					"protocol": "https",
+					"host": [
+						"iecapi",
+						"iec",
+						"co",
+						"il"
+					],
+					"path": [
+						"",
+						"api",
+						"outages",
+						"accounts"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Customer",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// Parse the response JSON",
+							"let jsonData = JSON.parse(pm.response.text());",
+							"",
+							"// Set the variables in the environment (optional)",
+							"pm.collectionVariables.set(\"bp_number\", jsonData.bpNumber);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "authority",
+						"value": "iecapi.iec.co.il"
+					},
+					{
+						"key": "accept",
+						"value": "application/json, text/plain, */*"
+					},
+					{
+						"key": "dnt",
+						"value": "1"
+					},
+					{
+						"key": "origin",
+						"value": "https://www.iec.co.il"
+					},
+					{
+						"key": "referer",
+						"value": "https://www.iec.co.il/"
+					},
+					{
+						"key": "sec-ch-ua",
+						"value": "\"Chromium\";v=\"121\", \"Not A(Brand\";v=\"99\""
+					},
+					{
+						"key": "sec-ch-ua-mobile",
+						"value": "?0"
+					},
+					{
+						"key": "sec-ch-ua-platform",
+						"value": "\"macOS\""
+					},
+					{
+						"key": "sec-fetch-dest",
+						"value": "empty"
+					},
+					{
+						"key": "sec-fetch-mode",
+						"value": "cors"
+					},
+					{
+						"key": "sec-fetch-site",
+						"value": "same-site"
+					},
+					{
+						"key": "user-agent",
+						"value": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36"
+					},
+					{
+						"key": "x-iec-idt",
+						"value": "1"
+					},
+					{
+						"key": "x-iec-webview",
+						"value": "1"
+					}
+				],
+				"url": {
+					"raw": "https://iecapi.iec.co.il//api/customer",
+					"protocol": "https",
+					"host": [
+						"iecapi",
+						"iec",
+						"co",
+						"il"
+					],
+					"path": [
+						"",
+						"api",
+						"customer"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Contracts",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// Parse the response JSON",
+							"let jsonData = JSON.parse(pm.response.text());",
+							"",
+							"// Set the variables in the environment (optional)",
+							"pm.collectionVariables.set(\"contract_id\", jsonData.data.contracts[0].contractId);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "authority",
+						"value": "iecapi.iec.co.il"
+					},
+					{
+						"key": "accept",
+						"value": "application/json, text/plain, */*"
+					},
+					{
+						"key": "accept-language",
+						"value": "en,he;q=0.9"
+					},
+					{
+						"key": "dnt",
+						"value": "1"
+					},
+					{
+						"key": "origin",
+						"value": "https://www.iec.co.il"
+					},
+					{
+						"key": "referer",
+						"value": "https://www.iec.co.il/"
+					},
+					{
+						"key": "sec-ch-ua",
+						"value": "\"Chromium\";v=\"121\", \"Not A(Brand\";v=\"99\""
+					},
+					{
+						"key": "sec-ch-ua-mobile",
+						"value": "?0"
+					},
+					{
+						"key": "sec-ch-ua-platform",
+						"value": "\"macOS\""
+					},
+					{
+						"key": "sec-fetch-dest",
+						"value": "empty"
+					},
+					{
+						"key": "sec-fetch-mode",
+						"value": "cors"
+					},
+					{
+						"key": "sec-fetch-site",
+						"value": "same-site"
+					},
+					{
+						"key": "user-agent",
+						"value": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36"
+					},
+					{
+						"key": "x-iec-idt",
+						"value": "1"
+					},
+					{
+						"key": "x-iec-webview",
+						"value": "1"
+					}
+				],
+				"url": {
+					"raw": "https://iecapi.iec.co.il//api/customer/contract/{{bp_number}}",
+					"protocol": "https",
+					"host": [
+						"iecapi",
+						"iec",
+						"co",
+						"il"
+					],
+					"path": [
+						"",
+						"api",
+						"customer",
+						"contract",
+						"{{bp_number}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Electric Bill",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "authority",
+						"value": "iecapi.iec.co.il"
+					},
+					{
+						"key": "accept",
+						"value": "application/json, text/plain, */*"
+					},
+					{
+						"key": "accept-language",
+						"value": "en,he;q=0.9"
+					},
+					{
+						"key": "dnt",
+						"value": "1"
+					},
+					{
+						"key": "origin",
+						"value": "https://www.iec.co.il"
+					},
+					{
+						"key": "referer",
+						"value": "https://www.iec.co.il/"
+					},
+					{
+						"key": "sec-ch-ua",
+						"value": "\"Chromium\";v=\"121\", \"Not A(Brand\";v=\"99\""
+					},
+					{
+						"key": "sec-ch-ua-mobile",
+						"value": "?0"
+					},
+					{
+						"key": "sec-ch-ua-platform",
+						"value": "\"macOS\""
+					},
+					{
+						"key": "sec-fetch-dest",
+						"value": "empty"
+					},
+					{
+						"key": "sec-fetch-mode",
+						"value": "cors"
+					},
+					{
+						"key": "sec-fetch-site",
+						"value": "same-site"
+					},
+					{
+						"key": "user-agent",
+						"value": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36"
+					},
+					{
+						"key": "x-iec-idt",
+						"value": "1"
+					},
+					{
+						"key": "x-iec-webview",
+						"value": "1"
+					}
+				],
+				"url": {
+					"raw": "https://iecapi.iec.co.il//api/ElectricBillsDrawers/ElectricBills/{{contract_id}}/{{bp_number}}",
+					"protocol": "https",
+					"host": [
+						"iecapi",
+						"iec",
+						"co",
+						"il"
+					],
+					"path": [
+						"",
+						"api",
+						"ElectricBillsDrawers",
+						"ElectricBills",
+						"{{contract_id}}",
+						"{{bp_number}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Billing Invoices",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "authority",
+						"value": "iecapi.iec.co.il"
+					},
+					{
+						"key": "accept",
+						"value": "application/json, text/plain, */*"
+					},
+					{
+						"key": "accept-language",
+						"value": "en,he;q=0.9"
+					},
+					{
+						"key": "dnt",
+						"value": "1"
+					},
+					{
+						"key": "origin",
+						"value": "https://www.iec.co.il"
+					},
+					{
+						"key": "referer",
+						"value": "https://www.iec.co.il/"
+					},
+					{
+						"key": "sec-ch-ua",
+						"value": "\"Chromium\";v=\"121\", \"Not A(Brand\";v=\"99\""
+					},
+					{
+						"key": "sec-ch-ua-mobile",
+						"value": "?0"
+					},
+					{
+						"key": "sec-ch-ua-platform",
+						"value": "\"macOS\""
+					},
+					{
+						"key": "sec-fetch-dest",
+						"value": "empty"
+					},
+					{
+						"key": "sec-fetch-mode",
+						"value": "cors"
+					},
+					{
+						"key": "sec-fetch-site",
+						"value": "same-site"
+					},
+					{
+						"key": "user-agent",
+						"value": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36"
+					},
+					{
+						"key": "x-iec-idt",
+						"value": "1"
+					},
+					{
+						"key": "x-iec-webview",
+						"value": "1"
+					}
+				],
+				"url": {
+					"raw": "https://iecapi.iec.co.il//api/billingCollection/invoices/{{contract_id}}/{{bp_number}}",
+					"protocol": "https",
+					"host": [
+						"iecapi",
+						"iec",
+						"co",
+						"il"
+					],
+					"path": [
+						"",
+						"api",
+						"billingCollection",
+						"invoices",
+						"{{contract_id}}",
+						"{{bp_number}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "RemoteReadingRange",
+			"protocolProfileBehavior": {
+				"disabledSystemHeaders": {
+					"accept": true,
+					"user-agent": true,
+					"accept-encoding": true,
+					"connection": true
+				}
+			},
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "authority",
+						"value": "iecapi.iec.co.il",
+						"disabled": true
+					},
+					{
+						"key": "accept",
+						"value": "application/json, text/plain, */*",
+						"disabled": true
+					},
+					{
+						"key": "accept-language",
+						"value": "en,he;q=0.9",
+						"disabled": true
+					},
+					{
+						"key": "dnt",
+						"value": "1",
+						"disabled": true
+					},
+					{
+						"key": "origin",
+						"value": "https://www.iec.co.il",
+						"disabled": true
+					},
+					{
+						"key": "referer",
+						"value": "https://www.iec.co.il/",
+						"disabled": true
+					},
+					{
+						"key": "sec-ch-ua",
+						"value": "\"Chromium\";v=\"121\", \"Not A(Brand\";v=\"99\"",
+						"disabled": true
+					},
+					{
+						"key": "sec-ch-ua-mobile",
+						"value": "?0",
+						"disabled": true
+					},
+					{
+						"key": "sec-ch-ua-platform",
+						"value": "\"macOS\"",
+						"disabled": true
+					},
+					{
+						"key": "sec-fetch-dest",
+						"value": "empty",
+						"disabled": true
+					},
+					{
+						"key": "sec-fetch-mode",
+						"value": "cors",
+						"disabled": true
+					},
+					{
+						"key": "sec-fetch-site",
+						"value": "same-site",
+						"disabled": true
+					},
+					{
+						"key": "user-agent",
+						"value": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36",
+						"disabled": true
+					},
+					{
+						"key": "x-iec-idt",
+						"value": "1",
+						"disabled": true
+					},
+					{
+						"key": "x-iec-webview",
+						"value": "1",
+						"disabled": true
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{   \n    \"meterSerialNumber\": \"{{device_id}}\",\n    \"meterCode\": \"494\",\n    \"lastInvoiceDate\": \"2024-02-17\",\n    \"fromDate\": \"2024-01-17\",\n    \"resolution\": 1\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://iecapi.iec.co.il//api/Consumption/RemoteReadingRange/{{contract_id}}",
+					"protocol": "https",
+					"host": [
+						"iecapi",
+						"iec",
+						"co",
+						"il"
+					],
+					"path": [
+						"",
+						"api",
+						"Consumption",
+						"RemoteReadingRange",
+						"{{contract_id}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Last Meter Reading",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "authority",
+						"value": "iecapi.iec.co.il"
+					},
+					{
+						"key": "accept",
+						"value": "application/json, text/plain, */*"
+					},
+					{
+						"key": "accept-language",
+						"value": "en,he;q=0.9"
+					},
+					{
+						"key": "dnt",
+						"value": "1"
+					},
+					{
+						"key": "origin",
+						"value": "https://www.iec.co.il"
+					},
+					{
+						"key": "referer",
+						"value": "https://www.iec.co.il/"
+					},
+					{
+						"key": "sec-ch-ua",
+						"value": "\"Chromium\";v=\"121\", \"Not A(Brand\";v=\"99\""
+					},
+					{
+						"key": "sec-ch-ua-mobile",
+						"value": "?0"
+					},
+					{
+						"key": "sec-ch-ua-platform",
+						"value": "\"macOS\""
+					},
+					{
+						"key": "sec-fetch-dest",
+						"value": "empty"
+					},
+					{
+						"key": "sec-fetch-mode",
+						"value": "cors"
+					},
+					{
+						"key": "sec-fetch-site",
+						"value": "same-site"
+					},
+					{
+						"key": "user-agent",
+						"value": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36"
+					},
+					{
+						"key": "x-iec-idt",
+						"value": "1"
+					},
+					{
+						"key": "x-iec-webview",
+						"value": "1"
+					}
+				],
+				"url": {
+					"raw": "https://iecapi.iec.co.il//api/Device/LastMeterReading/{{contract_id}}/{{bp_number}}",
+					"protocol": "https",
+					"host": [
+						"iecapi",
+						"iec",
+						"co",
+						"il"
+					],
+					"path": [
+						"",
+						"api",
+						"Device",
+						"LastMeterReading",
+						"{{contract_id}}",
+						"{{bp_number}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Devices",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// Parse the response JSON",
+							"let jsonData = JSON.parse(pm.response.text());",
+							"",
+							"// Set the variables in the environment (optional)",
+							"pm.collectionVariables.set(\"device_id\", jsonData[0].deviceNumber);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "authority",
+						"value": "iecapi.iec.co.il"
+					},
+					{
+						"key": "accept",
+						"value": "application/json, text/plain, */*"
+					},
+					{
+						"key": "accept-language",
+						"value": "en,he;q=0.9"
+					},
+					{
+						"key": "dnt",
+						"value": "1"
+					},
+					{
+						"key": "origin",
+						"value": "https://www.iec.co.il"
+					},
+					{
+						"key": "referer",
+						"value": "https://www.iec.co.il/"
+					},
+					{
+						"key": "sec-ch-ua",
+						"value": "\"Chromium\";v=\"121\", \"Not A(Brand\";v=\"99\""
+					},
+					{
+						"key": "sec-ch-ua-mobile",
+						"value": "?0"
+					},
+					{
+						"key": "sec-ch-ua-platform",
+						"value": "\"macOS\""
+					},
+					{
+						"key": "sec-fetch-dest",
+						"value": "empty"
+					},
+					{
+						"key": "sec-fetch-mode",
+						"value": "cors"
+					},
+					{
+						"key": "sec-fetch-site",
+						"value": "same-site"
+					},
+					{
+						"key": "user-agent",
+						"value": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36"
+					},
+					{
+						"key": "x-iec-idt",
+						"value": "1"
+					},
+					{
+						"key": "x-iec-webview",
+						"value": "1"
+					}
+				],
+				"url": {
+					"raw": "https://iecapi.iec.co.il//api/Device/{{contract_id}}",
+					"protocol": "https",
+					"host": [
+						"iecapi",
+						"iec",
+						"co",
+						"il"
+					],
+					"path": [
+						"",
+						"api",
+						"Device",
+						"{{contract_id}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Devices by DeviceId",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "authority",
+						"value": "iecapi.iec.co.il"
+					},
+					{
+						"key": "accept",
+						"value": "application/json, text/plain, */*"
+					},
+					{
+						"key": "accept-language",
+						"value": "en,he;q=0.9"
+					},
+					{
+						"key": "dnt",
+						"value": "1"
+					},
+					{
+						"key": "origin",
+						"value": "https://www.iec.co.il"
+					},
+					{
+						"key": "referer",
+						"value": "https://www.iec.co.il/"
+					},
+					{
+						"key": "sec-ch-ua",
+						"value": "\"Chromium\";v=\"121\", \"Not A(Brand\";v=\"99\""
+					},
+					{
+						"key": "sec-ch-ua-mobile",
+						"value": "?0"
+					},
+					{
+						"key": "sec-ch-ua-platform",
+						"value": "\"macOS\""
+					},
+					{
+						"key": "sec-fetch-dest",
+						"value": "empty"
+					},
+					{
+						"key": "sec-fetch-mode",
+						"value": "cors"
+					},
+					{
+						"key": "sec-fetch-site",
+						"value": "same-site"
+					},
+					{
+						"key": "user-agent",
+						"value": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36"
+					},
+					{
+						"key": "x-iec-idt",
+						"value": "1"
+					},
+					{
+						"key": "x-iec-webview",
+						"value": "1"
+					}
+				],
+				"url": {
+					"raw": "https://iecapi.iec.co.il//api/Device/{{contract_id}}/{{device_id}}",
+					"protocol": "https",
+					"host": [
+						"iecapi",
+						"iec",
+						"co",
+						"il"
+					],
+					"path": [
+						"",
+						"api",
+						"Device",
+						"{{contract_id}}",
+						"{{device_id}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "DeviceType",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "authority",
+						"value": "iecapi.iec.co.il"
+					},
+					{
+						"key": "accept",
+						"value": "application/json, text/plain, */*"
+					},
+					{
+						"key": "accept-language",
+						"value": "en,he;q=0.9"
+					},
+					{
+						"key": "dnt",
+						"value": "1"
+					},
+					{
+						"key": "origin",
+						"value": "https://www.iec.co.il"
+					},
+					{
+						"key": "referer",
+						"value": "https://www.iec.co.il/"
+					},
+					{
+						"key": "sec-ch-ua",
+						"value": "\"Chromium\";v=\"121\", \"Not A(Brand\";v=\"99\""
+					},
+					{
+						"key": "sec-ch-ua-mobile",
+						"value": "?0"
+					},
+					{
+						"key": "sec-ch-ua-platform",
+						"value": "\"macOS\""
+					},
+					{
+						"key": "sec-fetch-dest",
+						"value": "empty"
+					},
+					{
+						"key": "sec-fetch-mode",
+						"value": "cors"
+					},
+					{
+						"key": "sec-fetch-site",
+						"value": "same-site"
+					},
+					{
+						"key": "user-agent",
+						"value": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36"
+					},
+					{
+						"key": "x-iec-idt",
+						"value": "1"
+					},
+					{
+						"key": "x-iec-webview",
+						"value": "1"
+					}
+				],
+				"url": {
+					"raw": "https://iecapi.iec.co.il//api/Device/type/{{bp_number}}/{{contract_id}}/false",
+					"protocol": "https",
+					"host": [
+						"iecapi",
+						"iec",
+						"co",
+						"il"
+					],
+					"path": [
+						"",
+						"api",
+						"Device",
+						"type",
+						"{{bp_number}}",
+						"{{contract_id}}",
+						"false"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "{{idToken}}",
+				"type": "string"
+			}
+		]
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "user_id",
+			"value": "012345678",
+			"type": "string"
+		},
+		{
+			"key": "contract_id",
+			"value": "012345678",
+			"type": "string"
+		},
+		{
+			"key": "bp_number",
+			"value": "012345678",
+			"type": "string"
+		},
+		{
+			"key": "device_id",
+			"value": "012345678",
+			"type": "string"
+		},
+		{
+			"key": "idToken",
+			"value": "xxxx.notToday"
+		},
+		{
+			"key": "factorId",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "refreshToken",
+			"value": "xxxx.NotToday",
+			"type": "string"
+		},
+		{
+			"key": "stateToken",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "sessionToken",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "otpCode",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "VERIFIER",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "CODE_CHALLENGE",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "oauthCode",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "appClientId",
+			"value": "0oaqf6zr7yEcQZqqt2p7",
+			"type": "string"
+		},
+		{
+			"key": "accessToken",
+			"value": ""
+		}
+	]
+}
