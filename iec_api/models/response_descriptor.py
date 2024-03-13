@@ -33,5 +33,5 @@ T = TypeVar("T")
 class ResponseWithDescriptor(Generic[T], DataClassDictMixin):
     """Response With Descriptor"""
 
-    data: T
+    data: Optional[T]
     response_descriptor: ResponseDescriptor = field(metadata=field_options(alias=RESPONSE_DESCRIPTOR_FIELD))
