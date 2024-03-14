@@ -1,5 +1,6 @@
 import asyncio
 import http
+import logging
 import re
 from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime
@@ -8,12 +9,13 @@ from typing import Any, Optional
 
 import pytz
 from aiohttp import ClientError, ClientResponse, ClientSession
-from loguru import logger
 
 from iec_api.const import TIMEZONE
 from iec_api.models.exceptions import IECError, IECLoginError
 from iec_api.models.okta_errors import OktaError
 from iec_api.models.response_descriptor import RESPONSE_DESCRIPTOR_FIELD, ErrorResponseDescriptor
+
+logger = logging.getLogger(__name__)
 
 
 def add_auth_bearer_to_headers(headers: dict[str, str], token: str) -> dict[str, str]:

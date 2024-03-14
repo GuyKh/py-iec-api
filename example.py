@@ -2,18 +2,22 @@
 
 import asyncio
 import concurrent.futures
+import logging
 import os
 from datetime import datetime, timedelta
 
 import aiohttp
-from loguru import logger
 
 from iec_api.iec_client import IecClient
 from iec_api.login import IECLoginError
 from iec_api.models.exceptions import IECError
 
+logger = logging.getLogger(__name__)
+
 
 async def main():
+    logging.basicConfig(level=logging.DEBUG)
+
     session = aiohttp.ClientSession(connector=aiohttp.TCPConnector(ssl=False), timeout=aiohttp.ClientTimeout(total=10))
     try:
         # Example of usage
@@ -42,6 +46,9 @@ async def main():
             await client.save_token_to_file(token_json_file)
 
         print("id_token: " + token.id_token)
+
+        tariff = await client.get_kwh_tariff()
+        print(tariff)
 
         # client.manual_login()
         customer = await client.get_customer()

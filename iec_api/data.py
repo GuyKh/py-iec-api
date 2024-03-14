@@ -1,9 +1,9 @@
 import base64
+import logging
 from datetime import datetime
 from typing import Optional, TypeVar
 
 from aiohttp import ClientSession
-from loguru import logger
 from mashumaro.codecs import BasicDecoder
 
 from iec_api import commons
@@ -43,6 +43,7 @@ from iec_api.models.remote_reading import ReadingResolution, RemoteReadingReques
 from iec_api.models.response_descriptor import ResponseWithDescriptor
 
 T = TypeVar("T")
+logger = logging.getLogger(__name__)
 
 
 async def _get_response_with_descriptor(
