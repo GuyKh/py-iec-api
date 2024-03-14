@@ -66,7 +66,7 @@ class IecClient:
     # Data methods:
     # -------------
 
-    async def get_customer(self) -> Customer:
+    async def get_customer(self) -> Optional[Customer]:
         """
         Get consumer data response from IEC API.
         :return: Customer data
@@ -77,7 +77,7 @@ class IecClient:
             self._bp_number = customer.bp_number
         return customer
 
-    async def get_accounts(self) -> list[Account]:
+    async def get_accounts(self) -> Optional[list[Account]]:
         """
         Get consumer data response from IEC API.
         :return: Customer data
@@ -85,7 +85,7 @@ class IecClient:
         await self.check_token()
         accounts = await data.get_accounts(self._session, self._token)
 
-        if len(accounts) > 0:
+        if accounts and len(accounts) > 0:
             self._bp_number = accounts[0].account_number
 
         return accounts
@@ -113,7 +113,7 @@ class IecClient:
         assert bp_number, "BP number must be provided"
 
         get_contract_response = await data.get_contracts(self._session, self._token, bp_number)
-        if get_contract_response and get_contract_response:
+        if get_contract_response:
             contracts = get_contract_response.contracts
             if contracts and len(contracts) > 0:
                 self._contract_id = contracts[0].contract_id
@@ -165,10 +165,7 @@ class IecClient:
 
         assert contract_id, "Contract ID must be provided"
 
-        response = await data.get_last_meter_reading(self._session, self._token, bp_number, contract_id)
-        if response:
-            return response
-        return None
+        return await data.get_last_meter_reading(self._session, self._token, bp_number, contract_id)
 
     async def get_electric_bill(
         self, bp_number: Optional[str] = None, contract_id: Optional[str] = None
@@ -194,10 +191,7 @@ class IecClient:
 
         assert contract_id, "Contract ID must be provided"
 
-        response = await data.get_electric_bill(self._session, self._token, bp_number, contract_id)
-        if response:
-            return response
-        return None
+        return await data.get_electric_bill(self._session, self._token, bp_number, contract_id)
 
     async def get_devices(self, contract_id: Optional[str] = None) -> Optional[list[Device]]:
         """
@@ -217,7 +211,7 @@ class IecClient:
 
         return await data.get_devices(self._session, self._token, contract_id)
 
-    async def get_device_by_device_id(self, device_id: str, contract_id: Optional[str] = None) -> Devices:
+    async def get_device_by_device_id(self, device_id: str, contract_id: Optional[str] = None) -> Optional[Devices]:
         """
         Get a list of devices for the user
         Args:
@@ -273,7 +267,9 @@ class IecClient:
             resolution,
         )
 
-    async def get_device_type(self, bp_number: Optional[str] = None, contract_id: Optional[str] = None) -> DeviceType:
+    async def get_device_type(
+        self, bp_number: Optional[str] = None, contract_id: Optional[str] = None
+    ) -> Optional[DeviceType]:
         """
         Get a list of devices for the user
         Args:
@@ -299,7 +295,7 @@ class IecClient:
 
     async def get_billing_invoices(
         self, bp_number: Optional[str] = None, contract_id: Optional[str] = None
-    ) -> GetInvoicesBody:
+    ) -> Optional[GetInvoicesBody]:
         """
         Get a list of devices for the user
         Args:
