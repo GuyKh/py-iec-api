@@ -71,7 +71,7 @@ async def _get_response_with_descriptor(
     return response_with_descriptor.data
 
 
-async def get_accounts(session: ClientSession, token: JWT) -> list[Account]:
+async def get_accounts(session: ClientSession, token: JWT) -> Optional[list[Account]]:
     """Get Accounts response from IEC API."""
     return await _get_response_with_descriptor(session, token, GET_ACCOUNTS_URL, account_decoder)
 
@@ -112,7 +112,9 @@ async def get_remote_reading(
     return RemoteReadingResponse.from_dict(response)
 
 
-async def get_electric_bill(session: ClientSession, token: JWT, bp_number: str, contract_id: str) -> ElectricBill:
+async def get_electric_bill(
+    session: ClientSession, token: JWT, bp_number: str, contract_id: str
+) -> Optional[ElectricBill]:
     """Get Electric Bill data response from IEC API."""
     return await _get_response_with_descriptor(
         session,
@@ -122,21 +124,23 @@ async def get_electric_bill(session: ClientSession, token: JWT, bp_number: str, 
     )
 
 
-async def get_default_contract(session: ClientSession, token: JWT, bp_number: str) -> Contract:
+async def get_default_contract(session: ClientSession, token: JWT, bp_number: str) -> Optional[Contract]:
     """Get Contract data response from IEC API."""
     return await _get_response_with_descriptor(
         session, token, GET_DEFAULT_CONTRACT_URL.format(bp_number=bp_number), contract_decoder
     )
 
 
-async def get_contracts(session: ClientSession, token: JWT, bp_number: str) -> Contracts:
+async def get_contracts(session: ClientSession, token: JWT, bp_number: str) -> Optional[Contracts]:
     """Get all user's Contracts from IEC API."""
     return await _get_response_with_descriptor(
         session, token, GET_CONTRACTS_URL.format(bp_number=bp_number), contract_decoder
     )
 
 
-async def get_last_meter_reading(session: ClientSession, token: JWT, bp_number: str, contract_id: str) -> MeterReadings:
+async def get_last_meter_reading(
+    session: ClientSession, token: JWT, bp_number: str, contract_id: str
+) -> Optional[MeterReadings]:
     """Get Last Meter Reading data response from IEC API."""
     return await _get_response_with_descriptor(
         session,
@@ -154,11 +158,12 @@ async def get_devices(session: ClientSession, token: JWT, contract_id: str) -> l
         session=session, url=GET_DEVICES_URL.format(contract_id=contract_id), headers=headers
     )
 
-    logger.debug(f"Response: {response}")
     return [Device.from_dict(device) for device in response]
 
 
-async def get_device_by_device_id(session: ClientSession, token: JWT, contract_id: str, device_id: str) -> Devices:
+async def get_device_by_device_id(
+    session: ClientSession, token: JWT, contract_id: str, device_id: str
+) -> Optional[Devices]:
     """Get Device data response from IEC API."""
     return await _get_response_with_descriptor(
         session,
@@ -168,7 +173,7 @@ async def get_device_by_device_id(session: ClientSession, token: JWT, contract_i
     )
 
 
-async def get_device_type(session: ClientSession, token: JWT, bp_number: str, contract_id: str) -> DeviceType:
+async def get_device_type(session: ClientSession, token: JWT, bp_number: str, contract_id: str) -> Optional[DeviceType]:
     """Get Device Type data response from IEC API."""
     # sending get request and saving the response as response object
     return await _get_response_with_descriptor(
@@ -176,7 +181,9 @@ async def get_device_type(session: ClientSession, token: JWT, bp_number: str, co
     )
 
 
-async def get_billing_invoices(session: ClientSession, token: JWT, bp_number: str, contract_id: str) -> GetInvoicesBody:
+async def get_billing_invoices(
+    session: ClientSession, token: JWT, bp_number: str, contract_id: str
+) -> Optional[GetInvoicesBody]:
     """Get Device Type data response from IEC API."""
     return await _get_response_with_descriptor(
         session, token, GET_BILLING_INVOICES.format(bp_number=bp_number, contract_id=contract_id), invoice_decoder
