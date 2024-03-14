@@ -1,5 +1,5 @@
 from dataclasses import dataclass, field
-from datetime import datetime
+from datetime import date, datetime
 from typing import Optional
 
 from mashumaro import DataClassDictMixin, field_options
@@ -68,7 +68,7 @@ class Invoice(DataClassDictMixin):
     invoice_id: int = field(metadata=field_options(alias="invoiceId"))
     contract_number: int = field(metadata=field_options(alias="contractNumber"))
     order_number: int = field(metadata=field_options(alias="orderNumber"))
-    last_date: Optional[str] = field(
+    last_date: Optional[date] = field(
         metadata=field_options(alias="lastDate", serialization_strategy=FormattedDate("%d/%M/%Y"))
     )
     invoice_payment_status: int = field(metadata=field_options(alias="invoicePaymentStatus"))
