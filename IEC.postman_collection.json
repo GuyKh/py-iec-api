@@ -372,8 +372,10 @@
 									"verifier = verifier.substring(0, 128)",
 									"",
 									"// Derive the code challenge using the SHA-256 hash algorithm (base64url encoded)",
-									"let codeChallenge = CryptoJS.enc.Base64.stringify(CryptoJS.SHA256(verifier))",
-									"     .replace(/=/g, '').replace(/\\+/g, '-').replace(/\\/g, '_');",
+									"let codeChallenge = btoa(crypto.subtle.digest('SHA-256', new TextEncoder().encode(verifier)))",
+									"  .replace(/=/g, '')",
+									"  .replace(/\\+/g, '-')",
+									"  .replace(/\\//g, '_');",
 									"",
 									"// Store the verifier and code challenge in environment variables",
 									"pm.environment.set(\"VERIFIER\", verifier);",
@@ -1386,7 +1388,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{   \n    \"meterSerialNumber\": \"{{device_id}}\",\n    \"meterCode\": \"494\",\n    \"lastInvoiceDate\": \"2024-02-17\",\n    \"fromDate\": \"2024-01-17\",\n    \"resolution\": 1\n}",
+					"raw": "{   \n    \"meterSerialNumber\": \"{{device_id}}\",\n    \"meterCode\": \"{{device_code}}\",\n    \"lastInvoiceDate\": \"2024-02-17\",\n    \"fromDate\": \"2024-01-17\",\n    \"resolution\": 1\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -1511,7 +1513,8 @@
 							"let jsonData = JSON.parse(pm.response.text());",
 							"",
 							"// Set the variables in the environment (optional)",
-							"pm.collectionVariables.set(\"device_id\", jsonData[0].deviceNumber);"
+							"pm.collectionVariables.set(\"device_id\", jsonData[0].deviceNumber);",
+							"pm.collectionVariables.set(\"device_code\", jsonData[0].deviceCode);"
 						],
 						"type": "text/javascript"
 					}
@@ -1808,27 +1811,27 @@
 	"variable": [
 		{
 			"key": "user_id",
-			"value": "012345678",
+			"value": "12345678",
 			"type": "string"
 		},
 		{
 			"key": "contract_id",
-			"value": "012345678",
+			"value": "12345678",
 			"type": "string"
 		},
 		{
 			"key": "bp_number",
-			"value": "012345678",
+			"value": "12345678",
 			"type": "string"
 		},
 		{
 			"key": "device_id",
-			"value": "012345678",
+			"value": "20008389",
 			"type": "string"
 		},
 		{
 			"key": "idToken",
-			"value": "xxxx.notToday"
+			"value": "not.TODAY"
 		},
 		{
 			"key": "factorId",
@@ -1837,7 +1840,7 @@
 		},
 		{
 			"key": "refreshToken",
-			"value": "xxxx.NotToday",
+			"value": "notTOday",
 			"type": "string"
 		},
 		{
@@ -1877,6 +1880,10 @@
 		},
 		{
 			"key": "accessToken",
+			"value": ""
+		},
+		{
+			"key": "device_code",
 			"value": ""
 		}
 	]
