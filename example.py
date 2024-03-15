@@ -24,7 +24,7 @@ async def main():
         client = IecClient(123456782, session)
 
         token_json_file = "token.json"
-        if not os.path.exists(token_json_file):
+        if os.path.exists(token_json_file):
             await client.load_token_from_file(token_json_file)
         else:
             try:
