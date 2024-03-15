@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "iec-api"
-version = "0.2.10"
+version = "0.2.11"
 description = "A Python wrapper for Israel Electric Company API"
 authors = ["GuyKh"]
 license = "MIT"
@@ -19,7 +19,6 @@ requests = "^2.31.0"
 pkce = "^1.0.3"
 aiohttp = "^3.9.1"
 aiofiles = "^23.2.1"
-loguru = "^0.7.2"
 pytz = "^2024.1"
 
 [tool.poetry.dev-dependencies]

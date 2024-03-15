@@ -1,5 +1,6 @@
 """ IEC Login Module. """
 import json
+import logging
 import random
 import re
 import string
@@ -10,11 +11,12 @@ import aiofiles
 import jwt
 import pkce
 from aiohttp import ClientSession
-from loguru import logger
 
 from iec_api import commons
 from iec_api.models.exceptions import IECLoginError
 from iec_api.models.jwt import JWT
+
+logger = logging.getLogger(__name__)
 
 APP_CLIENT_ID = "0oaqf6zr7yEcQZqqt2p7"
 CODE_CHALLENGE_METHOD = "S256"
