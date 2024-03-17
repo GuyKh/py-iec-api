@@ -69,7 +69,7 @@ class Invoice(DataClassDictMixin):
     contract_number: int = field(metadata=field_options(alias="contractNumber"))
     order_number: int = field(metadata=field_options(alias="orderNumber"))
     last_date: Optional[date] = field(
-        metadata=field_options(alias="lastDate", serialization_strategy=FormattedDate("%d/%M/%Y"))
+        metadata=field_options(alias="lastDate", serialization_strategy=FormattedDate("%d/%m/%Y"))
     )
     invoice_payment_status: int = field(metadata=field_options(alias="invoicePaymentStatus"))
     document_id: str = field(metadata=field_options(alias="documentID"))
