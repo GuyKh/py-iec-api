@@ -255,7 +255,7 @@
 									"let match = regex.exec(respBody);",
 									"",
 									"// Extract the code if found, otherwise set to an empty string",
-									"let code = match ? match[0] : \"\";",
+									"let code = match ? match[1] : \"\";",
 									"",
 									"// Optional: Set the code in an environment variable",
 									"pm.collectionVariables.set(\"oauthCode\", code);"
@@ -372,7 +372,7 @@
 									"// Set the variables in the environment (optional)",
 									"pm.collectionVariables.set(\"accessToken\", jsonData.access_token);",
 									"pm.collectionVariables.set(\"idToken\", jsonData.id_token);",
-									"pm.collectionVariables.set(\"refreshToken\", refresh_token);"
+									"pm.collectionVariables.set(\"refreshToken\", jsonData.refresh_token);"
 								],
 								"type": "text/javascript"
 							}
@@ -447,19 +447,11 @@
 						}
 					],
 					"protocolProfileBehavior": {
-						"disabledSystemHeaders": {
-							"accept": true
-						}
+						"disabledSystemHeaders": {}
 					},
 					"request": {
 						"method": "POST",
-						"header": [
-							{
-								"key": "Accept",
-								"value": "application/json",
-								"type": "text"
-							}
-						],
+						"header": [],
 						"body": {
 							"mode": "urlencoded",
 							"urlencoded": [
