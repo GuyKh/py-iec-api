@@ -33,7 +33,6 @@ from iec_api.models.device_type import DeviceType
 from iec_api.models.device_type import decoder as device_type_decoder
 from iec_api.models.electric_bill import ElectricBill
 from iec_api.models.electric_bill import decoder as electric_bill_decoder
-from iec_api.models.error_response import IecErrorResponse
 from iec_api.models.exceptions import IECError
 from iec_api.models.invoice import GetInvoicesBody
 from iec_api.models.invoice import decoder as invoice_decoder
@@ -160,11 +159,7 @@ async def get_devices(session: ClientSession, token: JWT, contract_id: str) -> l
         session=session, url=GET_DEVICES_URL.format(contract_id=contract_id), headers=headers
     )
 
-    if isinstance(response, list):
-        return [Device.from_dict(device) for device in response]
-    else:
-        error = IecErrorResponse.from_dict(response)
-        raise IECError(error.code, error.error)
+    return [Device.from_dict(device) for device in response]
 
 
 async def get_device_by_device_id(
