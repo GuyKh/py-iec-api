@@ -10,7 +10,8 @@ from typing import Any, Optional
 import pytz
 from aiohttp import ClientError, ClientResponse, ClientSession
 
-from iec_api.const import TIMEZONE
+from iec_api.const import ERROR_FIELD_NAME, ERROR_SUMMARY_FIELD_NAME, TIMEZONE
+from iec_api.models.error_response import IecErrorResponse
 from iec_api.models.exceptions import IECError, IECLoginError
 from iec_api.models.okta_errors import OktaError
 from iec_api.models.response_descriptor import RESPONSE_DESCRIPTOR_FIELD, ErrorResponseDescriptor
@@ -83,7 +84,10 @@ def parse_error_response(resp: ClientResponse, json_resp: dict[str, Any]):
         if json_resp.get(RESPONSE_DESCRIPTOR_FIELD) is not None:
             login_error_response = ErrorResponseDescriptor.from_dict(json_resp.get(RESPONSE_DESCRIPTOR_FIELD))
             raise IECError(login_error_response.code, login_error_response.error)
-        elif json_resp.get("errorSummary") is not None:
+        elif json_resp.get(ERROR_FIELD_NAME) is not None:
+            error_response = IecErrorResponse.from_dict(json_resp)
+            raise IECError(error_response.code, error_response.error)
+        elif json_resp.get(ERROR_SUMMARY_FIELD_NAME) is not None:
             login_error_response = OktaError.from_dict(json_resp)
             raise IECLoginError(resp.status, resp.reason + ": " + login_error_response.error_summary)
     raise IECError(resp.status, resp.reason)
