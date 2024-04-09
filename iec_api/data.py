@@ -9,7 +9,7 @@ from mashumaro.codecs import BasicDecoder
 from iec_api import commons
 from iec_api.const import (
     GET_ACCOUNTS_URL,
-    GET_BILLING_INVOICES,
+    GET_BILLING_INVOICES_URL,
     GET_CONSUMER_URL,
     GET_CONTRACTS_URL,
     GET_DEFAULT_CONTRACT_URL,
@@ -17,6 +17,7 @@ from iec_api.const import (
     GET_DEVICE_TYPE_URL,
     GET_DEVICES_URL,
     GET_ELECTRIC_BILL_URL,
+    GET_INVOICE_PDF_URL,
     GET_KWH_TARIFF_URL,
     GET_LAST_METER_READING_URL,
     GET_REQUEST_READING_URL,
@@ -34,6 +35,7 @@ from iec_api.models.device_type import decoder as device_type_decoder
 from iec_api.models.electric_bill import ElectricBill
 from iec_api.models.electric_bill import decoder as electric_bill_decoder
 from iec_api.models.exceptions import IECError
+from iec_api.models.get_pdf import GetPdfRequest
 from iec_api.models.invoice import GetInvoicesBody
 from iec_api.models.invoice import decoder as invoice_decoder
 from iec_api.models.jwt import JWT
@@ -187,8 +189,25 @@ async def get_billing_invoices(
 ) -> Optional[GetInvoicesBody]:
     """Get Device Type data response from IEC API."""
     return await _get_response_with_descriptor(
-        session, token, GET_BILLING_INVOICES.format(bp_number=bp_number, contract_id=contract_id), invoice_decoder
+        session, token, GET_BILLING_INVOICES_URL.format(bp_number=bp_number, contract_id=contract_id), invoice_decoder
     )
+
+
+async def get_invoice_pdf(
+    session: ClientSession, token: JWT, bp_number: int | str, contract_id: int | str, invoice_number: int | str
+) -> bytes:
+    """Get Device Type data response from IEC API."""
+    headers = commons.add_auth_bearer_to_headers(HEADERS_WITH_AUTH, token.id_token)
+    headers = headers.copy()  # don't modify original headers
+    headers.update({"Accept": "application/pdf", "Content-Type": "application/json"})
+
+    request = GetPdfRequest(
+        invoice_number=str(invoice_number), contract_id=str(contract_id), bp_number=str(bp_number)
+    ).to_dict()
+    response = await commons.send_non_json_post_request(
+        session, url=GET_INVOICE_PDF_URL, headers=headers, json_data=request
+    )
+    return await response.read()
 
 
 async def get_kwh_tariff(session: ClientSession) -> float:
