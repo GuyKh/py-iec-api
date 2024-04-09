@@ -195,6 +195,40 @@ class IecClient:
 
         return await data.get_electric_bill(self._session, self._token, bp_number, contract_id)
 
+    async def save_invoice_pdf_to_file(
+        self,
+        file_path: str,
+        invoice_number: str | int,
+        bp_number: Optional[str | int] = None,
+        contract_id: Optional[str | int] = None,
+    ):
+        """
+        Get PDF of invoice from IEC api
+        Args:
+            self: The instance of the class.
+            file_path (str): Path to save the bill to
+            invoice_number (str): The requested invoice number
+            bp_number (str): The BP number of the meter.
+            contract_id (str): The contract ID associated with the meter.
+        """
+        await self.check_token()
+
+        if not bp_number:
+            bp_number = self._bp_number
+
+        assert bp_number, "BP number must be provided"
+
+        if not contract_id:
+            contract_id = self._contract_id
+
+        assert contract_id, "Contract ID must be provided"
+
+        response_bytes = await data.get_invoice_pdf(self._session, self._token, bp_number, contract_id, invoice_number)
+        if response_bytes:
+            f = open(file_path, "wb")
+            f.write(response_bytes)
+            f.close()
+
     async def get_devices(self, contract_id: Optional[str] = None) -> Optional[list[Device]]:
         """
         Get a list of devices for the user
