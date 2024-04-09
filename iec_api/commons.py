@@ -7,6 +7,7 @@ from datetime import datetime
 from json import JSONDecodeError
 from typing import Any, Optional
 
+import aiohttp
 import pytz
 from aiohttp import ClientError, ClientResponse, ClientSession
 
@@ -103,7 +104,6 @@ async def send_get_request(
         if not timeout:
             timeout = session.timeout
 
-        logger.debug(f"HTTP GET: {url}")
         resp = await session.get(url=url, headers=headers, timeout=timeout)
         json_resp: dict = await resp.json(content_type=None)
     except TimeoutError as ex:
@@ -113,7 +113,6 @@ async def send_get_request(
     except JSONDecodeError as ex:
         raise IECError(-1, f"Received invalid response from IEC API: {str(ex)}")
 
-    logger.debug(f"HTTP GET Response: {json_resp}")
     if resp.status != http.HTTPStatus.OK:
         parse_error_response(resp, json_resp)
 
@@ -134,9 +133,6 @@ async def send_non_json_get_request(
         if not timeout:
             timeout = session.timeout
 
-        logger.debug(
-            f"HTTP GET: {url}",
-        )
         resp = await session.get(url=url, headers=headers, timeout=timeout)
         resp_content = await resp.text(encoding=encoding)
     except TimeoutError as ex:
@@ -145,8 +141,6 @@ async def send_non_json_get_request(
         raise IECError(-1, f"Failed to communicate with IEC API due to ClientError: ({str(ex)})")
     except JSONDecodeError as ex:
         raise IECError(-1, f"Received invalid response from IEC API: {str(ex)}")
-
-    logger.debug(f"HTTP GET Response: {resp_content}")
 
     return resp_content
 
@@ -166,9 +160,6 @@ async def send_post_request(
         if not timeout:
             headers = session.timeout
 
-        logger.debug(f"HTTP POST: {url}")
-        logger.debug(f"HTTP Content: {data or json_data}")
-
         resp = await session.post(url=url, data=data, json=json_data, headers=headers, timeout=timeout)
 
         json_resp: dict = await resp.json(content_type=None)
@@ -178,8 +169,6 @@ async def send_post_request(
         raise IECError(-1, f"Failed to communicate with IEC API due to ClientError: ({str(ex)})")
     except JSONDecodeError as ex:
         raise IECError(-1, f"Received invalid response from IEC API: {str(ex)}")
-
-    logger.debug(f"HTTP POST Response: {json_resp}")
 
     if resp.status != http.HTTPStatus.OK:
         parse_error_response(resp, json_resp)
@@ -200,3 +189,18 @@ def convert_to_tz_aware_datetime(dt: Optional[datetime]) -> Optional[datetime]:
         return TIMEZONE.localize(dt)
     else:
         return dt.replace(tzinfo=pytz.utc)
+
+
+async def on_request_start_debug(session: aiohttp.ClientSession, context, params: aiohttp.TraceRequestStartParams):
+    logger.debug(f"HTTP {params.method}: {params.url}")
+
+
+async def on_request_chunk_sent_debug(
+    session: aiohttp.ClientSession, context, params: aiohttp.TraceRequestChunkSentParams
+):
+    if (params.method == "POST" or params.method == "PUT") and params.chunk:
+        logger.debug(f"HTTP Content {params.method}: {params.chunk}")
+
+
+async def on_request_end_debug(session: aiohttp.ClientSession, context, params: aiohttp.TraceRequestEndParams):
+    logger.debug(f"HTTP {params.method} Response <{params.response.status}>: {await params.response.text()}")
