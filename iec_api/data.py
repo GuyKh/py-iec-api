@@ -199,7 +199,7 @@ async def get_invoice_pdf(
     """Get Device Type data response from IEC API."""
     headers = commons.add_auth_bearer_to_headers(HEADERS_WITH_AUTH, token.id_token)
     headers = headers.copy()  # don't modify original headers
-    headers.update({"Accept": "application/pdf", "Content-Type": "application/json"})
+    headers.update({"accept": "application/pdf", "content-type": "application/json"})
 
     request = GetPdfRequest(
         invoice_number=str(invoice_number), contract_id=str(contract_id), bp_number=str(bp_number)
