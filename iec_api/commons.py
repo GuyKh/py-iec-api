@@ -8,7 +8,7 @@ from json import JSONDecodeError
 from typing import Any, Optional
 
 import pytz
-from aiohttp import ClientError, ClientResponse, ClientSession
+from aiohttp import ClientError, ClientResponse, ClientSession, StreamReader
 
 from iec_api.const import ERROR_FIELD_NAME, ERROR_SUMMARY_FIELD_NAME, TIMEZONE
 from iec_api.models.error_response import IecErrorResponse
@@ -184,6 +184,37 @@ async def send_post_request(
     if resp.status != http.HTTPStatus.OK:
         parse_error_response(resp, json_resp)
     return json_resp
+
+
+async def send_non_json_post_request(
+    session: ClientSession,
+    url: str,
+    timeout: Optional[int] = 60,
+    headers: Optional[dict] = None,
+    data: Optional[dict] = None,
+    json_data: Optional[dict] = None,
+) -> StreamReader:
+    try:
+        if not headers:
+            headers = session.headers
+
+        if not timeout:
+            headers = session.timeout
+
+        logger.debug(f"HTTP POST: {url}")
+        logger.debug(f"HTTP Content: {data or json_data}")
+
+        resp = await session.post(url=url, data=data, json=json_data, headers=headers, timeout=timeout)
+    except TimeoutError as ex:
+        raise IECError(-1, f"Failed to communicate with IEC API due to time out: ({str(ex)})")
+    except ClientError as ex:
+        raise IECError(-1, f"Failed to communicate with IEC API due to ClientError: ({str(ex)})")
+    except JSONDecodeError as ex:
+        raise IECError(-1, f"Received invalid response from IEC API: {str(ex)}")
+
+    if resp.status != http.HTTPStatus.OK:
+        raise IECError(resp.status, resp.reason)
+    return resp.content
 
 
 def convert_to_tz_aware_datetime(dt: Optional[datetime]) -> Optional[datetime]:
