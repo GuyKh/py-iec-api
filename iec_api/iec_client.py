@@ -196,7 +196,11 @@ class IecClient:
         return await data.get_electric_bill(self._session, self._token, bp_number, contract_id)
 
     async def save_invoice_pdf_to_file(
-        self, file_path: str, invoice_number: str, bp_number: Optional[str] = None, contract_id: Optional[str] = None
+        self,
+        file_path: str,
+        invoice_number: str | int,
+        bp_number: Optional[str | int] = None,
+        contract_id: Optional[str | int] = None,
     ):
         """
         Get PDF of invoice from IEC api
