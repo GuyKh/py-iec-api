@@ -12,6 +12,7 @@ from iec_api.const import (
     GET_BILLING_INVOICES_URL,
     GET_CONSUMER_URL,
     GET_CONTRACTS_URL,
+    GET_CONTRACT_CHECK_URL,
     GET_DEFAULT_CONTRACT_URL,
     GET_DEVICE_BY_DEVICE_ID_URL,
     GET_DEVICE_TYPE_URL,
@@ -27,6 +28,8 @@ from iec_api.models.account import Account
 from iec_api.models.account import decoder as account_decoder
 from iec_api.models.contract import Contract, Contracts
 from iec_api.models.contract import decoder as contract_decoder
+from iec_api.models.contract_check import ContractCheck
+from iec_api.models.contract_check import decoder as contract_check_decoder
 from iec_api.models.customer import Customer
 from iec_api.models.device import Device, Devices
 from iec_api.models.device import decoder as devices_decoder
@@ -137,6 +140,18 @@ async def get_contracts(session: ClientSession, token: JWT, bp_number: str) -> O
     """Get all user's Contracts from IEC API."""
     return await _get_response_with_descriptor(
         session, token, GET_CONTRACTS_URL.format(bp_number=bp_number), contract_decoder
+    )
+
+
+async def get_contract_check(
+    session: ClientSession, token: JWT, contract_id: str
+) -> Optional[ContractCheck]:
+    """Get Contract Check response from IEC API."""
+    return await _get_response_with_descriptor(
+        session,
+        token,
+        GET_CONTRACT_CHECK_URL.format(contract_id=contract_id),
+        contract_check_decoder
     )
 
 

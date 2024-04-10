@@ -10,6 +10,7 @@ from aiohttp import ClientSession
 
 from iec_api import commons, data, login
 from iec_api.models.contract import Contract
+from iec_api.models.contract_check import ContractCheck
 from iec_api.models.customer import Account, Customer
 from iec_api.models.device import Device, Devices
 from iec_api.models.device_type import DeviceType
@@ -151,6 +152,25 @@ class IecClient:
                 self._contract_id = contracts[0].contract_id
             return contracts
         return []
+
+    async def get_contract_check(self, contract_id: Optional[str] = None) -> Optional[ContractCheck]:
+        """
+        Get contract check for the contract
+        Args:
+            self: The instance of the class.
+            contract_id (str): The Contract ID of the meter.
+        Returns:
+            ContractCheck: a contract check
+        """
+        await self.check_token()
+
+        if not contract_id:
+            contract_id = self._contract_id
+
+        assert contract_id, "Contract Id must be provided"
+
+        return await data.get_contract_check(self._session, self._token, contract_id)
+
 
     async def get_last_meter_reading(
         self, bp_number: Optional[str] = None, contract_id: Optional[str] = None
