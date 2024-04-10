@@ -41,14 +41,18 @@ class IecClient:
         if not commons.is_valid_israeli_id(user_id):
             raise ValueError("User ID must be a valid Israeli ID.")
 
+        # Custom Logger to the session
         trace_config = aiohttp.TraceConfig()
         trace_config.on_request_start.append(commons.on_request_start_debug)
         trace_config.on_request_chunk_sent.append(commons.on_request_chunk_sent_debug)
         trace_config.on_request_end.append(commons.on_request_end_debug)
+        trace_config.freeze()
 
         if not session:
             session = aiohttp.ClientSession(trace_configs=[trace_config])
             atexit.register(self._shutdown)
+        else:
+            session.trace_configs.append(trace_config)
 
         self._session = session
 
