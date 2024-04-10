@@ -190,9 +190,6 @@ async def send_non_json_post_request(
         if not timeout:
             headers = session.timeout
 
-        logger.debug(f"HTTP POST: {url}")
-        logger.debug(f"HTTP Content: {data or json_data}")
-
         resp = await session.post(url=url, data=data, json=json_data, headers=headers, timeout=timeout)
     except TimeoutError as ex:
         raise IECError(-1, f"Failed to communicate with IEC API due to time out: ({str(ex)})")
