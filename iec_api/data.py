@@ -85,6 +85,7 @@ async def get_customer(session: ClientSession, token: JWT) -> Optional[Customer]
     # sending get request and saving the response as response object
     response = await commons.send_get_request(session=session, url=GET_CONSUMER_URL, headers=headers)
 
+    logger.debug(f"Response: {response}")
     return Customer.from_dict(response)
 
 

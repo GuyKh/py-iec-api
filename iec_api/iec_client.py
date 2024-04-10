@@ -8,7 +8,8 @@ import aiohttp
 import jwt
 from aiohttp import ClientSession
 
-from iec_api import commons, data, login
+from iec_api import data, login
+from iec_api.commons import is_valid_israeli_id
 from iec_api.models.contract import Contract
 from iec_api.models.customer import Account, Customer
 from iec_api.models.device import Device, Devices
@@ -37,22 +38,13 @@ class IecClient:
         """
 
         self._kwh_tariff: Optional[float] = None
-        self._kwh_tariff_fetch_time: Optional[datetime] = None
-        if not commons.is_valid_israeli_id(user_id):
+        self._kwh_tariff_fetch_time: Optional[datetime.datetime] = None
+        if not is_valid_israeli_id(user_id):
             raise ValueError("User ID must be a valid Israeli ID.")
 
-        # Custom Logger to the session
-        trace_config = aiohttp.TraceConfig()
-        trace_config.on_request_start.append(commons.on_request_start_debug)
-        trace_config.on_request_chunk_sent.append(commons.on_request_chunk_sent_debug)
-        trace_config.on_request_end.append(commons.on_request_end_debug)
-        trace_config.freeze()
-
         if not session:
-            session = aiohttp.ClientSession(trace_configs=[trace_config])
+            session = aiohttp.ClientSession()
             atexit.register(self._shutdown)
-        else:
-            session.trace_configs.append(trace_config)
 
         self._session = session
 
