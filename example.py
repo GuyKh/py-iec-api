@@ -8,6 +8,7 @@ from datetime import datetime, timedelta
 
 import aiohttp
 
+from iec_api import commons
 from iec_api.iec_client import IecClient
 from iec_api.login import IECLoginError
 from iec_api.models.exceptions import IECError
@@ -18,7 +19,14 @@ logger = logging.getLogger(__name__)
 async def main():
     logging.basicConfig(level=logging.DEBUG)
 
-    session = aiohttp.ClientSession(connector=aiohttp.TCPConnector(ssl=False), timeout=aiohttp.ClientTimeout(total=10))
+    trace_config = aiohttp.TraceConfig()
+    trace_config.on_request_start.append(commons.on_request_start_debug)
+    trace_config.on_request_chunk_sent.append(commons.on_request_chunk_sent_debug)
+    trace_config.on_request_end.append(commons.on_request_end_debug)
+
+    session = aiohttp.ClientSession(
+        connector=aiohttp.TCPConnector(ssl=False), timeout=aiohttp.ClientTimeout(total=10), trace_configs=[trace_config]
+    )
     try:
         # Example of usage
         client = IecClient(123456782, session)
