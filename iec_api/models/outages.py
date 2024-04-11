@@ -40,7 +40,7 @@ from iec_api.models.response_descriptor import ResponseWithDescriptor
 class GetOutageByAddressRequest(DataClassDictMixin):
     city_code: UUID = field(metadata=field_options(alias="cityCode"))
     house_code: UUID = field(metadata=field_options(alias="streetCode"))
-    logical_name: str = field(metadata=field_options(alias="houseNumber"))
+    house_number: str = field(metadata=field_options(alias="houseNumber"))
 
     class Config(BaseConfig):
         serialize_by_alias = True

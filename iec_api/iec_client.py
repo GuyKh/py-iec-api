@@ -463,7 +463,7 @@ class IecClient:
         Returns:
             City: the relevant city
         """
-        return await data.get_outages(self._session, city, street, house_num)
+        return await data.get_outages(self._session, self._token, city, street, house_num)
 
     # ----------------
     # Login/Token Flow

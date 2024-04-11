@@ -249,7 +249,7 @@ async def get_city_street(session: ClientSession, city: City | str, street_name:
 
 
 async def get_outages(
-    session: ClientSession, city: City | str, street: Street | str, house_num: str
+    session: ClientSession, token: JWT, city: City | str, street: Street | str, house_num: str
 ) -> Optional[GetOutageByAddressResponse]:
     """Get Cities response from IEC API."""
 
@@ -263,9 +263,9 @@ async def get_outages(
     else:
         street_id = street.id
 
-    req = GetOutageByAddressRequest(city_code=city_id, house_code=street_id, logical_name=house_num)
+    req = GetOutageByAddressRequest(city_code=city_id, house_code=street_id, house_number=house_num)
     return await _post_response_with_descriptor(
-        session, None, GET_OUTAGES_BY_ADDRESS_URL, req.to_dict(), outage_decoder
+        session, token, GET_OUTAGES_BY_ADDRESS_URL, req.to_dict(), outage_decoder
     )
 
 
