@@ -11,6 +11,8 @@ from iec_api.const import (
     GET_ACCOUNTS_URL,
     GET_BILLING_INVOICES_URL,
     GET_CHECK_CONTRACT_URL,
+    GET_CITIES_URL,
+    GET_CITY_STREETS_URL,
     GET_CONSUMER_URL,
     GET_CONTRACTS_URL,
     GET_DEFAULT_CONTRACT_URL,
@@ -22,11 +24,15 @@ from iec_api.const import (
     GET_INVOICE_PDF_URL,
     GET_KWH_TARIFF_URL,
     GET_LAST_METER_READING_URL,
+    GET_OUTAGES_BY_ADDRESS_URL,
     GET_REQUEST_READING_URL,
     HEADERS_WITH_AUTH,
 )
 from iec_api.models.account import Account
 from iec_api.models.account import decoder as account_decoder
+from iec_api.models.address import City, Street
+from iec_api.models.address import get_cities_decoder as cities_decoder
+from iec_api.models.address import get_city_streets_decoder as streets_decoder
 from iec_api.models.contract import Contract, Contracts
 from iec_api.models.contract import decoder as contract_decoder
 from iec_api.models.contract_check import ContractCheck
@@ -47,6 +53,8 @@ from iec_api.models.invoice import decoder as invoice_decoder
 from iec_api.models.jwt import JWT
 from iec_api.models.meter_reading import MeterReadings
 from iec_api.models.meter_reading import decoder as meter_reading_decoder
+from iec_api.models.outages import GetOutageByAddressRequest, GetOutageByAddressResponse
+from iec_api.models.outages import decoder as outage_decoder
 from iec_api.models.remote_reading import ReadingResolution, RemoteReadingRequest, RemoteReadingResponse
 from iec_api.models.response_descriptor import ResponseWithDescriptor
 
@@ -55,7 +63,7 @@ logger = logging.getLogger(__name__)
 
 
 async def _get_response_with_descriptor(
-    session: ClientSession, jwt_token: JWT, request_url: str, decoder: BasicDecoder[ResponseWithDescriptor[T]]
+    session: ClientSession, jwt_token: Optional[JWT], request_url: str, decoder: BasicDecoder[ResponseWithDescriptor[T]]
 ) -> T:
     """
     A function to retrieve a response with a descriptor using a JWT token and a URL.
@@ -67,7 +75,9 @@ async def _get_response_with_descriptor(
     Returns:
         T: The response with a descriptor, with its type specified by the return type annotation.
     """
-    headers = commons.add_auth_bearer_to_headers(HEADERS_WITH_AUTH, jwt_token.id_token)
+    headers = (
+        commons.add_auth_bearer_to_headers(HEADERS_WITH_AUTH, jwt_token.id_token) if jwt_token else session.headers
+    )
     response = await commons.send_get_request(session=session, url=request_url, headers=headers)
 
     response_with_descriptor = decoder.decode(response)
@@ -82,7 +92,7 @@ async def _get_response_with_descriptor(
 
 async def _post_response_with_descriptor(
     session: ClientSession,
-    jwt_token: JWT,
+    jwt_token: Optional[JWT],
     request_url: str,
     json_data: Optional[dict],
     decoder: BasicDecoder[ResponseWithDescriptor[T]],
@@ -98,7 +108,9 @@ async def _post_response_with_descriptor(
     Returns:
         T: The response with a descriptor, with its type specified by the return type annotation.
     """
-    headers = commons.add_auth_bearer_to_headers(HEADERS_WITH_AUTH, jwt_token.id_token)
+    headers = (
+        commons.add_auth_bearer_to_headers(HEADERS_WITH_AUTH, jwt_token.id_token) if jwt_token else session.headers
+    )
     response = await commons.send_post_request(session=session, url=request_url, headers=headers, json_data=json_data)
 
     response_with_descriptor = decoder.decode(response)
@@ -197,6 +209,47 @@ async def get_contract_check(session: ClientSession, token: JWT, contract_id: st
     """Get Contract Check response from IEC API."""
     return await _get_response_with_descriptor(
         session, token, GET_CHECK_CONTRACT_URL.format(contract_id=contract_id), contract_check_decoder
+    )
+
+
+async def get_cities(session: ClientSession) -> Optional[list[City]]:
+    """Get Cities response from IEC API."""
+    get_cities_response = await _get_response_with_descriptor(session, None, GET_CITIES_URL, cities_decoder)
+
+    return get_cities_response.data_collection if get_cities_response else None
+
+
+async def get_city(session: ClientSession, city_name: str) -> Optional[City]:
+    """Get City by Name from IEC API."""
+
+    cities = await get_cities(session)
+    return next((city for city in cities if city.name == city_name), None)
+
+
+async def get_city_streets(session: ClientSession, city: City) -> Optional[list[Street]]:
+    """Get Cities response from IEC API."""
+    get_streets_response = await _get_response_with_descriptor(
+        session, jwt_token=None, request_url=GET_CITY_STREETS_URL.format(city_id=str(city.id)), decoder=streets_decoder
+    )
+
+    return get_streets_response.streets if get_streets_response else None
+
+
+async def get_city_street(session: ClientSession, city: City, street_name: str) -> Optional[Street]:
+    """Get Cities response from IEC API."""
+
+    streets = await get_city_streets(session, city)
+    return next((street for street in streets if street.name == street_name), None)
+
+
+async def get_outages(
+    session: ClientSession, city: City, street: Street, house_num: str
+) -> Optional[GetOutageByAddressResponse]:
+    """Get Cities response from IEC API."""
+
+    req = GetOutageByAddressRequest(city_code=city.id, house_code=street.id, logical_name=house_num)
+    return await _post_response_with_descriptor(
+        session, None, GET_OUTAGES_BY_ADDRESS_URL, req.to_dict(), outage_decoder
     )
 
 
