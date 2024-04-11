@@ -10,9 +10,9 @@ from iec_api import commons
 from iec_api.const import (
     GET_ACCOUNTS_URL,
     GET_BILLING_INVOICES_URL,
+    GET_CHECK_CONTRACT_URL,
     GET_CONSUMER_URL,
     GET_CONTRACTS_URL,
-    GET_CONTRACT_CHECK_URL,
     GET_DEFAULT_CONTRACT_URL,
     GET_DEVICE_BY_DEVICE_ID_URL,
     GET_DEVICE_TYPE_URL,
@@ -143,15 +143,10 @@ async def get_contracts(session: ClientSession, token: JWT, bp_number: str) -> O
     )
 
 
-async def get_contract_check(
-    session: ClientSession, token: JWT, contract_id: str
-) -> Optional[ContractCheck]:
+async def get_contract_check(session: ClientSession, token: JWT, contract_id: str) -> Optional[ContractCheck]:
     """Get Contract Check response from IEC API."""
     return await _get_response_with_descriptor(
-        session,
-        token,
-        GET_CONTRACT_CHECK_URL.format(contract_id=contract_id),
-        contract_check_decoder
+        session, token, GET_CHECK_CONTRACT_URL.format(contract_id=contract_id), contract_check_decoder
     )
 
 
