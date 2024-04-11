@@ -52,7 +52,7 @@ class Contract(DataClassDictMixin):
     total_debt: float = field(metadata=field_options(alias="totalDebt"))
     frequency: int
     status: int
-    from_pativte_producer: bool = field(metadata=field_options(alias="fromPativteProducer"))
+    from_private_producer: bool = field(metadata=field_options(alias="fromPativteProducer"))
     city_code: str = field(metadata=field_options(alias="cityCode"))
     city_name: str = field(metadata=field_options(alias="cityName"))
     street_code: str = field(metadata=field_options(alias="streetCode"))
