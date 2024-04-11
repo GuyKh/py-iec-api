@@ -226,16 +226,22 @@ async def get_city(session: ClientSession, city_name: str) -> Optional[City]:
     return next((city for city in cities if city.name == city_name), None)
 
 
-async def get_city_streets(session: ClientSession, city: City) -> Optional[list[Street]]:
+async def get_city_streets(session: ClientSession, city: City | str) -> Optional[list[Street]]:
     """Get Cities response from IEC API."""
+
+    if isinstance(city, str):
+        city_id = city
+    else:
+        city_id = city.id
+
     get_streets_response = await _get_response_with_descriptor(
-        session, jwt_token=None, request_url=GET_CITY_STREETS_URL.format(city_id=str(city.id)), decoder=streets_decoder
+        session, jwt_token=None, request_url=GET_CITY_STREETS_URL.format(city_id=city_id), decoder=streets_decoder
     )
 
     return get_streets_response.streets if get_streets_response else None
 
 
-async def get_city_street(session: ClientSession, city: City, street_name: str) -> Optional[Street]:
+async def get_city_street(session: ClientSession, city: City | str, street_name: str) -> Optional[Street]:
     """Get Cities response from IEC API."""
 
     streets = await get_city_streets(session, city)
@@ -243,11 +249,21 @@ async def get_city_street(session: ClientSession, city: City, street_name: str) 
 
 
 async def get_outages(
-    session: ClientSession, city: City, street: Street, house_num: str
+    session: ClientSession, city: City | str, street: Street | str, house_num: str
 ) -> Optional[GetOutageByAddressResponse]:
     """Get Cities response from IEC API."""
 
-    req = GetOutageByAddressRequest(city_code=city.id, house_code=street.id, logical_name=house_num)
+    if isinstance(city, str):
+        city_id = city
+    else:
+        city_id = city.id
+
+    if isinstance(street, str):
+        street_id = street
+    else:
+        street_id = street.id
+
+    req = GetOutageByAddressRequest(city_code=city_id, house_code=street_id, logical_name=house_num)
     return await _post_response_with_descriptor(
         session, None, GET_OUTAGES_BY_ADDRESS_URL, req.to_dict(), outage_decoder
     )
