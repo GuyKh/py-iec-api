@@ -14,6 +14,7 @@ from iec_api.models.contract_check import ContractCheck
 from iec_api.models.customer import Account, Customer
 from iec_api.models.device import Device, Devices
 from iec_api.models.device_type import DeviceType
+from iec_api.models.efs import EfsMessage
 from iec_api.models.electric_bill import ElectricBill
 from iec_api.models.exceptions import IECLoginError
 from iec_api.models.invoice import GetInvoicesBody
@@ -170,7 +171,6 @@ class IecClient:
         assert contract_id, "Contract Id must be provided"
 
         return await data.get_contract_check(self._session, self._token, contract_id)
-
 
     async def get_last_meter_reading(
         self, bp_number: Optional[str] = None, contract_id: Optional[str] = None
@@ -390,6 +390,27 @@ class IecClient:
             self._kwh_tariff = await data.get_kwh_tariff(self._session)
 
         return self._kwh_tariff
+
+    async def get_efs_messages(
+        self, contract_id: Optional[str] = None, service_code: Optional[int] = None
+    ) -> Optional[list[EfsMessage]]:
+        """
+        Get EFS Messages for the contract
+        Args:
+            self: The instance of the class.
+            contract_id (str): The Contract ID of the meter.
+            service_code (str): Specific EFS Service code
+        Returns:
+            list[EfsMessage]: List of EFS Messages
+        """
+        await self.check_token()
+
+        if not contract_id:
+            contract_id = self._contract_id
+
+        assert contract_id, "Contract Id must be provided"
+
+        return await data.get_efs_messages(self._session, self._token, contract_id, service_code)
 
     # ----------------
     # Login/Token Flow

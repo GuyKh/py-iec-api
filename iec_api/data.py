@@ -17,6 +17,7 @@ from iec_api.const import (
     GET_DEVICE_BY_DEVICE_ID_URL,
     GET_DEVICE_TYPE_URL,
     GET_DEVICES_URL,
+    GET_EFS_MESSAGES_URL,
     GET_ELECTRIC_BILL_URL,
     GET_INVOICE_PDF_URL,
     GET_KWH_TARIFF_URL,
@@ -35,6 +36,8 @@ from iec_api.models.device import Device, Devices
 from iec_api.models.device import decoder as devices_decoder
 from iec_api.models.device_type import DeviceType
 from iec_api.models.device_type import decoder as device_type_decoder
+from iec_api.models.efs import EfsMessage, EfsRequestAllServices, EfsRequestSingleService
+from iec_api.models.efs import decoder as efs_decoder
 from iec_api.models.electric_bill import ElectricBill
 from iec_api.models.electric_bill import decoder as electric_bill_decoder
 from iec_api.models.exceptions import IECError
@@ -66,6 +69,37 @@ async def _get_response_with_descriptor(
     """
     headers = commons.add_auth_bearer_to_headers(HEADERS_WITH_AUTH, jwt_token.id_token)
     response = await commons.send_get_request(session=session, url=request_url, headers=headers)
+
+    response_with_descriptor = decoder.decode(response)
+
+    if not response_with_descriptor.data and not response_with_descriptor.response_descriptor.is_success:
+        raise IECError(
+            response_with_descriptor.response_descriptor.code, response_with_descriptor.response_descriptor.description
+        )
+
+    return response_with_descriptor.data
+
+
+async def _post_response_with_descriptor(
+    session: ClientSession,
+    jwt_token: JWT,
+    request_url: str,
+    json_data: Optional[dict],
+    decoder: BasicDecoder[ResponseWithDescriptor[T]],
+) -> T:
+    """
+    A function to retrieve a response with a descriptor using a JWT token and a URL.
+
+    Args:
+        jwt_token (JWT): The JWT token used for authentication.
+        request_url (str): The URL to send the request to.
+        json_data (dict): POST content
+
+    Returns:
+        T: The response with a descriptor, with its type specified by the return type annotation.
+    """
+    headers = commons.add_auth_bearer_to_headers(HEADERS_WITH_AUTH, jwt_token.id_token)
+    response = await commons.send_post_request(session=session, url=request_url, headers=headers, json_data=json_data)
 
     response_with_descriptor = decoder.decode(response)
 
@@ -115,6 +149,22 @@ async def get_remote_reading(
     response = await commons.send_post_request(session=session, url=url, headers=headers, json_data=req.to_dict())
 
     return RemoteReadingResponse.from_dict(response)
+
+
+async def get_efs_messages(
+    session: ClientSession, token: JWT, contract_id: str, service_code: Optional[int] = None
+) -> Optional[list[EfsMessage]]:
+    """Get EFS Messages response from IEC API."""
+    if service_code:
+        req = EfsRequestSingleService(
+            contract_number=contract_id, process_type=1, service_code="EFS" + str(service_code).zfill(3)
+        )
+    else:
+        req = EfsRequestAllServices(contract_number=contract_id, process_type=1)
+
+    url = GET_EFS_MESSAGES_URL
+
+    return await _post_response_with_descriptor(session, token, url, json_data=req.to_dict(), decoder=efs_decoder)
 
 
 async def get_electric_bill(
