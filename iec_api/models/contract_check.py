@@ -57,8 +57,8 @@ class ContractCheck(DataClassDictMixin):
     house_number: str = field(metadata=field_options(alias="houseNumber"))
     bp_type: str = field(metadata=field_options(alias="bpType"))
     is_private: str = field(metadata=field_options(alias="isPrivate"))  # "X" if private producer
-    has_direct_debit: bool = field(metadata=field_options(alias="hasDirectDebit"))
-    is_matam: bool = field(metadata=field_options(alias="isMatam"))
+    has_direct_debit: bool = field(metadata=field_options(alias="hasDirectDebit"))  # הוראת קבע
+    is_matam: bool = field(metadata=field_options(alias="isMatam"))  # Prepaid Meter (מונה תשלום מראש)
     frequency: Optional[InvoiceFrequency] = field(metadata=field_options(alias="frequency"))
 
 

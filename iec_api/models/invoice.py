@@ -74,7 +74,7 @@ class Invoice(DataClassDictMixin):
     invoice_payment_status: int = field(metadata=field_options(alias="invoicePaymentStatus"))
     document_id: str = field(metadata=field_options(alias="documentID"))
     days_period: str = field(metadata=field_options(alias="daysPeriod"))
-    has_direct_debit: bool = field(metadata=field_options(alias="hasDirectDebit"))
+    has_direct_debit: bool = field(metadata=field_options(alias="hasDirectDebit"))  # הוראת קבע
     invoice_type: int = field(metadata=field_options(alias="invoiceType"))
 
     reading_code: int = field(metadata=field_options(alias="readingCode"), default=0)
