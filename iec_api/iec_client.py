@@ -2,7 +2,7 @@ import asyncio
 import atexit
 import logging
 from datetime import datetime, timedelta
-from typing import Optional
+from typing import List, Optional
 
 import aiohttp
 import jwt
@@ -13,6 +13,7 @@ from iec_api.models.contract import Contract
 from iec_api.models.contract_check import ContractCheck
 from iec_api.models.customer import Account, Customer
 from iec_api.models.device import Device, Devices
+from iec_api.models.device_identity import DeviceDetails
 from iec_api.models.device_type import DeviceType
 from iec_api.models.efs import EfsMessage
 from iec_api.models.electric_bill import ElectricBill
@@ -89,7 +90,7 @@ class IecClient:
             self._bp_number = customer.bp_number
         return customer
 
-    async def get_accounts(self) -> Optional[list[Account]]:
+    async def get_accounts(self) -> Optional[List[Account]]:
         """
         Get consumer data response from IEC API.
         :return: Customer data
@@ -257,7 +258,7 @@ class IecClient:
             f.write(response_bytes)
             f.close()
 
-    async def get_devices(self, contract_id: Optional[str] = None) -> Optional[list[Device]]:
+    async def get_devices(self, contract_id: Optional[str] = None) -> Optional[List[Device]]:
         """
         Get a list of devices for the user
         Args:
@@ -293,6 +294,35 @@ class IecClient:
         assert contract_id, "Contract ID must be provided"
 
         return await data.get_device_by_device_id(self._session, self._token, contract_id, device_id)
+
+    async def get_device_details_by_device_id(self, device_id: str) -> Optional[List[DeviceDetails]]:
+        """
+        Get a list of devices for the user
+        Args:
+            self: The instance of the class.
+            device_id (str): The Device id.
+        Returns:
+            list[DeviceDetails]: List of device details or None
+        """
+        await self.check_token()
+
+        return await data.get_device_details(self._session, self._token, device_id)
+
+    async def get_device_details_by_device_id_and_code(
+        self, device_id: str, device_code: str
+    ) -> Optional[DeviceDetails]:
+        """
+        Get a list of devices for the user
+        Args:
+            self: The instance of the class.
+            device_id (str): The Device id.
+            device_code (str): The Device code.
+        Returns:
+            DeviceDetails: Device details or None
+        """
+        await self.check_token()
+
+        return await data.get_device_details_by_code(self._session, self._token, device_id, device_code)
 
     async def get_remote_reading(
         self,
@@ -393,7 +423,7 @@ class IecClient:
 
     async def get_efs_messages(
         self, contract_id: Optional[str] = None, service_code: Optional[int] = None
-    ) -> Optional[list[EfsMessage]]:
+    ) -> Optional[List[EfsMessage]]:
         """
         Get EFS Messages for the contract
         Args:
