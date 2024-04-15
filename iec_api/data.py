@@ -1,7 +1,7 @@
 import base64
 import logging
 from datetime import datetime
-from typing import Optional, TypeVar
+from typing import List, Optional, TypeVar
 
 from aiohttp import ClientSession
 from mashumaro.codecs import BasicDecoder
@@ -35,7 +35,7 @@ from iec_api.models.contract_check import decoder as contract_check_decoder
 from iec_api.models.customer import Customer
 from iec_api.models.device import Device, Devices
 from iec_api.models.device import decoder as devices_decoder
-from iec_api.models.device_identity import DeviceDetails
+from iec_api.models.device_identity import DeviceDetails, DeviceIdentity
 from iec_api.models.device_identity import decoder as device_identity_decoder
 from iec_api.models.device_type import DeviceType
 from iec_api.models.device_type import decoder as device_type_decoder
@@ -114,7 +114,7 @@ async def _post_response_with_descriptor(
     return response_with_descriptor.data
 
 
-async def get_accounts(session: ClientSession, token: JWT) -> Optional[list[Account]]:
+async def get_accounts(session: ClientSession, token: JWT) -> Optional[List[Account]]:
     """Get Accounts response from IEC API."""
     return await _get_response_with_descriptor(session, token, GET_ACCOUNTS_URL, account_decoder)
 
@@ -156,7 +156,7 @@ async def get_remote_reading(
 
 async def get_efs_messages(
     session: ClientSession, token: JWT, contract_id: str, service_code: Optional[int] = None
-) -> Optional[list[EfsMessage]]:
+) -> Optional[List[EfsMessage]]:
     """Get EFS Messages response from IEC API."""
     if service_code:
         req = EfsRequestSingleService(
@@ -226,13 +226,13 @@ async def get_devices(session: ClientSession, token: JWT, contract_id: str) -> l
     return [Device.from_dict(device) for device in response]
 
 
-async def get_device_details(session: ClientSession, token: JWT, device_id: str) -> Optional[list[DeviceDetails]]:
+async def get_device_details(session: ClientSession, token: JWT, device_id: str) -> Optional[List[DeviceDetails]]:
     """Get Device Details response from IEC API."""
-    res = await _get_response_with_descriptor(
+    device_identity: DeviceIdentity = await _get_response_with_descriptor(
         session, token, GET_TENANT_IDENTITY_URL.format(device_id=device_id), device_identity_decoder
     )
 
-    return res.device_details if res else None
+    return device_identity.device_details if device_identity else None
 
 
 async def get_device_details_by_code(

@@ -48,7 +48,7 @@ class DeviceIdentity(DataClassDictMixin):
     """Devices dataclass."""
 
     device_details: Optional[list[DeviceDetails]] = field(metadata=field_options(alias="devicesDetails"))
-    last_date: str = field(metadata=field_options(alias="lastDate"))
+    last_date: datetime = field(metadata=field_options(alias="lastDate"))
     is_private_producer: bool = field(metadata=field_options(alias="privateProducer"))
 
 
