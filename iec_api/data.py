@@ -2,6 +2,7 @@ import base64
 import logging
 from datetime import datetime
 from typing import Optional, TypeVar
+from uuid import UUID
 
 from aiohttp import ClientSession
 from mashumaro.codecs import BasicDecoder
@@ -212,33 +213,50 @@ async def get_contract_check(session: ClientSession, token: JWT, contract_id: st
     )
 
 
+city_streets: dict[str, list[Street]] = {}
+cities: list[City] = []
+
+
 async def get_cities(session: ClientSession) -> Optional[list[City]]:
     """Get Cities response from IEC API."""
-    get_cities_response = await _get_response_with_descriptor(session, None, GET_CITIES_URL, cities_decoder)
 
-    return get_cities_response.data_collection if get_cities_response else None
+    if len(cities) == 0:
+        response = await _get_response_with_descriptor(session, None, GET_CITIES_URL, cities_decoder)
+        if response:
+            cities.extend(response.data_collection)
+
+    return cities if cities else None
 
 
 async def get_city(session: ClientSession, city_name: str) -> Optional[City]:
-    """Get City by Name from IEC API."""
+    """Get City by Name from cache or  IEC API."""
 
     cities = await get_cities(session)
     return next((city for city in cities if city.name == city_name), None)
 
 
-async def get_city_streets(session: ClientSession, city: City | str) -> Optional[list[Street]]:
-    """Get Cities response from IEC API."""
+async def get_city_streets(session: ClientSession, city: City | str | UUID) -> Optional[list[Street]]:
+    """Get Cities response from cache or IEC API."""
 
     if isinstance(city, str):
         city_id = city
+    elif isinstance(city, UUID):
+        city_id = str(city)
     else:
         city_id = city.id
+
+    if city_id in city_streets:
+        return city_streets[city_id]
 
     get_streets_response = await _get_response_with_descriptor(
         session, jwt_token=None, request_url=GET_CITY_STREETS_URL.format(city_id=city_id), decoder=streets_decoder
     )
 
-    return get_streets_response.streets if get_streets_response else None
+    if get_streets_response:
+        city_streets[city_id] = get_streets_response.data_collection
+        return city_streets[city_id]
+    else:
+        return None
 
 
 async def get_city_street(session: ClientSession, city: City | str, street_name: str) -> Optional[Street]:
