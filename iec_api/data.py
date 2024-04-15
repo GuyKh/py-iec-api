@@ -23,6 +23,7 @@ from iec_api.const import (
     GET_KWH_TARIFF_URL,
     GET_LAST_METER_READING_URL,
     GET_REQUEST_READING_URL,
+    GET_TENANT_IDENTITY_URL,
     HEADERS_WITH_AUTH,
 )
 from iec_api.models.account import Account
@@ -34,6 +35,8 @@ from iec_api.models.contract_check import decoder as contract_check_decoder
 from iec_api.models.customer import Customer
 from iec_api.models.device import Device, Devices
 from iec_api.models.device import decoder as devices_decoder
+from iec_api.models.device_identity import DeviceDetails
+from iec_api.models.device_identity import decoder as device_identity_decoder
 from iec_api.models.device_type import DeviceType
 from iec_api.models.device_type import decoder as device_type_decoder
 from iec_api.models.efs import EfsMessage, EfsRequestAllServices, EfsRequestSingleService
@@ -221,6 +224,24 @@ async def get_devices(session: ClientSession, token: JWT, contract_id: str) -> l
     )
 
     return [Device.from_dict(device) for device in response]
+
+
+async def get_device_details(session: ClientSession, token: JWT, device_id: str) -> Optional[list[DeviceDetails]]:
+    """Get Device Details response from IEC API."""
+    res = await _get_response_with_descriptor(
+        session, token, GET_TENANT_IDENTITY_URL.format(device_id=device_id), device_identity_decoder
+    )
+
+    return res.device_details if res else None
+
+
+async def get_device_details_by_code(
+    session: ClientSession, token: JWT, device_id: str, device_code: str
+) -> Optional[DeviceDetails]:
+    """Get Device Details response from IEC API."""
+    devices = await get_device_details(session, token, device_id)
+
+    return next((device for device in devices if device.device_code == device_code), None)
 
 
 async def get_device_by_device_id(

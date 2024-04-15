@@ -13,6 +13,7 @@ from iec_api.models.contract import Contract
 from iec_api.models.contract_check import ContractCheck
 from iec_api.models.customer import Account, Customer
 from iec_api.models.device import Device, Devices
+from iec_api.models.device_identity import DeviceDetails
 from iec_api.models.device_type import DeviceType
 from iec_api.models.efs import EfsMessage
 from iec_api.models.electric_bill import ElectricBill
@@ -293,6 +294,35 @@ class IecClient:
         assert contract_id, "Contract ID must be provided"
 
         return await data.get_device_by_device_id(self._session, self._token, contract_id, device_id)
+
+    async def get_device_details_by_device_id(self, device_id: str) -> Optional[list[DeviceDetails]]:
+        """
+        Get a list of devices for the user
+        Args:
+            self: The instance of the class.
+            device_id (str): The Device id.
+        Returns:
+            list[DeviceDetails]: List of device details
+        """
+        await self.check_token()
+
+        return await data.get_device_details(self._session, self._token, device_id)
+
+    async def get_device_details_by_device_id_and_code(
+        self, device_id: str, device_code: str
+    ) -> Optional[DeviceDetails]:
+        """
+        Get a list of devices for the user
+        Args:
+            self: The instance of the class.
+            device_id (str): The Device id.
+            device_code (str): The Device code.
+        Returns:
+            DeviceDetails: List of device details or No
+        """
+        await self.check_token()
+
+        return await data.get_device_details_by_code(self._session, self._token, device_id, device_code)
 
     async def get_remote_reading(
         self,
