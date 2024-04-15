@@ -231,8 +231,8 @@ async def get_cities(session: ClientSession) -> Optional[list[City]]:
 async def get_city(session: ClientSession, city_name: str) -> Optional[City]:
     """Get City by Name from cache or  IEC API."""
 
-    cities = await get_cities(session)
-    return next((city for city in cities if city.name == city_name), None)
+    all_cities = await get_cities(session)
+    return next((city for city in all_cities if all_cities and city.name == city_name), None)
 
 
 async def get_city_streets(session: ClientSession, city: City | str | UUID) -> Optional[list[Street]]:
