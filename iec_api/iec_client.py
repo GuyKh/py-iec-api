@@ -1,7 +1,7 @@
 import asyncio
 import atexit
 import logging
-from datetime import datetime, timedelta
+from datetime import datetime
 from typing import List, Optional
 
 import aiofiles
@@ -41,8 +41,6 @@ class IecClient:
         automatically_login (bool): Whether to automatically log in the user. Default is False.
         """
 
-        self._kwh_tariff: Optional[float] = None
-        self._kwh_tariff_fetch_time: Optional[datetime] = None
         if not commons.is_valid_israeli_id(user_id):
             raise ValueError("User ID must be a valid Israeli ID.")
 
@@ -415,21 +413,21 @@ class IecClient:
         return await data.get_billing_invoices(self._session, self._token, bp_number, contract_id)
 
     async def get_kwh_tariff(self) -> float:
-        if not self._kwh_tariff or self._kwh_tariff_fetch_time < datetime.now() - timedelta(hours=1):
-            logger.debug("Tariff is missing or expired, fetching kwh tariff from IEC API")
-            self._kwh_tariff_fetch_time = datetime.now()
-            self._kwh_tariff = await static_data.get_kwh_tariff(self._session)
-
-        return self._kwh_tariff
+        """Get kWh tariff"""
+        return await static_data.get_kwh_tariff(self._session)
 
     async def get_usage_calculator(self) -> UsageCalculator:
+        """
+        Get Usage Calculator module
+        Returns:
+            UsageCalculator
+        """
         return await static_data.get_usage_calculator(self._session)
 
     async def get_efs_messages(
         self, contract_id: Optional[str] = None, service_code: Optional[int] = None
     ) -> Optional[List[EfsMessage]]:
-        """
-        Get EFS Messages for the contract
+        """Get EFS Messages for the contract
         Args:
             self: The instance of the class.
             contract_id (str): The Contract ID of the meter.
