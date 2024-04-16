@@ -422,8 +422,10 @@ class IecClient:
 
         return self._kwh_tariff
 
+
     async def get_usage_calculator(self) -> UsageCalculator:
         return await static_data.get_usage_calculator(self._session)
+
 
     async def get_efs_messages(
         self, contract_id: Optional[str] = None, service_code: Optional[int] = None
