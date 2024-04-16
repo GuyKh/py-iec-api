@@ -4,6 +4,7 @@ import logging
 from datetime import datetime, timedelta
 from typing import List, Optional
 
+import aiofiles
 import aiohttp
 import jwt
 from aiohttp import ClientSession
@@ -255,9 +256,8 @@ class IecClient:
 
         response_bytes = await data.get_invoice_pdf(self._session, self._token, bp_number, contract_id, invoice_number)
         if response_bytes:
-            f = open(file_path, "wb")
-            f.write(response_bytes)
-            f.close()
+            async with aiofiles.open(file_path, "wb") as f:
+                await f.write(response_bytes)
 
     async def get_devices(self, contract_id: Optional[str] = None) -> Optional[List[Device]]:
         """
@@ -422,10 +422,8 @@ class IecClient:
 
         return self._kwh_tariff
 
-
     async def get_usage_calculator(self) -> UsageCalculator:
         return await static_data.get_usage_calculator(self._session)
-
 
     async def get_efs_messages(
         self, contract_id: Optional[str] = None, service_code: Optional[int] = None

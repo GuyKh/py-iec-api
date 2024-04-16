@@ -157,9 +157,7 @@ async def get_efs_messages(
 ) -> Optional[List[EfsMessage]]:
     """Get EFS Messages response from IEC API."""
     if service_code:
-        req = EfsRequestSingleService(
-            contract_number=contract_id, process_type=1, service_code="EFS" + str(service_code).zfill(3)
-        )
+        req = EfsRequestSingleService(contract_number=contract_id, process_type=1, service_code=f"EFS{service_code:03}")
     else:
         req = EfsRequestAllServices(contract_number=contract_id, process_type=1)
 
@@ -274,24 +272,7 @@ async def get_billing_invoices(
 async def get_invoice_pdf(
     session: ClientSession, token: JWT, bp_number: int | str, contract_id: int | str, invoice_number: int | str
 ) -> bytes:
-    """Get Device Type data response from IEC API."""
-    headers = commons.add_auth_bearer_to_headers(HEADERS_WITH_AUTH, token.id_token)
-    headers = headers.copy()  # don't modify original headers
-    headers.update({"accept": "application/pdf", "content-type": "application/json"})
-
-    request = GetPdfRequest(
-        invoice_number=str(invoice_number), contract_id=str(contract_id), bp_number=str(bp_number)
-    ).to_dict()
-    response = await commons.send_non_json_post_request(
-        session, url=GET_INVOICE_PDF_URL, headers=headers, json_data=request
-    )
-    return await response.read()
-
-
-async def get_invoice_pdf(
-    session: ClientSession, token: JWT, bp_number: int | str, contract_id: int | str, invoice_number: int | str
-) -> bytes:
-    """Get Device Type data response from IEC API."""
+    """Get Invoice PDF response from IEC API."""
     headers = commons.add_auth_bearer_to_headers(HEADERS_WITH_AUTH, token.id_token)
     headers = headers.copy()  # don't modify original headers
     headers.update({"accept": "application/pdf", "content-type": "application/json"})

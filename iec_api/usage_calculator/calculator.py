@@ -1,5 +1,6 @@
 import logging
 from datetime import timedelta
+from decimal import Decimal
 from typing import Optional
 
 from aiohttp import ClientSession
@@ -60,14 +61,14 @@ class UsageCalculator:
         minutes = time_delta.total_seconds() / 60
 
         consumption = self._convert_to_kwh(device, custom_unit)
-        rate = self.rates.home_rate * self.rates.vat
+        rate = self.rates.home_rate * (1 + self.rates.vat / 100)
 
         return Consumption(
             name=name,
             power=custom_unit if custom_unit else device.power,
             power_unit=device.power_unit,
             consumption=consumption,
-            cost=consumption * rate,
+            cost=Decimal.from_float(consumption) * rate,
             duration=timedelta(minutes=minutes),
         )
 

@@ -1,5 +1,6 @@
 from dataclasses import dataclass
 from datetime import timedelta
+from decimal import Decimal
 
 from iec_api.usage_calculator.electric_device import PowerUnit
 
@@ -13,4 +14,4 @@ class Consumption:
     power_unit: PowerUnit
     duration: timedelta
     consumption: float
-    cost: float
+    cost: Decimal
