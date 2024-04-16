@@ -1,4 +1,3 @@
-import base64
 import logging
 from datetime import datetime
 from typing import List, Optional, TypeVar
@@ -20,7 +19,6 @@ from iec_api.const import (
     GET_EFS_MESSAGES_URL,
     GET_ELECTRIC_BILL_URL,
     GET_INVOICE_PDF_URL,
-    GET_KWH_TARIFF_URL,
     GET_LAST_METER_READING_URL,
     GET_REQUEST_READING_URL,
     GET_TENANT_IDENTITY_URL,
@@ -288,11 +286,3 @@ async def get_invoice_pdf(
         session, url=GET_INVOICE_PDF_URL, headers=headers, json_data=request
     )
     return await response.read()
-
-
-async def get_kwh_tariff(session: ClientSession) -> float:
-    """Get Device Type data response from IEC API."""
-    response = await commons.send_get_request(session=session, url=GET_KWH_TARIFF_URL)
-    kwh_tariff_str = response["components"][1]["table"][1][2]["value"]
-
-    return float(base64.b64decode(kwh_tariff_str).decode("utf-8"))

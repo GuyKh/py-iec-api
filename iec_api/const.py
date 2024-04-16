@@ -42,5 +42,6 @@ GET_DEVICE_TYPE_URL = IEC_API_BASE_URL + "Device/type/{bp_number}/{contract_id}/
 GET_BILLING_INVOICES_URL = IEC_API_BASE_URL + "BillingCollection/invoices/{contract_id}/{bp_number}"
 GET_INVOICE_PDF_URL = IEC_API_BASE_URL + "BillingCollection/pdf"
 GET_KWH_TARIFF_URL = IEC_API_BASE_URL + "content/en-US/content/tariffs/contentpages/homeelectricitytariff"
+GET_CALCULATOR_GADGET_URL = IEC_API_BASE_URL + "content/en-US/calculators/gadget"
 ERROR_FIELD_NAME = "Error"
 ERROR_SUMMARY_FIELD_NAME = "errorSummary"

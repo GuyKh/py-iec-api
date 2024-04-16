@@ -28,6 +28,6 @@ class ElectricDevice(DataClassDictMixin):
     calculation_resolution: CalculationResolution = field(metadata=field_options(alias="calculationResolution"))
     power: int = field(metadata=field_options(alias="power"))
     power_unit: PowerUnit = field(metadata=field_options(alias="powerUnit"))
-    average_duration_time_of_operation_in_minutes: PowerUnit = field(
+    average_duration_time_of_operation_in_minutes: float = field(
         metadata=field_options(alias="avarageDurationTimeOfOperationInMinutes")
     )

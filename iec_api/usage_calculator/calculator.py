@@ -1,25 +1,50 @@
+import logging
 from datetime import timedelta
 from typing import Optional
 
+from aiohttp import ClientSession
+
+from iec_api import commons
+from iec_api.const import GET_CALCULATOR_GADGET_URL
 from iec_api.usage_calculator.consumption import Consumption
 from iec_api.usage_calculator.electric_device import ElectricDevice, PowerUnit
 from iec_api.usage_calculator.get_calculator_response import GetCalculatorResponse
 from iec_api.usage_calculator.rates import Rates
 
+logger = logging.getLogger(__name__)
+
 
 class UsageCalculator:
-    def __init__(self, get_response: dict):
-        response = GetCalculatorResponse.from_dict(get_response)
-        self.devices: list[ElectricDevice] = response.electric_devices
-        self.rates: Rates = response.gadget_calculator_rates
+    """Usage Calculator"""
+
+    def __init__(self):
+        self.devices: list[ElectricDevice] = []
+        self.rates: Rates | None = None
+        self.is_loaded = False
+
+    async def load_data(self, session: ClientSession):
+        if not self.is_loaded:
+            iec_api_data = await commons.send_get_request(session=session, url=GET_CALCULATOR_GADGET_URL)
+            response = GetCalculatorResponse.from_dict(iec_api_data)
+            self.devices: list[ElectricDevice] = response.electric_devices
+            self.rates: Rates | None = response.gadget_calculator_rates
+            self.is_loaded = True
+        else:
+            logger.info("Usage calculator data was already loaded")
 
     def get_kwh_tariff(self) -> float:
-        return self.rates.home_rate * self.rates.vat
+        if not self.is_loaded:
+            raise ValueError("Usage calculator data is not loaded")
+        return self.rates.home_rate * (1 + self.rates.vat / 100)
 
     def get_device_names(self) -> list[str]:
+        if not self.is_loaded:
+            raise ValueError("Usage calculator data is not loaded")
         return list(map(lambda device: device.name, self.devices))
 
     def get_device_info_by_name(self, name: str) -> Optional[ElectricDevice]:
+        if not self.is_loaded:
+            raise ValueError("Usage calculator data is not loaded")
         for device in self.devices:
             if device.name == name:
                 return device

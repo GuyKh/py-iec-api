@@ -8,7 +8,7 @@ import aiohttp
 import jwt
 from aiohttp import ClientSession
 
-from iec_api import commons, data, login
+from iec_api import commons, data, login, static_data
 from iec_api.models.contract import Contract
 from iec_api.models.contract_check import ContractCheck
 from iec_api.models.customer import Account, Customer
@@ -22,6 +22,7 @@ from iec_api.models.invoice import GetInvoicesBody
 from iec_api.models.jwt import JWT
 from iec_api.models.meter_reading import MeterReadings
 from iec_api.models.remote_reading import ReadingResolution, RemoteReadingResponse
+from iec_api.usage_calculator.calculator import UsageCalculator
 
 logger = logging.getLogger(__name__)
 
@@ -417,9 +418,12 @@ class IecClient:
         if not self._kwh_tariff or self._kwh_tariff_fetch_time < datetime.now() - timedelta(hours=1):
             logger.debug("Tariff is missing or expired, fetching kwh tariff from IEC API")
             self._kwh_tariff_fetch_time = datetime.now()
-            self._kwh_tariff = await data.get_kwh_tariff(self._session)
+            self._kwh_tariff = await static_data.get_kwh_tariff(self._session)
 
         return self._kwh_tariff
+
+    async def get_usage_calculator(self) -> UsageCalculator:
+        return await static_data.get_usage_calculator(self._session)
 
     async def get_efs_messages(
         self, contract_id: Optional[str] = None, service_code: Optional[int] = None
