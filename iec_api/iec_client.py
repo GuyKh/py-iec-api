@@ -1,14 +1,15 @@
 import asyncio
 import atexit
 import logging
-from datetime import datetime, timedelta
+from datetime import datetime
 from typing import List, Optional
 
+import aiofiles
 import aiohttp
 import jwt
 from aiohttp import ClientSession
 
-from iec_api import commons, data, login
+from iec_api import commons, data, login, static_data
 from iec_api.models.contract import Contract
 from iec_api.models.contract_check import ContractCheck
 from iec_api.models.customer import Account, Customer
@@ -22,6 +23,7 @@ from iec_api.models.invoice import GetInvoicesBody
 from iec_api.models.jwt import JWT
 from iec_api.models.meter_reading import MeterReadings
 from iec_api.models.remote_reading import ReadingResolution, RemoteReadingResponse
+from iec_api.usage_calculator.calculator import UsageCalculator
 
 logger = logging.getLogger(__name__)
 
@@ -39,8 +41,6 @@ class IecClient:
         automatically_login (bool): Whether to automatically log in the user. Default is False.
         """
 
-        self._kwh_tariff: Optional[float] = None
-        self._kwh_tariff_fetch_time: Optional[datetime] = None
         if not commons.is_valid_israeli_id(user_id):
             raise ValueError("User ID must be a valid Israeli ID.")
 
@@ -254,9 +254,8 @@ class IecClient:
 
         response_bytes = await data.get_invoice_pdf(self._session, self._token, bp_number, contract_id, invoice_number)
         if response_bytes:
-            f = open(file_path, "wb")
-            f.write(response_bytes)
-            f.close()
+            async with aiofiles.open(file_path, "wb") as f:
+                await f.write(response_bytes)
 
     async def get_devices(self, contract_id: Optional[str] = None) -> Optional[List[Device]]:
         """
@@ -414,18 +413,21 @@ class IecClient:
         return await data.get_billing_invoices(self._session, self._token, bp_number, contract_id)
 
     async def get_kwh_tariff(self) -> float:
-        if not self._kwh_tariff or self._kwh_tariff_fetch_time < datetime.now() - timedelta(hours=1):
-            logger.debug("Tariff is missing or expired, fetching kwh tariff from IEC API")
-            self._kwh_tariff_fetch_time = datetime.now()
-            self._kwh_tariff = await data.get_kwh_tariff(self._session)
+        """Get kWh tariff"""
+        return await static_data.get_kwh_tariff(self._session)
 
-        return self._kwh_tariff
+    async def get_usage_calculator(self) -> UsageCalculator:
+        """
+        Get Usage Calculator module
+        Returns:
+            UsageCalculator
+        """
+        return await static_data.get_usage_calculator(self._session)
 
     async def get_efs_messages(
         self, contract_id: Optional[str] = None, service_code: Optional[int] = None
     ) -> Optional[List[EfsMessage]]:
-        """
-        Get EFS Messages for the contract
+        """Get EFS Messages for the contract
         Args:
             self: The instance of the class.
             contract_id (str): The Contract ID of the meter.

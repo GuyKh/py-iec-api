@@ -158,7 +158,7 @@ async def send_post_request(
             headers = session.headers
 
         if not timeout:
-            headers = session.timeout
+            timeout = session.timeout
 
         resp = await session.post(url=url, data=data, json=json_data, headers=headers, timeout=timeout)
 
