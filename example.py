@@ -11,6 +11,7 @@ import aiohttp
 from iec_api.iec_client import IecClient
 from iec_api.login import IECLoginError
 from iec_api.models.exceptions import IECError
+from iec_api.usage_calculator.calculator import UsageCalculator
 
 logger = logging.getLogger(__name__)
 
@@ -88,6 +89,48 @@ async def main():
         print(await client.get_billing_invoices())
     except IECError as err:
         logger.error(f"IEC Error: (Code {err.code}): {err.error}")
+    finally:
+        await session.close()
+
+    #
+    # Example of usage of UsageCalculator
+    #
+    session = aiohttp.ClientSession(connector=aiohttp.TCPConnector(ssl=False), timeout=aiohttp.ClientTimeout(total=10))
+    try:
+        usage_calculator = UsageCalculator()
+        await usage_calculator.load_data(session)
+
+        # Get kWh Tariff
+        tariff = usage_calculator.get_kwh_tariff()
+        print(f"kWh Tariff: {tariff} ILS/kWh")
+
+        # Get all device names
+        device_names = usage_calculator.get_device_names()
+        print(device_names)
+
+        # Select "Air-conditioner"
+        device_name = device_names[8]
+        print(f"Selected device: [{device_name}]")
+
+        # Get device info by name
+        device = usage_calculator.get_device_info_by_name(device_name)
+        print(device)
+
+        # Get default utility consumption by time
+        consumption = usage_calculator.get_consumption_by_device_and_time(device_name, timedelta(days=1), None)
+        print(consumption)
+
+        # You can specify specific power usage of your device:
+        # e.g. 3.5HP air-conditioner running for 6 hours
+        consumption = usage_calculator.get_consumption_by_device_and_time(
+            device_name, timedelta(hours=6), custom_usage_value=3.5
+        )
+        print(
+            f"Running a {consumption.power} {consumption.power_unit.name} {consumption.name} "
+            f"for {consumption.duration.seconds // (60 * 60)} hours would cost: "
+            f"{round(consumption.cost, 2)} ILS"
+        )
+
     finally:
         await session.close()
 

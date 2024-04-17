@@ -52,7 +52,7 @@ class UsageCalculator:
         return None
 
     def get_consumption_by_device_and_time(
-        self, name: str, time_delta: timedelta, custom_unit: Optional[float]
+        self, name: str, time_delta: timedelta, custom_usage_value: Optional[float]
     ) -> Optional[Consumption]:
         device = self.get_device_info_by_name(name)
         if not device:
@@ -60,12 +60,12 @@ class UsageCalculator:
 
         minutes = time_delta.total_seconds() / 60
 
-        consumption = self._convert_to_kwh(device, custom_unit)
+        consumption = self._convert_to_kwh(device, custom_usage_value)
         rate = self.rates.home_rate * (1 + self.rates.vat / 100)
 
         return Consumption(
             name=name,
-            power=custom_unit if custom_unit else device.power,
+            power=custom_usage_value if custom_usage_value else device.power,
             power_unit=device.power_unit,
             consumption=consumption,
             cost=Decimal.from_float(consumption) * rate,
@@ -73,10 +73,10 @@ class UsageCalculator:
         )
 
     @staticmethod
-    def _convert_to_kwh(device: ElectricDevice, custom_value: Optional[float] = None) -> float:
+    def _convert_to_kwh(device: ElectricDevice, custom_usage_value: Optional[float] = None) -> float:
         # From IEC Logic
 
-        power = custom_value if custom_value else device.power
+        power = custom_usage_value if custom_usage_value else device.power
 
         match device.power_unit:
             case PowerUnit.KiloWatt:
