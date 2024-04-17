@@ -9,6 +9,7 @@ import jwt
 from aiohttp import ClientSession
 
 from iec_api import commons, data, login
+from iec_api.models.address import City, Street
 from iec_api.models.contract import Contract
 from iec_api.models.contract_check import ContractCheck
 from iec_api.models.customer import Account, Customer
@@ -21,6 +22,7 @@ from iec_api.models.exceptions import IECLoginError
 from iec_api.models.invoice import GetInvoicesBody
 from iec_api.models.jwt import JWT
 from iec_api.models.meter_reading import MeterReadings
+from iec_api.models.outages import GetOutageByAddressResponse
 from iec_api.models.remote_reading import ReadingResolution, RemoteReadingResponse
 
 logger = logging.getLogger(__name__)
@@ -441,6 +443,57 @@ class IecClient:
         assert contract_id, "Contract Id must be provided"
 
         return await data.get_efs_messages(self._session, self._token, contract_id, service_code)
+
+    async def get_all_cities(self) -> Optional[list[City]]:
+        """
+        Get all cities
+        Returns:
+            list[City]: List of cities
+        """
+        return await data.get_cities(self._session)
+
+    async def get_city(self, city_name: str) -> Optional[City]:
+        """
+        Get all cities
+        Returns:
+            City: the relevant city
+        """
+        return await data.get_city(self._session, city_name)
+
+    async def get_all_city_streets(self, city: City | str) -> Optional[list[Street]]:
+        """
+        Get all city Streets
+        Args:
+            city (City): The city
+        Returns:
+            list[Street]: List of streets
+        """
+        return await data.get_city_streets(self._session, city)
+
+    async def get_city_street_by_name(self, city: City | str, street_name: str) -> Optional[Street]:
+        """
+        Get City Street
+        Args:
+            city (City | str): The city or city id
+            street_name (str): The street name
+        Returns:
+            City: the relevant city
+        """
+        return await data.get_city_street(self._session, city, street_name)
+
+    async def get_outages_by_address(
+        self, city: City | str, street: Street | str, house_num: str
+    ) -> Optional[GetOutageByAddressResponse]:
+        """
+        Get City Street
+        Args:
+            city (City | str): The city or city id
+            street (Street | str): The street or street id
+            house_num (str): The house number
+        Returns:
+            City: the relevant city
+        """
+        return await data.get_outages(self._session, self._token, city, street, house_num)
 
     # ----------------
     # Login/Token Flow
