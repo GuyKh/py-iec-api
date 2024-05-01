@@ -68,13 +68,17 @@ class FutureConsumptionInfo(DataClassDictMixin):
     total_import_date: Optional[date] = field(metadata=field_options(alias="totalImportDate"))
 
 
-@dataclass(unsafe_hash=True)
+@dataclass
 class RemoteReading(DataClassDictMixin):
     """Remote Reading Data dataclass."""
 
     status: int
     date: datetime
     value: float
+
+    def __hash__(self):
+        """Compute the hash value the remote reading, based on all fields."""
+        return hash((self.status, self.date, self.value))
 
     @classmethod
     def __post_deserialize__(cls, obj: "RemoteReading") -> "RemoteReading":
