@@ -36,7 +36,7 @@ class UsageCalculator:
     def get_kwh_tariff(self) -> float:
         if not self.is_loaded:
             raise ValueError("Usage calculator data is not loaded")
-        return self.rates.home_rate * (1 + self.rates.vat / 100)
+        return float(self.rates.home_rate * (1 + self.rates.vat / 100))
 
     def get_device_names(self) -> list[str]:
         if not self.is_loaded:
@@ -61,7 +61,7 @@ class UsageCalculator:
         minutes = time_delta.total_seconds() / 60
 
         consumption = self._convert_to_kwh(device, custom_usage_value)
-        rate = self.rates.home_rate * (1 + self.rates.vat / 100)
+        rate = float(self.rates.home_rate * (1 + self.rates.vat / 100))
 
         return Consumption(
             name=name,
