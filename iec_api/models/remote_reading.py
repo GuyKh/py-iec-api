@@ -68,7 +68,7 @@ class FutureConsumptionInfo(DataClassDictMixin):
     total_import_date: Optional[date] = field(metadata=field_options(alias="totalImportDate"))
 
 
-@dataclass
+@dataclass(unsafe_hash=True)
 class RemoteReading(DataClassDictMixin):
     """Remote Reading Data dataclass."""
 
