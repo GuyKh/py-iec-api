@@ -36,7 +36,7 @@ from mashumaro import DataClassDictMixin, field_options
 
 
 @dataclass
-class Account(DataClassDictMixin):
+class CustomerAccount(DataClassDictMixin):
     main_contract_id: str = field(metadata=field_options(alias="mainContractId"))
     main_contract_id_type: int = field(metadata=field_options(alias="mainContractIdType"))
     company_id: str = field(metadata=field_options(alias="companyId"))
@@ -53,7 +53,7 @@ class Account(DataClassDictMixin):
 class Customer(DataClassDictMixin):
     bp_number: str = field(metadata=field_options(alias="bpNumber"))
     id_type: int = field(metadata=field_options(alias="idType"))
-    accounts: list[Account]
+    accounts: list[CustomerAccount]
     customer_status: int = field(metadata=field_options(alias="customerStatus"))
     id_number: str = field(metadata=field_options(alias="idNumber"))
     first_name: str = field(metadata=field_options(alias="firstName"))

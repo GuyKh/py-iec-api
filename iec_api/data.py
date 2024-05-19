@@ -20,6 +20,7 @@ from iec_api.const import (
     GET_ELECTRIC_BILL_URL,
     GET_INVOICE_PDF_URL,
     GET_LAST_METER_READING_URL,
+    GET_OUTAGES_URL,
     GET_REQUEST_READING_URL,
     GET_TENANT_IDENTITY_URL,
     HEADERS_WITH_AUTH,
@@ -48,6 +49,8 @@ from iec_api.models.invoice import decoder as invoice_decoder
 from iec_api.models.jwt import JWT
 from iec_api.models.meter_reading import MeterReadings
 from iec_api.models.meter_reading import decoder as meter_reading_decoder
+from iec_api.models.outages import Outage
+from iec_api.models.outages import decoder as outages_decoder
 from iec_api.models.remote_reading import ReadingResolution, RemoteReadingRequest, RemoteReadingResponse
 from iec_api.models.response_descriptor import ResponseWithDescriptor
 
@@ -284,3 +287,10 @@ async def get_invoice_pdf(
         session, url=GET_INVOICE_PDF_URL, headers=headers, json_data=request
     )
     return await response.read()
+
+
+async def get_outages_by_account(session: ClientSession, token: JWT, account_id: str) -> Optional[list[Outage]]:
+    """Get Device Type data response from IEC API."""
+    return await _get_response_with_descriptor(
+        session, token, GET_OUTAGES_URL.format(account_id=account_id), outages_decoder
+    )

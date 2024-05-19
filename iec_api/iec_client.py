@@ -10,9 +10,10 @@ import jwt
 from aiohttp import ClientSession
 
 from iec_api import commons, data, login, static_data
+from iec_api.models.account import Account
 from iec_api.models.contract import Contract
 from iec_api.models.contract_check import ContractCheck
-from iec_api.models.customer import Account, Customer
+from iec_api.models.customer import Customer
 from iec_api.models.device import Device, Devices
 from iec_api.models.device_identity import DeviceDetails
 from iec_api.models.device_type import DeviceType
@@ -22,6 +23,7 @@ from iec_api.models.exceptions import IECLoginError
 from iec_api.models.invoice import GetInvoicesBody
 from iec_api.models.jwt import JWT
 from iec_api.models.meter_reading import MeterReadings
+from iec_api.models.outages import Outage
 from iec_api.models.remote_reading import ReadingResolution, RemoteReadingResponse
 from iec_api.usage_calculator.calculator import UsageCalculator
 
@@ -70,6 +72,7 @@ class IecClient:
         self._login_response: Optional[str] = None  # Response from the login attempt
         self._bp_number: Optional[str] = None  # BP Number associated with the instance
         self._contract_id: Optional[str] = None  # Contract ID associated with the instance
+        self._account_id: Optional[str] = None  # Account ID associated with the instance
 
     def _shutdown(self):
         if not self._session.closed:
@@ -100,6 +103,7 @@ class IecClient:
 
         if accounts and len(accounts) > 0:
             self._bp_number = accounts[0].account_number
+            self._account_id = accounts[0].id
 
         return accounts
 
@@ -443,6 +447,23 @@ class IecClient:
         assert contract_id, "Contract Id must be provided"
 
         return await data.get_efs_messages(self._session, self._token, contract_id, service_code)
+
+    async def get_outages_by_account(self, account_id: Optional[str] = None) -> Optional[List[Outage]]:
+        """Get Outages for the Account
+        Args:
+            self: The instance of the class.
+            account_id (str): The Account ID of the meter.
+        Returns:
+            list[Outage]: List of the Outages Messages
+        """
+        await self.check_token()
+
+        if not account_id:
+            account_id = self._account_id
+
+        assert account_id, "Account Id must be provided"
+
+        return await data.get_outages_by_account(self._session, self._token, account_id)
 
     # ----------------
     # Login/Token Flow
