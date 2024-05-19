@@ -45,6 +45,7 @@ GET_BILLING_INVOICES_URL = IEC_API_BASE_URL + "BillingCollection/invoices/{contr
 GET_INVOICE_PDF_URL = IEC_API_BASE_URL + "BillingCollection/pdf"
 GET_KWH_TARIFF_URL = IEC_API_BASE_URL + "content/en-US/content/tariffs/contentpages/homeelectricitytariff"
 GET_CALCULATOR_GADGET_URL = IEC_API_BASE_URL + "content/en-US/calculators/gadget"
+GET_OUTAGES_URL = IEC_API_BASE_URL + "outages/transactions/{account_id}/2"
 
 GET_USER_PROFILE_FROM_FAULT_PORTAL_URL = IEC_FAULT_PORTAL_API_URL + "contacts/userprofile"
 GET_OUTAGES_FROM_FAULT_PORTAL_URL = IEC_FAULT_PORTAL_API_URL + "accounts/{account_id}/tranzactions/2"

@@ -1,5 +1,6 @@
 from dataclasses import dataclass, field
 from typing import Optional
+from uuid import UUID
 
 from mashumaro import DataClassDictMixin, field_options
 from mashumaro.codecs import BasicDecoder
@@ -34,7 +35,7 @@ from iec_api.models.response_descriptor import ResponseWithDescriptor
 class Account(DataClassDictMixin):
     account_number: str = field(metadata=field_options(alias="accountNumber"))
     account_type: int = field(metadata=field_options(alias="accountType"))
-    id: str
+    id: UUID
     email: Optional[str]
     telephone: Optional[str]
     government_number: str = field(metadata=field_options(alias="governmentNumber"))
