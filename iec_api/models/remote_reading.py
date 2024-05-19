@@ -76,6 +76,10 @@ class RemoteReading(DataClassDictMixin):
     date: datetime
     value: float
 
+    def __hash__(self):
+        """Compute the hash value the remote reading, based on all fields."""
+        return hash((self.status, self.date, self.value))
+
     @classmethod
     def __post_deserialize__(cls, obj: "RemoteReading") -> "RemoteReading":
         obj.date = convert_to_tz_aware_datetime(obj.date)
