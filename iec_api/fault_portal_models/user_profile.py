@@ -1,5 +1,12 @@
 # User Profile Model
 
+from dataclasses import dataclass, field
+from typing import Optional
+
+from mashumaro import field_options
+
+from iec_api.fault_portal_models.fault_portal_base import FaultPortalBase
+
 # GET https://masa-mainportalapi.iec.co.il/api/contacts/userprofile
 #
 # {
@@ -29,14 +36,8 @@
 # }
 
 
-from dataclasses import dataclass, field
-from typing import Optional
-
-from mashumaro import DataClassDictMixin, field_options
-
-
 @dataclass
-class FaultPortalAccount(DataClassDictMixin):
+class FaultPortalAccount(FaultPortalBase):
     name: Optional[str] = field(metadata=field_options(alias="name"))
     account_number: Optional[str] = field(metadata=field_options(alias="accountNumber"))
     government_number: Optional[str] = field(metadata=field_options(alias="governmentNumber"))
@@ -46,12 +47,10 @@ class FaultPortalAccount(DataClassDictMixin):
     consumption_order_view_type_code: Optional[int] = field(
         metadata=field_options(alias="consumptionOrderViewTypeCode")
     )
-    id: Optional[str] = field(metadata=field_options(alias="id"))
-    logical_name: Optional[str] = field(metadata=field_options(alias="logicalName"))
 
 
 @dataclass
-class UserProfile(DataClassDictMixin):
+class UserProfile(FaultPortalBase):
     government_id: Optional[str] = field(metadata=field_options(alias="government_id"))
     id_type: Optional[int] = field(metadata=field_options(alias="idType"))
     email: Optional[str] = field(metadata=field_options(alias="email"))
@@ -61,5 +60,3 @@ class UserProfile(DataClassDictMixin):
     is_connected_to_private_account: Optional[bool] = field(metadata=field_options(alias="isConnectedToPrivateAccount"))
     is_account_owner: Optional[bool] = field(metadata=field_options(alias="isAccountOwner"))
     is_account_contact: Optional[bool] = field(metadata=field_options(alias="isAccountContact"))
-    id: Optional[str] = field(metadata=field_options(alias="contractNumber"))
-    logical_name: Optional[str] = field(metadata=field_options(alias="logicalName"))
