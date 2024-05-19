@@ -9,7 +9,9 @@ import aiohttp
 import jwt
 from aiohttp import ClientSession
 
-from iec_api import commons, data, login, static_data
+from iec_api import commons, data, fault_portal_data, login, static_data
+from iec_api.fault_portal_models.outages import FaultPortalOutage
+from iec_api.fault_portal_models.user_profile import UserProfile
 from iec_api.models.contract import Contract
 from iec_api.models.contract_check import ContractCheck
 from iec_api.models.customer import Account, Customer
@@ -443,6 +445,40 @@ class IecClient:
         assert contract_id, "Contract Id must be provided"
 
         return await data.get_efs_messages(self._session, self._token, contract_id, service_code)
+
+    # ----------------
+    # Fault Portal Endpoints
+    # ----------------
+
+    async def get_fault_portal_user_profile(self) -> Optional[UserProfile]:
+        """Get User Profile for the Account from Fault Portal
+        Args:
+            self: The instance of the class.
+        Returns:
+            list[UserProfile]: The User Profile
+        """
+        await self.check_token()
+
+        return await fault_portal_data.get_user_profile(self._session, self._token)
+
+    async def get_fault_portal_outages_by_account(
+        self, account_id: Optional[str] = None
+    ) -> (Optional)[List[FaultPortalOutage]]:
+        """Get Outages for the Account from Fault Portal
+        Args:
+            self: The instance of the class.
+            account_id (str): The Account ID of the meter.
+        Returns:
+            list[Outage]: List of the Outages Messages
+        """
+        await self.check_token()
+
+        if not account_id:
+            account_id = self._account_id
+
+        assert account_id, "Account Id must be provided"
+
+        return await fault_portal_data.get_outages_by_account(self._session, self._token, account_id)
 
     # ----------------
     # Login/Token Flow
