@@ -51,7 +51,7 @@ class FaultPortalAccount(FaultPortalBase):
 
 @dataclass
 class UserProfile(FaultPortalBase):
-    government_id: Optional[str] = field(metadata=field_options(alias="government_id"))
+    government_id: Optional[str] = field(metadata=field_options(alias="governmentId"))
     id_type: Optional[int] = field(metadata=field_options(alias="idType"))
     email: Optional[str] = field(metadata=field_options(alias="email"))
     phone_prefix: Optional[str] = field(metadata=field_options(alias="phonePrefix"))
