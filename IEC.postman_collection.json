@@ -401,13 +401,34 @@
 							}
 						],
 						"body": {
-							"mode": "raw",
-							"raw": "    {\n        \"client_id\": {{appClientId}},\n        \"code_verifier\": {{VERIFIER}},\n        \"grant_type\": \"authorization_code\",\n        \"redirect_uri\": \"com.iecrn:/\",\n        \"code\": {{oauthCode}}\n    }",
-							"options": {
-								"raw": {
-									"language": "json"
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "client_id",
+									"value": "{{appClientId}}",
+									"type": "text"
+								},
+								{
+									"key": "code_verifier",
+									"value": "{{VERIFIER}}",
+									"type": "text"
+								},
+								{
+									"key": "grant_type",
+									"value": "authorization_code",
+									"type": "text"
+								},
+								{
+									"key": "redirect_uri",
+									"value": "com.iecrn:/",
+									"type": "text"
+								},
+								{
+									"key": "code",
+									"value": "{{oauthCode}}",
+									"type": "text"
 								}
-							}
+							]
 						},
 						"url": {
 							"raw": "https://iec-ext.okta.com/oauth2/default/v1/token",
