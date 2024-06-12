@@ -824,6 +824,106 @@
 			"response": []
 		},
 		{
+			"name": "Devices",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// Parse the response JSON",
+							"let jsonData = JSON.parse(pm.response.text());",
+							"",
+							"// Set the variables in the environment (optional)",
+							"pm.collectionVariables.set(\"device_id\", jsonData[0].deviceNumber);",
+							"pm.collectionVariables.set(\"device_code\", jsonData[0].deviceCode);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "authority",
+						"value": "iecapi.iec.co.il"
+					},
+					{
+						"key": "accept",
+						"value": "application/json, text/plain, */*"
+					},
+					{
+						"key": "accept-language",
+						"value": "en,he;q=0.9"
+					},
+					{
+						"key": "dnt",
+						"value": "1"
+					},
+					{
+						"key": "origin",
+						"value": "https://www.iec.co.il"
+					},
+					{
+						"key": "referer",
+						"value": "https://www.iec.co.il/"
+					},
+					{
+						"key": "sec-ch-ua",
+						"value": "\"Chromium\";v=\"121\", \"Not A(Brand\";v=\"99\""
+					},
+					{
+						"key": "sec-ch-ua-mobile",
+						"value": "?0"
+					},
+					{
+						"key": "sec-ch-ua-platform",
+						"value": "\"macOS\""
+					},
+					{
+						"key": "sec-fetch-dest",
+						"value": "empty"
+					},
+					{
+						"key": "sec-fetch-mode",
+						"value": "cors"
+					},
+					{
+						"key": "sec-fetch-site",
+						"value": "same-site"
+					},
+					{
+						"key": "user-agent",
+						"value": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36"
+					},
+					{
+						"key": "x-iec-idt",
+						"value": "1"
+					},
+					{
+						"key": "x-iec-webview",
+						"value": "1"
+					}
+				],
+				"url": {
+					"raw": "https://iecapi.iec.co.il/api/Device/{{contract_id}}",
+					"protocol": "https",
+					"host": [
+						"iecapi",
+						"iec",
+						"co",
+						"il"
+					],
+					"path": [
+						"api",
+						"Device",
+						"{{contract_id}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
 			"name": "Get Electric Bill",
 			"request": {
 				"method": "GET",
@@ -1197,107 +1297,6 @@
 						"LastMeterReading",
 						"{{contract_id}}",
 						"{{bp_number}}"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "Devices",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"exec": [
-							"// Parse the response JSON",
-							"let jsonData = JSON.parse(pm.response.text());",
-							"",
-							"// Set the variables in the environment (optional)",
-							"pm.collectionVariables.set(\"device_id\", jsonData[0].deviceNumber);",
-							"pm.collectionVariables.set(\"device_code\", jsonData[0].deviceCode);"
-						],
-						"type": "text/javascript"
-					}
-				}
-			],
-			"request": {
-				"method": "GET",
-				"header": [
-					{
-						"key": "authority",
-						"value": "iecapi.iec.co.il"
-					},
-					{
-						"key": "accept",
-						"value": "application/json, text/plain, */*"
-					},
-					{
-						"key": "accept-language",
-						"value": "en,he;q=0.9"
-					},
-					{
-						"key": "dnt",
-						"value": "1"
-					},
-					{
-						"key": "origin",
-						"value": "https://www.iec.co.il"
-					},
-					{
-						"key": "referer",
-						"value": "https://www.iec.co.il/"
-					},
-					{
-						"key": "sec-ch-ua",
-						"value": "\"Chromium\";v=\"121\", \"Not A(Brand\";v=\"99\""
-					},
-					{
-						"key": "sec-ch-ua-mobile",
-						"value": "?0"
-					},
-					{
-						"key": "sec-ch-ua-platform",
-						"value": "\"macOS\""
-					},
-					{
-						"key": "sec-fetch-dest",
-						"value": "empty"
-					},
-					{
-						"key": "sec-fetch-mode",
-						"value": "cors"
-					},
-					{
-						"key": "sec-fetch-site",
-						"value": "same-site"
-					},
-					{
-						"key": "user-agent",
-						"value": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36"
-					},
-					{
-						"key": "x-iec-idt",
-						"value": "1"
-					},
-					{
-						"key": "x-iec-webview",
-						"value": "1"
-					}
-				],
-				"url": {
-					"raw": "https://iecapi.iec.co.il//api/Device/{{contract_id}}",
-					"protocol": "https",
-					"host": [
-						"iecapi",
-						"iec",
-						"co",
-						"il"
-					],
-					"path": [
-						"",
-						"api",
-						"Device",
-						"{{contract_id}}"
 					]
 				}
 			},
