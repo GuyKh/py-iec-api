@@ -43,13 +43,11 @@
 						"header": [
 							{
 								"key": "Accept",
-								"value": "application/json",
-								"type": "text"
+								"value": "application/json"
 							},
 							{
 								"key": "Content-Type",
-								"value": "application/json",
-								"type": "text"
+								"value": "application/json"
 							}
 						],
 						"body": {
@@ -109,13 +107,11 @@
 						"header": [
 							{
 								"key": "Accept",
-								"value": "application/json",
-								"type": "text"
+								"value": "application/json"
 							},
 							{
 								"key": "Content-Type",
-								"value": "application/json",
-								"type": "text"
+								"value": "application/json"
 							}
 						],
 						"body": {
@@ -178,13 +174,11 @@
 						"header": [
 							{
 								"key": "Accept",
-								"value": "application/json",
-								"type": "text"
+								"value": "application/json"
 							},
 							{
 								"key": "Content-Type",
-								"value": "application/json",
-								"type": "text"
+								"value": "application/json"
 							}
 						],
 						"body": {
@@ -279,14 +273,7 @@
 						"header": [
 							{
 								"key": "Accept",
-								"value": "application/json",
-								"type": "text",
-								"disabled": true
-							},
-							{
-								"key": "Content-Type",
-								"value": "application/json",
-								"type": "text",
+								"value": "text/html",
 								"disabled": true
 							}
 						],
@@ -391,13 +378,7 @@
 						"header": [
 							{
 								"key": "Accept",
-								"value": "application/json",
-								"type": "text"
-							},
-							{
-								"key": "Content-Type",
-								"value": "application/json",
-								"type": "text"
+								"value": "application/json"
 							}
 						],
 						"body": {
@@ -628,7 +609,7 @@
 					}
 				],
 				"url": {
-					"raw": "https://iecapi.iec.co.il//api/outages/accounts",
+					"raw": "https://iecapi.iec.co.il/api/outages/accounts",
 					"protocol": "https",
 					"host": [
 						"iecapi",
@@ -637,7 +618,6 @@
 						"il"
 					],
 					"path": [
-						"",
 						"api",
 						"outages",
 						"accounts"
@@ -724,7 +704,7 @@
 					}
 				],
 				"url": {
-					"raw": "https://iecapi.iec.co.il//api/customer",
+					"raw": "https://iecapi.iec.co.il/api/customer",
 					"protocol": "https",
 					"host": [
 						"iecapi",
@@ -733,7 +713,6 @@
 						"il"
 					],
 					"path": [
-						"",
 						"api",
 						"customer"
 					]
@@ -823,7 +802,7 @@
 					}
 				],
 				"url": {
-					"raw": "https://iecapi.iec.co.il//api/customer/contract/{{bp_number}}",
+					"raw": "https://iecapi.iec.co.il/api/customer/contract/{{bp_number}}",
 					"protocol": "https",
 					"host": [
 						"iecapi",
@@ -832,11 +811,110 @@
 						"il"
 					],
 					"path": [
-						"",
 						"api",
 						"customer",
 						"contract",
 						"{{bp_number}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Devices",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// Parse the response JSON",
+							"let jsonData = JSON.parse(pm.response.text());",
+							"",
+							"// Set the variables in the environment (optional)",
+							"pm.collectionVariables.set(\"device_id\", jsonData[0].deviceNumber);",
+							"pm.collectionVariables.set(\"device_code\", jsonData[0].deviceCode);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "authority",
+						"value": "iecapi.iec.co.il"
+					},
+					{
+						"key": "accept",
+						"value": "application/json, text/plain, */*"
+					},
+					{
+						"key": "accept-language",
+						"value": "en,he;q=0.9"
+					},
+					{
+						"key": "dnt",
+						"value": "1"
+					},
+					{
+						"key": "origin",
+						"value": "https://www.iec.co.il"
+					},
+					{
+						"key": "referer",
+						"value": "https://www.iec.co.il/"
+					},
+					{
+						"key": "sec-ch-ua",
+						"value": "\"Chromium\";v=\"121\", \"Not A(Brand\";v=\"99\""
+					},
+					{
+						"key": "sec-ch-ua-mobile",
+						"value": "?0"
+					},
+					{
+						"key": "sec-ch-ua-platform",
+						"value": "\"macOS\""
+					},
+					{
+						"key": "sec-fetch-dest",
+						"value": "empty"
+					},
+					{
+						"key": "sec-fetch-mode",
+						"value": "cors"
+					},
+					{
+						"key": "sec-fetch-site",
+						"value": "same-site"
+					},
+					{
+						"key": "user-agent",
+						"value": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36"
+					},
+					{
+						"key": "x-iec-idt",
+						"value": "1"
+					},
+					{
+						"key": "x-iec-webview",
+						"value": "1"
+					}
+				],
+				"url": {
+					"raw": "https://iecapi.iec.co.il/api/Device/{{contract_id}}",
+					"protocol": "https",
+					"host": [
+						"iecapi",
+						"iec",
+						"co",
+						"il"
+					],
+					"path": [
+						"api",
+						"Device",
+						"{{contract_id}}"
 					]
 				}
 			},
@@ -909,7 +987,7 @@
 					}
 				],
 				"url": {
-					"raw": "https://iecapi.iec.co.il//api/ElectricBillsDrawers/ElectricBills/{{contract_id}}/{{bp_number}}",
+					"raw": "https://iecapi.iec.co.il/api/ElectricBillsDrawers/ElectricBills/{{contract_id}}/{{bp_number}}",
 					"protocol": "https",
 					"host": [
 						"iecapi",
@@ -918,7 +996,6 @@
 						"il"
 					],
 					"path": [
-						"",
 						"api",
 						"ElectricBillsDrawers",
 						"ElectricBills",
@@ -996,7 +1073,7 @@
 					}
 				],
 				"url": {
-					"raw": "https://iecapi.iec.co.il//api/billingCollection/invoices/{{contract_id}}/{{bp_number}}",
+					"raw": "https://iecapi.iec.co.il/api/billingCollection/invoices/{{contract_id}}/{{bp_number}}",
 					"protocol": "https",
 					"host": [
 						"iecapi",
@@ -1005,7 +1082,6 @@
 						"il"
 					],
 					"path": [
-						"",
 						"api",
 						"billingCollection",
 						"invoices",
@@ -1115,7 +1191,7 @@
 					}
 				},
 				"url": {
-					"raw": "https://iecapi.iec.co.il//api/Consumption/RemoteReadingRange/{{contract_id}}",
+					"raw": "https://iecapi.iec.co.il/api/Consumption/RemoteReadingRange/{{contract_id}}",
 					"protocol": "https",
 					"host": [
 						"iecapi",
@@ -1124,7 +1200,6 @@
 						"il"
 					],
 					"path": [
-						"",
 						"api",
 						"Consumption",
 						"RemoteReadingRange",
@@ -1201,7 +1276,7 @@
 					}
 				],
 				"url": {
-					"raw": "https://iecapi.iec.co.il//api/Device/LastMeterReading/{{contract_id}}/{{bp_number}}",
+					"raw": "https://iecapi.iec.co.il/api/Device/LastMeterReading/{{contract_id}}/{{bp_number}}",
 					"protocol": "https",
 					"host": [
 						"iecapi",
@@ -1210,113 +1285,11 @@
 						"il"
 					],
 					"path": [
-						"",
 						"api",
 						"Device",
 						"LastMeterReading",
 						"{{contract_id}}",
 						"{{bp_number}}"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "Devices",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"exec": [
-							"// Parse the response JSON",
-							"let jsonData = JSON.parse(pm.response.text());",
-							"",
-							"// Set the variables in the environment (optional)",
-							"pm.collectionVariables.set(\"device_id\", jsonData[0].deviceNumber);",
-							"pm.collectionVariables.set(\"device_code\", jsonData[0].deviceCode);"
-						],
-						"type": "text/javascript"
-					}
-				}
-			],
-			"request": {
-				"method": "GET",
-				"header": [
-					{
-						"key": "authority",
-						"value": "iecapi.iec.co.il"
-					},
-					{
-						"key": "accept",
-						"value": "application/json, text/plain, */*"
-					},
-					{
-						"key": "accept-language",
-						"value": "en,he;q=0.9"
-					},
-					{
-						"key": "dnt",
-						"value": "1"
-					},
-					{
-						"key": "origin",
-						"value": "https://www.iec.co.il"
-					},
-					{
-						"key": "referer",
-						"value": "https://www.iec.co.il/"
-					},
-					{
-						"key": "sec-ch-ua",
-						"value": "\"Chromium\";v=\"121\", \"Not A(Brand\";v=\"99\""
-					},
-					{
-						"key": "sec-ch-ua-mobile",
-						"value": "?0"
-					},
-					{
-						"key": "sec-ch-ua-platform",
-						"value": "\"macOS\""
-					},
-					{
-						"key": "sec-fetch-dest",
-						"value": "empty"
-					},
-					{
-						"key": "sec-fetch-mode",
-						"value": "cors"
-					},
-					{
-						"key": "sec-fetch-site",
-						"value": "same-site"
-					},
-					{
-						"key": "user-agent",
-						"value": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36"
-					},
-					{
-						"key": "x-iec-idt",
-						"value": "1"
-					},
-					{
-						"key": "x-iec-webview",
-						"value": "1"
-					}
-				],
-				"url": {
-					"raw": "https://iecapi.iec.co.il//api/Device/{{contract_id}}",
-					"protocol": "https",
-					"host": [
-						"iecapi",
-						"iec",
-						"co",
-						"il"
-					],
-					"path": [
-						"",
-						"api",
-						"Device",
-						"{{contract_id}}"
 					]
 				}
 			},
@@ -1389,7 +1362,7 @@
 					}
 				],
 				"url": {
-					"raw": "https://iecapi.iec.co.il//api/Device/{{contract_id}}/{{device_id}}",
+					"raw": "https://iecapi.iec.co.il/api/Device/{{contract_id}}/{{device_id}}",
 					"protocol": "https",
 					"host": [
 						"iecapi",
@@ -1398,7 +1371,6 @@
 						"il"
 					],
 					"path": [
-						"",
 						"api",
 						"Device",
 						"{{contract_id}}",
@@ -1475,7 +1447,7 @@
 					}
 				],
 				"url": {
-					"raw": "https://iecapi.iec.co.il//api/Device/type/{{bp_number}}/{{contract_id}}/false",
+					"raw": "https://iecapi.iec.co.il/api/Device/type/{{bp_number}}/{{contract_id}}/false",
 					"protocol": "https",
 					"host": [
 						"iecapi",
@@ -1484,7 +1456,6 @@
 						"il"
 					],
 					"path": [
-						"",
 						"api",
 						"Device",
 						"type",
