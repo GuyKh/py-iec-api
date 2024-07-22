@@ -22,7 +22,7 @@ aiofiles = ">=23.2.1,<25.0.0"
 pytz = "^2024.1"
 
 [tool.poetry.dev-dependencies]
-pytest = "8.2.2"
+pytest = "8.3.1"
 pytest-cov = "^5.0.0"
 ruff = "^0.5.0"
 pre-commit = "^3.2.2"
