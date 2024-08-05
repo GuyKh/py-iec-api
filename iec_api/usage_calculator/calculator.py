@@ -33,6 +33,11 @@ class UsageCalculator:
         else:
             logger.info("Usage calculator data was already loaded")
 
+    def get_vat(self) -> float:
+        if not self.is_loaded:
+            raise ValueError("Usage calculator data is not loaded")
+        return self.rates.vat / 100
+
     def get_kwh_tariff(self) -> float:
         if not self.is_loaded:
             raise ValueError("Usage calculator data is not loaded")

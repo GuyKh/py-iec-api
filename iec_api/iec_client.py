@@ -422,6 +422,58 @@ class IecClient:
         """Get kWh tariff"""
         return await static_data.get_kwh_tariff(self._session)
 
+    async def get_distribution_tariff(self, phase_count: Optional[int] = None) -> float:
+        """Get get_distribution tariff"""
+
+        if not phase_count:
+            devices = await self.get_devices()
+
+            assert devices, "No Devices found"
+            device = devices[0]
+
+            device_details = await self.get_device_by_device_id(device.device_number)
+            assert device_details, "No Device Details"
+
+            phase_count = device_details.counter_devices[0].connection_size.phase
+
+        return await static_data.get_distribution_tariff(self._session, phase_count)
+
+    async def get_delivery_tariff(self, phase_count: Optional[int] = None) -> float:
+        """Get delivery tariff"""
+
+        if not phase_count:
+            devices = await self.get_devices()
+
+            assert devices, "No Devices found"
+            device = devices[0]
+
+            device_details = await self.get_device_by_device_id(device.device_number)
+            assert device_details, "No Device Details"
+
+            phase_count = device_details.counter_devices[0].connection_size.phase
+
+        return await static_data.get_delivery_tariff(self._session, phase_count)
+
+    async def get_kva_tariff(self) -> float:
+        """Get KVA tariff"""
+        return await static_data.get_kva_tariff(self._session)
+
+    async def get_power_size(self, connection: Optional[str] = None) -> float:
+        """Get delivery tariff"""
+
+        if not connection:
+            devices = await self.get_devices()
+
+            assert devices, "No Devices found"
+            device = devices[0]
+
+            device_details = await self.get_device_by_device_id(device.device_number)
+            assert device_details, "No Device Details"
+
+            connection = device_details.counter_devices[0].connection_size.representative_connection_size
+
+        return await static_data.get_power_size(self._session, connection)
+
     async def get_usage_calculator(self) -> UsageCalculator:
         """
         Get Usage Calculator module
@@ -484,7 +536,7 @@ class IecClient:
 
     async def get_fault_portal_outages_by_account(
         self, account_id: Optional[str] = None
-    ) -> (Optional)[List[FaultPortalOutage]]:
+    ) -> Optional[List[FaultPortalOutage]]:
         """Get Outages for the Account from Fault Portal
         Args:
             self: The instance of the class.
