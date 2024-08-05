@@ -62,7 +62,7 @@ class ConnectionSize(DataClassDictMixin):
     """Connection dataclass."""
 
     size: int = field(metadata=field_options(alias="size"))
-    phase: str = field(metadata=field_options(alias="phase"))
+    phase: int = field(metadata=field_options(alias="phase"))
     representative_connection_size: str = field(metadata=field_options(alias="representativeConnectionSize"))
 
 
