@@ -26,25 +26,25 @@ local/run:
 ############################################
 
 docker/install:
-	docker-compose build ${APP_NAME}
+	docker compose build ${APP_NAME}
 
 docker/up:
-	docker-compose up -d
+	docker compose up -d
 
 docker/down:
-	docker-compose down --remove-orphans
+	docker compose down --remove-orphans
 
 docker/test:
-	docker-compose run ${APP_NAME} poetry run pytest --cov-report=html --cov-report=term --cov .
+	docker compose run ${APP_NAME} poetry run pytest --cov-report=html --cov-report=term --cov .
 
 docker/lint:
-	docker-compose run ${APP_NAME} poetry run ruff check .
+	docker compose run ${APP_NAME} poetry run ruff check .
 
 docker/lint/fix:
-	docker-compose run ${APP_NAME} poetry run ruff . --fix --exit-non-zero-on-fix
+	docker compose run ${APP_NAME} poetry run ruff . --fix --exit-non-zero-on-fix
 
 docker/run:
-	docker-compose run ${APP_NAME} poetry run python src/main.py
+	docker compose run ${APP_NAME} poetry run python src/main.py
 
 ##################
 # HEPFUL COMMANDS
