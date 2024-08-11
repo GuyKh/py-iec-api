@@ -30,7 +30,8 @@ from iec_api.models.response_descriptor import ResponseWithDescriptor
 #                 "debtForInvoicesDueDateNotPassed": 0.0,
 #                 "isTouz": false,
 #                 "smartMeter": false,
-#                 "producerType": 1
+#                 "producerType": 1,
+#                 "isDomestic": true,
 #             }
 #         ],
 #         "contractAmount": 1,
@@ -64,6 +65,7 @@ class Contract(DataClassDictMixin):
     is_touz: bool = field(metadata=field_options(alias="isTouz"))
     smart_meter: bool = field(metadata=field_options(alias="smartMeter"))
     producer_type: int = field(metadata=field_options(alias="producerType"))
+    is_domestic: bool = field(metadata=field_options(alias="isDomestic"))
 
 
 @dataclass
