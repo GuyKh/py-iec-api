@@ -74,7 +74,7 @@ def is_valid_israeli_id(id_number: str | int) -> bool:
 def is_json(s: str):
     try:
         json.loads(s)
-    except ValueError as e:
+    except ValueError:
         return False
     return True
 

@@ -3,8 +3,6 @@ from dataclasses import dataclass, field
 from mashumaro import DataClassDictMixin, field_options
 from mashumaro.config import BaseConfig
 
-from iec_api.models.response_descriptor import ResponseWithDescriptor
-
 # POST https://iecapi.iec.co.il/api/Consumption/SendConsumptionReportToMail/{{contract_id}}
 # {
 #     "emailAddress": "sefi.ninio@gmail.com",
