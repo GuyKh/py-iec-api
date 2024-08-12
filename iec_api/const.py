@@ -24,7 +24,7 @@ HEADERS_WITH_AUTH["Authorization"] = "Bearer 1234"
 HEADERS_WITH_AUTH["Cookie"] = "ARRAffinity=?; " "ARRAffinitySameSite=?;" " GCLB=?"
 
 TIMEZONE = pytz.timezone("Asia/Jerusalem")
-IEC_API_BASE_URL = "https://iecapi.iec.co.il//api/"
+IEC_API_BASE_URL = "https://iecapi.iec.co.il/api/"
 IEC_FAULT_PORTAL_API_URL = "https://masa-faultsportalapi.iec.co.il/api/"
 
 GET_ACCOUNTS_URL = IEC_API_BASE_URL + "outages/accounts"
@@ -47,6 +47,7 @@ GET_KWH_TARIFF_URL = IEC_API_BASE_URL + "content/en-US/content/tariffs/contentpa
 GET_PREIOD_CALCULATOR_URL = IEC_API_BASE_URL + "content/en-US/calculators/period"
 GET_CALCULATOR_GADGET_URL = IEC_API_BASE_URL + "content/en-US/calculators/gadget"
 GET_OUTAGES_URL = IEC_API_BASE_URL + "outages/transactions/{account_id}/2"
+SEND_CONSUMPTION_REPORT_TO_MAIL_URL = IEC_API_BASE_URL + "/Consumption/SendConsumptionReportToMail/{contract_id}"
 
 GET_USER_PROFILE_FROM_FAULT_PORTAL_URL = IEC_FAULT_PORTAL_API_URL + "contacts/userprofile"
 GET_OUTAGES_FROM_FAULT_PORTAL_URL = IEC_FAULT_PORTAL_API_URL + "accounts/{account_id}/tranzactions/2"

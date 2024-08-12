@@ -1,5 +1,6 @@
 import asyncio
 import http
+import json
 import logging
 import re
 from concurrent.futures import ThreadPoolExecutor
@@ -69,6 +70,13 @@ def is_valid_israeli_id(id_number: str | int) -> bool:
         % 10
         == 0
     )
+
+def is_json(s: str):
+    try:
+        json.loads(s)
+    except ValueError as e:
+        return False
+    return True
 
 
 async def read_user_input(prompt: str) -> str:
@@ -199,6 +207,8 @@ async def send_non_json_post_request(
         raise IECError(-1, f"Received invalid response from IEC API: {str(ex)}")
 
     if resp.status != http.HTTPStatus.OK:
+        if is_json(resp):
+            parse_error_response(resp, json.loads(resp.content))
         raise IECError(resp.status, resp.reason)
     return resp.content
 

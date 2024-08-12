@@ -263,6 +263,50 @@ class IecClient:
             async with aiofiles.open(file_path, "wb") as f:
                 await f.write(response_bytes)
 
+    async def send_consumption_report_to_mail(
+        self,
+        email: str,
+        contract_id: Optional[str | int] = None,
+        device_id: Optional(str | int) = None,
+        device_code: Optional(str | int) = None
+    ) -> bool:
+        """
+        Send Consumption Report to Mail
+        Args:
+            self: The instance of the class.
+            email (str): Email to send the report to
+            contract_id (str): The contract ID associated with the meter.
+            device_id: Meter Id,
+            device_code: Meter Code
+        """
+        await self.check_token()
+
+        if not contract_id:
+            contract_id = self._contract_id
+
+        assert contract_id, "Contract ID must be provided"
+
+        if not device_id:
+            devices = await self.get_devices()
+
+            assert devices, "No Devices found"
+            device_id = devices[0].device_number
+
+        assert device_id, "Device ID must be provided"
+
+
+        if not device_code:
+            devices = await self.get_devices()
+
+            assert devices, "No Devices found"
+            device_code = devices[0].device_code
+
+        assert device_code, "Device Code must be provided"
+
+        return await data.send_consumption_report_to_mail(self._session, self._token, contract_id, email, device_code,
+            device_id)
+
+
     async def get_devices(self, contract_id: Optional[str] = None) -> Optional[List[Device]]:
         """
         Get a list of devices for the user
