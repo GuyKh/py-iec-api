@@ -58,6 +58,7 @@ GET_MASA_ORDER_TITLES_URL = IEC_MASA_API_BASE_URL + "accounts/{account_id}/order
 GET_MASA_ORDER_LOOKUP_URL = IEC_MASA_API_BASE_URL + "orderLookup"
 GET_MASA_VOLT_LEVELS_URL = IEC_MASA_API_BASE_URL + "voltLevels/active"
 GET_MASA_EQUIPMENTS_URL = IEC_MASA_API_BASE_URL + "equipments/get?accountId={account_id}&pageNumber=1&pageSize=10"
+GET_MASA_LOOKUP_URL = IEC_MASA_BASE_URL + "lookup/all"
 
 GET_USER_PROFILE_FROM_FAULT_PORTAL_URL = IEC_FAULT_PORTAL_API_URL + "contacts/userprofile"
 GET_OUTAGES_FROM_FAULT_PORTAL_URL = IEC_FAULT_PORTAL_API_URL + "accounts/{account_id}/tranzactions/2"
