@@ -32,6 +32,7 @@ from mashumaro import DataClassDictMixin, field_options
 #     "logicalName": "contact"
 # }
 
+
 @dataclass
 class UserProfileAccount(DataClassDictMixin):
     """
@@ -48,6 +49,7 @@ class UserProfileAccount(DataClassDictMixin):
         id (UUID): The unique identifier for the account.
         logical_name (str): The logical name of the entity.
     """
+
     name: str = field(metadata=field_options(alias="name"))
     account_number: str = field(metadata=field_options(alias="accountNumber"))
     government_number: str = field(metadata=field_options(alias="governmentNumber"))
@@ -58,8 +60,9 @@ class UserProfileAccount(DataClassDictMixin):
     id: UUID = field(metadata=field_options(alias="id"))
     logical_name: str = field(metadata=field_options(alias="logicalName"))
 
+
 @dataclass
-class UserProfile(DataClassDictMixin):
+class MasaUserProfile(DataClassDictMixin):
     """
     Represents a contact with associated accounts.
 
@@ -76,6 +79,7 @@ class UserProfile(DataClassDictMixin):
         id (UUID): The unique identifier for the contact.
         logical_name (str): The logical name of the entity.
     """
+
     government_id: str = field(metadata=field_options(alias="governmentid"))
     id_type: int = field(metadata=field_options(alias="idType"))
     email: str = field(metadata=field_options(alias="email"))

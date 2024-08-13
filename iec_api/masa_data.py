@@ -28,9 +28,7 @@ async def get_masa_cities(session: ClientSession, token: JWT) -> List[City]:
 
     headers = commons.add_auth_bearer_to_headers(HEADERS_WITH_AUTH, token.id_token)
     # sending get request and saving the response as response object
-    response = await commons.send_get_request(
-        session=session, url=GET_MASA_CITIES_LOOKUP_URL, headers=headers
-    )
+    response = await commons.send_get_request(session=session, url=GET_MASA_CITIES_LOOKUP_URL, headers=headers)
 
     return CitiesResponse.from_dict(response).data_collection
 
@@ -40,9 +38,7 @@ async def get_masa_order_categories(session: ClientSession, token: JWT) -> List[
 
     headers = commons.add_auth_bearer_to_headers(HEADERS_WITH_AUTH, token.id_token)
     # sending get request and saving the response as response object
-    response = await commons.send_get_request(
-        session=session, url=GET_MASA_ORDER_LOOKUP_URL, headers=headers
-    )
+    response = await commons.send_get_request(session=session, url=GET_MASA_ORDER_LOOKUP_URL, headers=headers)
 
     return OrderLookupResponse.from_dict(response).order_categories
 
@@ -60,7 +56,7 @@ async def get_masa_user_profile(session: ClientSession, token: JWT, account_id: 
 
 
 async def get_masa_equipments(session: ClientSession, token: JWT, account_id: str) -> GetEquipmentResponse:
-    """Get Equimpents from IEC Masa API."""
+    """Get Equipments from IEC Masa API."""
 
     headers = commons.add_auth_bearer_to_headers(HEADERS_WITH_AUTH, token.id_token)
     # sending get request and saving the response as response object
@@ -76,9 +72,7 @@ async def get_masa_volt_levels(session: ClientSession, token: JWT) -> List[VoltL
 
     headers = commons.add_auth_bearer_to_headers(HEADERS_WITH_AUTH, token.id_token)
     # sending get request and saving the response as response object
-    response = await commons.send_get_request(
-        session=session, url=GET_MASA_VOLT_LEVELS_URL, headers=headers
-    )
+    response = await commons.send_get_request(session=session, url=GET_MASA_VOLT_LEVELS_URL, headers=headers)
 
     return VoltLevelsResponse.from_dict(response).data_collection
 
@@ -88,19 +82,16 @@ async def get_masa_order_titles(session: ClientSession, token: JWT) -> GetTitleR
 
     headers = commons.add_auth_bearer_to_headers(HEADERS_WITH_AUTH, token.id_token)
     # sending get request and saving the response as response object
-    response = await commons.send_get_request(
-        session=session, url=GET_MASA_ORDER_TITLES_URL, headers=headers
-    )
+    response = await commons.send_get_request(session=session, url=GET_MASA_ORDER_TITLES_URL, headers=headers)
 
     return GetTitleResponse.from_dict(response)
+
 
 async def get_masa_lookup(session: ClientSession, token: JWT) -> GetLookupResponse:
     """Get All Lookup from IEC Masa API."""
 
     headers = commons.add_auth_bearer_to_headers(HEADERS_WITH_AUTH, token.id_token)
     # sending get request and saving the response as response object
-    response = await commons.send_get_request(
-        session=session, url=GET_MASA_LOOKUP_URL, headers=headers
-    )
+    response = await commons.send_get_request(session=session, url=GET_MASA_LOOKUP_URL, headers=headers)
 
     return GetLookupResponse.from_dict(response)

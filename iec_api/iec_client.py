@@ -113,7 +113,7 @@ class IecClient:
 
         if accounts and len(accounts) > 0:
             self._bp_number = accounts[0].account_number
-            self._account_id = accounts[0].id
+            self._account_id = str(accounts[0].id)
 
         return accounts
 
@@ -527,7 +527,6 @@ class IecClient:
 
         return await data.get_outages_by_account(self._session, self._token, account_id)
 
-
     # ----------------
     # Masa API Flow
     # ----------------
@@ -577,7 +576,6 @@ class IecClient:
 
         return await masa_data.get_masa_cities(self._session, self._token)
 
-
     async def get_masa_order_categories(self) -> List[OrderCategory]:
         """Get Masa Cities for the Account
         Args:
@@ -609,7 +607,6 @@ class IecClient:
         await self.check_token()
         return await masa_data.get_masa_order_titles(self._session, self._token)
 
-
     async def get_masa_lookup(self) -> GetLookupResponse:
         """Get Masa Lookup
         Args:
@@ -620,12 +617,10 @@ class IecClient:
         await self.check_token()
         return await masa_data.get_masa_lookup(self._session, self._token)
 
-
     async def get_masa_connection_size_from_masa(self, account_id: Optional[str] = None) -> Optional[str]:
         if not self._masa_connection_size_map:
             lookup = self.get_masa_lookup()
             self._masa_connection_size_map = {obj.size_type: obj.name for obj in lookup.connection_size_types}
-
 
         equipment = self.get_masa_equipment_by_account(account_id)
         connection_size = equipment.items.connections[0].power_connection_size
