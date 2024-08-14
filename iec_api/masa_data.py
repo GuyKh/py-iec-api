@@ -22,25 +22,34 @@ from iec_api.masa_api_models.user_profile import MasaUserProfile
 from iec_api.masa_api_models.volt_levels import VoltLevel, VoltLevelsResponse
 from iec_api.models.jwt import JWT
 
+cities = None
+order_categories = None
+volt_levels = None
+lookup = None
+
 
 async def get_masa_cities(session: ClientSession, token: JWT) -> List[City]:
     """Get Cities from IEC Masa API."""
 
-    headers = commons.add_auth_bearer_to_headers(HEADERS_WITH_AUTH, token.id_token)
-    # sending get request and saving the response as response object
-    response = await commons.send_get_request(session=session, url=GET_MASA_CITIES_LOOKUP_URL, headers=headers)
+    if not cities:
+        headers = commons.add_auth_bearer_to_headers(HEADERS_WITH_AUTH, token.id_token)
+        # sending get request and saving the response as response object
+        response = await commons.send_get_request(session=session, url=GET_MASA_CITIES_LOOKUP_URL, headers=headers)
 
-    return CitiesResponse.from_dict(response).data_collection
+        cities = CitiesResponse.from_dict(response).data_collection
+    return cities
 
 
 async def get_masa_order_categories(session: ClientSession, token: JWT) -> List[OrderCategory]:
     """Get Order Categories from IEC Masa API."""
 
-    headers = commons.add_auth_bearer_to_headers(HEADERS_WITH_AUTH, token.id_token)
-    # sending get request and saving the response as response object
-    response = await commons.send_get_request(session=session, url=GET_MASA_ORDER_LOOKUP_URL, headers=headers)
+    if not order_categories:
+        headers = commons.add_auth_bearer_to_headers(HEADERS_WITH_AUTH, token.id_token)
+        # sending get request and saving the response as response object
+        response = await commons.send_get_request(session=session, url=GET_MASA_ORDER_LOOKUP_URL, headers=headers)
 
-    return OrderLookupResponse.from_dict(response).order_categories
+        order_categories = OrderLookupResponse.from_dict(response).order_categories
+    return order_categories
 
 
 async def get_masa_user_profile(session: ClientSession, token: JWT) -> MasaUserProfile:
@@ -70,11 +79,13 @@ async def get_masa_equipments(session: ClientSession, token: JWT, account_id: st
 async def get_masa_volt_levels(session: ClientSession, token: JWT) -> List[VoltLevel]:
     """Get Volt Levels from IEC Masa API."""
 
-    headers = commons.add_auth_bearer_to_headers(HEADERS_WITH_AUTH, token.id_token)
-    # sending get request and saving the response as response object
-    response = await commons.send_get_request(session=session, url=GET_MASA_VOLT_LEVELS_URL, headers=headers)
+    if not volt_levels:
+        headers = commons.add_auth_bearer_to_headers(HEADERS_WITH_AUTH, token.id_token)
+        # sending get request and saving the response as response object
+        response = await commons.send_get_request(session=session, url=GET_MASA_VOLT_LEVELS_URL, headers=headers)
 
-    return VoltLevelsResponse.from_dict(response).data_collection
+        volt_levels = VoltLevelsResponse.from_dict(response).data_collection
+    return volt_levels
 
 
 async def get_masa_order_titles(session: ClientSession, token: JWT, account_id: str) -> GetTitleResponse:
@@ -90,8 +101,10 @@ async def get_masa_order_titles(session: ClientSession, token: JWT, account_id: 
 async def get_masa_lookup(session: ClientSession, token: JWT) -> GetLookupResponse:
     """Get All Lookup from IEC Masa API."""
 
-    headers = commons.add_auth_bearer_to_headers(HEADERS_WITH_AUTH, token.id_token)
-    # sending get request and saving the response as response object
-    response = await commons.send_get_request(session=session, url=GET_MASA_LOOKUP_URL, headers=headers)
+    if not lookup:
+        headers = commons.add_auth_bearer_to_headers(HEADERS_WITH_AUTH, token.id_token)
+        # sending get request and saving the response as response object
+        response = await commons.send_get_request(session=session, url=GET_MASA_LOOKUP_URL, headers=headers)
 
-    return GetLookupResponse.from_dict(response)
+        lookup = GetLookupResponse.from_dict(response)
+    return lookup
