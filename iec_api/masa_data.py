@@ -31,6 +31,7 @@ lookup = None
 async def get_masa_cities(session: ClientSession, token: JWT) -> List[City]:
     """Get Cities from IEC Masa API."""
 
+    global cities
     if not cities:
         headers = commons.add_auth_bearer_to_headers(HEADERS_WITH_AUTH, token.id_token)
         # sending get request and saving the response as response object
@@ -43,6 +44,7 @@ async def get_masa_cities(session: ClientSession, token: JWT) -> List[City]:
 async def get_masa_order_categories(session: ClientSession, token: JWT) -> List[OrderCategory]:
     """Get Order Categories from IEC Masa API."""
 
+    global order_categories
     if not order_categories:
         headers = commons.add_auth_bearer_to_headers(HEADERS_WITH_AUTH, token.id_token)
         # sending get request and saving the response as response object
@@ -79,6 +81,7 @@ async def get_masa_equipments(session: ClientSession, token: JWT, account_id: st
 async def get_masa_volt_levels(session: ClientSession, token: JWT) -> List[VoltLevel]:
     """Get Volt Levels from IEC Masa API."""
 
+    global volt_levels
     if not volt_levels:
         headers = commons.add_auth_bearer_to_headers(HEADERS_WITH_AUTH, token.id_token)
         # sending get request and saving the response as response object
@@ -100,7 +103,7 @@ async def get_masa_order_titles(session: ClientSession, token: JWT, account_id: 
 
 async def get_masa_lookup(session: ClientSession, token: JWT) -> GetLookupResponse:
     """Get All Lookup from IEC Masa API."""
-
+    global lookup
     if not lookup:
         headers = commons.add_auth_bearer_to_headers(HEADERS_WITH_AUTH, token.id_token)
         # sending get request and saving the response as response object
