@@ -43,13 +43,13 @@ async def get_masa_order_categories(session: ClientSession, token: JWT) -> List[
     return OrderLookupResponse.from_dict(response).order_categories
 
 
-async def get_masa_user_profile(session: ClientSession, token: JWT, account_id: str) -> MasaUserProfile:
+async def get_masa_user_profile(session: ClientSession, token: JWT) -> MasaUserProfile:
     """Get User Profile from IEC Masa API."""
 
     headers = commons.add_auth_bearer_to_headers(HEADERS_WITH_AUTH, token.id_token)
     # sending get request and saving the response as response object
     response = await commons.send_get_request(
-        session=session, url=GET_MASA_USER_PROFILE_LOOKUP_URL.format(account_id=account_id), headers=headers
+        session=session, url=GET_MASA_USER_PROFILE_LOOKUP_URL, headers=headers
     )
 
     return MasaUserProfile.from_dict(response)
@@ -77,12 +77,12 @@ async def get_masa_volt_levels(session: ClientSession, token: JWT) -> List[VoltL
     return VoltLevelsResponse.from_dict(response).data_collection
 
 
-async def get_masa_order_titles(session: ClientSession, token: JWT) -> GetTitleResponse:
+async def get_masa_order_titles(session: ClientSession, token: JWT, account_id: str) -> GetTitleResponse:
     """Get Order Title from IEC Masa API."""
 
     headers = commons.add_auth_bearer_to_headers(HEADERS_WITH_AUTH, token.id_token)
     # sending get request and saving the response as response object
-    response = await commons.send_get_request(session=session, url=GET_MASA_ORDER_TITLES_URL, headers=headers)
+    response = await commons.send_get_request(session=session, url=GET_MASA_ORDER_TITLES_URL.format(account_id=account_id), headers=headers)
 
     return GetTitleResponse.from_dict(response)
 

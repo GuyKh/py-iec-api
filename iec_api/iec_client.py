@@ -548,22 +548,16 @@ class IecClient:
 
         return await masa_data.get_masa_equipments(self._session, self._token, account_id)
 
-    async def get_masa_user_profile(self, account_id: Optional[str] = None) -> MasaUserProfile:
-        """Get Masa User Profile for the Account
+    async def get_masa_user_profile(self) -> MasaUserProfile:
+        """Get Masa User Profile
         Args:
             self: The instance of the class.
-            account_id (str): The Account ID of the meter.
         Returns:
             MasaUserProfile: Masa User Profile
         """
         await self.check_token()
 
-        if not account_id:
-            account_id = self._account_id
-
-        assert account_id, "Account Id must be provided"
-
-        return await masa_data.get_masa_user_profile(self._session, self._token, account_id)
+        return await masa_data.get_masa_user_profile(self._session, self._token)
 
     async def get_masa_cities(self) -> List[City]:
         """Get Masa Cities
@@ -597,15 +591,22 @@ class IecClient:
         await self.check_token()
         return await masa_data.get_masa_volt_levels(self._session, self._token)
 
-    async def get_masa_order_titles(self) -> GetTitleResponse:
+    async def get_masa_order_titles(self, account_id: Optional[str] = None) -> GetTitleResponse:
         """Get Masa Cities
         Args:
             self: The instance of the class.
+            account_id (str): The Account ID of the meter.
         Returns:
             GetTitleResponse: Get Title Response
         """
         await self.check_token()
-        return await masa_data.get_masa_order_titles(self._session, self._token)
+
+        if not account_id:
+            account_id = self._account_id
+
+        assert account_id, "Account Id must be provided"
+
+        return await masa_data.get_masa_order_titles(self._session, self._token, account_id)
 
     async def get_masa_lookup(self) -> GetLookupResponse:
         """Get Masa Lookup
@@ -619,11 +620,11 @@ class IecClient:
 
     async def get_masa_connection_size_from_masa(self, account_id: Optional[str] = None) -> Optional[str]:
         if not self._masa_connection_size_map:
-            lookup = self.get_masa_lookup()
+            lookup = await self.get_masa_lookup()
             self._masa_connection_size_map = {obj.size_type: obj.name for obj in lookup.connection_size_types}
 
-        equipment = self.get_masa_equipment_by_account(account_id)
-        connection_size = equipment.items.connections[0].power_connection_size
+        equipment = await self.get_masa_equipment_by_account(account_id)
+        connection_size = equipment.items[0].connections[0].power_connection_size
 
         return self._masa_connection_size_map.get(connection_size)
 

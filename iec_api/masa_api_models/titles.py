@@ -28,5 +28,5 @@ class GetTitleResponse(DataClassDictMixin):
         orders (List[Order]) : list of orders
     """
     id: UUID = field(metadata=field_options(alias="id"))
-    orders: List[Order] = field(metadata=field_options(alias="order"))
+    orders: List[Order] = field(metadata=field_options(alias="orders"))
 
