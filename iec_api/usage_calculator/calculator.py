@@ -1,6 +1,5 @@
 import logging
 from datetime import timedelta
-from decimal import Decimal
 from typing import Optional
 
 from aiohttp import ClientSession
