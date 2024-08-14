@@ -73,7 +73,7 @@ class UsageCalculator:
             power=custom_usage_value if custom_usage_value else device.power,
             power_unit=device.power_unit,
             consumption=consumption,
-            cost=Decimal.from_float(consumption) * rate,
+            cost=consumption * rate,
             duration=timedelta(minutes=minutes),
         )
 
