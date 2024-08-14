@@ -51,6 +51,7 @@ GET_KWH_TARIFF_URL = IEC_API_BASE_URL + "content/en-US/content/tariffs/contentpa
 GET_PREIOD_CALCULATOR_URL = IEC_API_BASE_URL + "content/en-US/calculators/period"
 GET_CALCULATOR_GADGET_URL = IEC_API_BASE_URL + "content/en-US/calculators/gadget"
 GET_OUTAGES_URL = IEC_API_BASE_URL + "outages/transactions/{account_id}/2"
+SEND_CONSUMPTION_REPORT_TO_MAIL_URL = IEC_API_BASE_URL + "/Consumption/SendConsumptionReportToMail/{contract_id}"
 
 GET_MASA_CITIES_LOOKUP_URL = IEC_MASA_MAINPORTAL_API_BASE_URL + "cities"
 GET_MASA_USER_PROFILE_LOOKUP_URL = IEC_MASA_MAINPORTAL_API_BASE_URL + "contacts/userprofile"

@@ -24,6 +24,7 @@ from iec_api.const import (
     GET_REQUEST_READING_URL,
     GET_TENANT_IDENTITY_URL,
     HEADERS_WITH_AUTH,
+    SEND_CONSUMPTION_REPORT_TO_MAIL_URL,
 )
 from iec_api.models.account import Account
 from iec_api.models.account import decoder as account_decoder
@@ -53,6 +54,7 @@ from iec_api.models.outages import Outage
 from iec_api.models.outages import decoder as outages_decoder
 from iec_api.models.remote_reading import ReadingResolution, RemoteReadingRequest, RemoteReadingResponse
 from iec_api.models.response_descriptor import ResponseWithDescriptor
+from iec_api.models.send_consumption_to_mail import SendConsumptionReportToMailRequest
 
 T = TypeVar("T")
 logger = logging.getLogger(__name__)
@@ -287,6 +289,22 @@ async def get_invoice_pdf(
         session, url=GET_INVOICE_PDF_URL, headers=headers, json_data=request
     )
     return await response.read()
+
+
+async def send_consumption_report_to_mail(
+    session: ClientSession, token: JWT, contract_id: int | str, email: str , device_code: int | str,
+    device_id: int | str) -> bool:
+    """Send Consumption Report to Mail from IEC API."""
+    headers = commons.add_auth_bearer_to_headers(HEADERS_WITH_AUTH, token.id_token)
+
+    request = SendConsumptionReportToMailRequest(
+        email=email, device_code=str(device_code), device_id=str(device_id)
+    ).to_dict()
+    response = await commons.send_non_json_post_request(
+        session, url=SEND_CONSUMPTION_REPORT_TO_MAIL_URL.format(contract_id=contract_id), headers=headers,
+        json_data=request
+    )
+    return await bool(response.read())
 
 
 async def get_outages_by_account(session: ClientSession, token: JWT, account_id: str) -> Optional[list[Outage]]:
