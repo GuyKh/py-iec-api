@@ -9,9 +9,16 @@ import aiohttp
 import jwt
 from aiohttp import ClientSession
 
-from iec_api import commons, data, fault_portal_data, login, static_data
+from iec_api import commons, data, fault_portal_data, login, masa_data, static_data
 from iec_api.fault_portal_models.outages import FaultPortalOutage
 from iec_api.fault_portal_models.user_profile import UserProfile
+from iec_api.masa_api_models.cities import City
+from iec_api.masa_api_models.equipment import GetEquipmentResponse
+from iec_api.masa_api_models.lookup import GetLookupResponse
+from iec_api.masa_api_models.order_lookup import OrderCategory
+from iec_api.masa_api_models.titles import GetTitleResponse
+from iec_api.masa_api_models.user_profile import MasaUserProfile
+from iec_api.masa_api_models.volt_levels import VoltLevel
 from iec_api.models.account import Account
 from iec_api.models.contract import Contract
 from iec_api.models.contract_check import ContractCheck
@@ -75,6 +82,7 @@ class IecClient:
         self._bp_number: Optional[str] = None  # BP Number associated with the instance
         self._contract_id: Optional[str] = None  # Contract ID associated with the instance
         self._account_id: Optional[str] = None  # Account ID associated with the instance
+        self._masa_connection_size_map: Optional[dict[int, str]] = None
 
     def _shutdown(self):
         if not self._session.closed:
@@ -105,7 +113,7 @@ class IecClient:
 
         if accounts and len(accounts) > 0:
             self._bp_number = accounts[0].account_number
-            self._account_id = accounts[0].id
+            self._account_id = str(accounts[0].id)
 
         return accounts
 
@@ -518,6 +526,107 @@ class IecClient:
         assert account_id, "Account Id must be provided"
 
         return await data.get_outages_by_account(self._session, self._token, account_id)
+
+    # ----------------
+    # Masa API Flow
+    # ----------------
+
+    async def get_masa_equipment_by_account(self, account_id: Optional[str] = None) -> GetEquipmentResponse:
+        """Get Equipment for the Account
+        Args:
+            self: The instance of the class.
+            account_id (str): The Account ID of the meter.
+        Returns:
+            GetEquipmentResponse: Get Equipment Response
+        """
+        await self.check_token()
+
+        if not account_id:
+            account_id = self._account_id
+
+        assert account_id, "Account Id must be provided"
+
+        return await masa_data.get_masa_equipments(self._session, self._token, account_id)
+
+    async def get_masa_user_profile(self) -> MasaUserProfile:
+        """Get Masa User Profile
+        Args:
+            self: The instance of the class.
+        Returns:
+            MasaUserProfile: Masa User Profile
+        """
+        await self.check_token()
+
+        return await masa_data.get_masa_user_profile(self._session, self._token)
+
+    async def get_masa_cities(self) -> List[City]:
+        """Get Masa Cities
+        Args:
+            self: The instance of the class.
+        Returns:
+            list[City]: List of Cities
+        """
+        await self.check_token()
+
+        return await masa_data.get_masa_cities(self._session, self._token)
+
+    async def get_masa_order_categories(self) -> List[OrderCategory]:
+        """Get Masa Cities for the Account
+        Args:
+            self: The instance of the class.
+        Returns:
+            list[OrderCategory]: List of Order Categories
+        """
+        await self.check_token()
+
+        return await masa_data.get_masa_order_categories(self._session, self._token)
+
+    async def get_masa_volt_levels(self) -> List[VoltLevel]:
+        """Get Masa Volt Level
+        Args:
+            self: The instance of the class.
+        Returns:
+            list[VoltLevel]: List of Volt Levelts
+        """
+        await self.check_token()
+        return await masa_data.get_masa_volt_levels(self._session, self._token)
+
+    async def get_masa_order_titles(self, account_id: Optional[str] = None) -> GetTitleResponse:
+        """Get Masa Cities
+        Args:
+            self: The instance of the class.
+            account_id (str): The Account ID of the meter.
+        Returns:
+            GetTitleResponse: Get Title Response
+        """
+        await self.check_token()
+
+        if not account_id:
+            account_id = self._account_id
+
+        assert account_id, "Account Id must be provided"
+
+        return await masa_data.get_masa_order_titles(self._session, self._token, account_id)
+
+    async def get_masa_lookup(self) -> GetLookupResponse:
+        """Get Masa Lookup
+        Args:
+            self: The instance of the class.
+        Returns:
+            GetLookupResponse: Get Title Response
+        """
+        await self.check_token()
+        return await masa_data.get_masa_lookup(self._session, self._token)
+
+    async def get_masa_connection_size_from_masa(self, account_id: Optional[str] = None) -> Optional[str]:
+        if not self._masa_connection_size_map:
+            lookup = await self.get_masa_lookup()
+            self._masa_connection_size_map = {obj.size_type: obj.name for obj in lookup.connection_size_types}
+
+        equipment = await self.get_masa_equipment_by_account(account_id)
+        connection_size = equipment.items[0].connections[0].power_connection_size
+
+        return self._masa_connection_size_map.get(connection_size)
 
     # ----------------
     # Fault Portal Endpoints
