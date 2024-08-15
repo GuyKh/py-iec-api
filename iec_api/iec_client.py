@@ -275,8 +275,8 @@ class IecClient:
         self,
         email: str,
         contract_id: Optional[str | int] = None,
-        device_id: Optional(str | int) = None,
-        device_code: Optional(str | int) = None
+        device_id: Optional[str | int] = None,
+        device_code: Optional[str | int] = None
     ) -> bool:
         """
         Send Consumption Report to Mail
