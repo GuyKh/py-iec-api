@@ -1,9 +1,9 @@
 {
 	"info": {
-		"_postman_id": "f8030148-ee7f-4bfe-953f-dcf9de645f1b",
+		"_postman_id": "043dd09c-b19e-417f-88ce-c2b597046568",
 		"name": "IEC",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-		"_exporter_id": "305946"
+		"_exporter_id": "35109912"
 	},
 	"item": [
 		{
@@ -524,6 +524,785 @@
 							""
 						]
 					}
+				}
+			]
+		},
+		{
+			"name": "Masa API",
+			"item": [
+				{
+					"name": "Get Cities",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "authority",
+								"value": "iecapi.iec.co.il"
+							},
+							{
+								"key": "accept",
+								"value": "application/json, text/plain, */*"
+							},
+							{
+								"key": "accept-language",
+								"value": "en,he;q=0.9"
+							},
+							{
+								"key": "dnt",
+								"value": "1"
+							},
+							{
+								"key": "origin",
+								"value": "https://www.iec.co.il"
+							},
+							{
+								"key": "referer",
+								"value": "https://www.iec.co.il/"
+							},
+							{
+								"key": "sec-ch-ua",
+								"value": "\"Chromium\";v=\"121\", \"Not A(Brand\";v=\"99\""
+							},
+							{
+								"key": "sec-ch-ua-mobile",
+								"value": "?0"
+							},
+							{
+								"key": "sec-ch-ua-platform",
+								"value": "\"macOS\""
+							},
+							{
+								"key": "sec-fetch-dest",
+								"value": "empty"
+							},
+							{
+								"key": "sec-fetch-mode",
+								"value": "cors"
+							},
+							{
+								"key": "sec-fetch-site",
+								"value": "same-site"
+							},
+							{
+								"key": "user-agent",
+								"value": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36"
+							},
+							{
+								"key": "x-iec-idt",
+								"value": "1"
+							},
+							{
+								"key": "x-iec-webview",
+								"value": "1"
+							}
+						],
+						"url": {
+							"raw": "https://masa-mainportalapi.iec.co.il/api/cities",
+							"protocol": "https",
+							"host": [
+								"masa-mainportalapi",
+								"iec",
+								"co",
+								"il"
+							],
+							"path": [
+								"api",
+								"cities"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Active Volt Levels",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "authority",
+								"value": "iecapi.iec.co.il"
+							},
+							{
+								"key": "accept",
+								"value": "application/json, text/plain, */*"
+							},
+							{
+								"key": "accept-language",
+								"value": "en,he;q=0.9"
+							},
+							{
+								"key": "dnt",
+								"value": "1"
+							},
+							{
+								"key": "origin",
+								"value": "https://www.iec.co.il"
+							},
+							{
+								"key": "referer",
+								"value": "https://www.iec.co.il/"
+							},
+							{
+								"key": "sec-ch-ua",
+								"value": "\"Chromium\";v=\"121\", \"Not A(Brand\";v=\"99\""
+							},
+							{
+								"key": "sec-ch-ua-mobile",
+								"value": "?0"
+							},
+							{
+								"key": "sec-ch-ua-platform",
+								"value": "\"macOS\""
+							},
+							{
+								"key": "sec-fetch-dest",
+								"value": "empty"
+							},
+							{
+								"key": "sec-fetch-mode",
+								"value": "cors"
+							},
+							{
+								"key": "sec-fetch-site",
+								"value": "same-site"
+							},
+							{
+								"key": "user-agent",
+								"value": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36"
+							},
+							{
+								"key": "x-iec-idt",
+								"value": "1"
+							},
+							{
+								"key": "x-iec-webview",
+								"value": "1"
+							}
+						],
+						"url": {
+							"raw": "https://masaapi-wa.azurewebsites.net/api/voltLevels/active",
+							"protocol": "https",
+							"host": [
+								"masaapi-wa",
+								"azurewebsites",
+								"net"
+							],
+							"path": [
+								"api",
+								"voltLevels",
+								"active"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get User Order Titles",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "authority",
+								"value": "iecapi.iec.co.il"
+							},
+							{
+								"key": "accept",
+								"value": "application/json, text/plain, */*"
+							},
+							{
+								"key": "accept-language",
+								"value": "en,he;q=0.9"
+							},
+							{
+								"key": "dnt",
+								"value": "1"
+							},
+							{
+								"key": "origin",
+								"value": "https://www.iec.co.il"
+							},
+							{
+								"key": "referer",
+								"value": "https://www.iec.co.il/"
+							},
+							{
+								"key": "sec-ch-ua",
+								"value": "\"Chromium\";v=\"121\", \"Not A(Brand\";v=\"99\""
+							},
+							{
+								"key": "sec-ch-ua-mobile",
+								"value": "?0"
+							},
+							{
+								"key": "sec-ch-ua-platform",
+								"value": "\"macOS\""
+							},
+							{
+								"key": "sec-fetch-dest",
+								"value": "empty"
+							},
+							{
+								"key": "sec-fetch-mode",
+								"value": "cors"
+							},
+							{
+								"key": "sec-fetch-site",
+								"value": "same-site"
+							},
+							{
+								"key": "user-agent",
+								"value": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36"
+							},
+							{
+								"key": "x-iec-idt",
+								"value": "1"
+							},
+							{
+								"key": "x-iec-webview",
+								"value": "1"
+							}
+						],
+						"url": {
+							"raw": "https://masaapi-wa.azurewebsites.net/api/accounts/{{account_id}}/orders/titles",
+							"protocol": "https",
+							"host": [
+								"masaapi-wa",
+								"azurewebsites",
+								"net"
+							],
+							"path": [
+								"api",
+								"accounts",
+								"{{account_id}}",
+								"orders",
+								"titles"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Order Lookup",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "authority",
+								"value": "iecapi.iec.co.il"
+							},
+							{
+								"key": "accept",
+								"value": "application/json, text/plain, */*"
+							},
+							{
+								"key": "accept-language",
+								"value": "en,he;q=0.9"
+							},
+							{
+								"key": "dnt",
+								"value": "1"
+							},
+							{
+								"key": "origin",
+								"value": "https://www.iec.co.il"
+							},
+							{
+								"key": "referer",
+								"value": "https://www.iec.co.il/"
+							},
+							{
+								"key": "sec-ch-ua",
+								"value": "\"Chromium\";v=\"121\", \"Not A(Brand\";v=\"99\""
+							},
+							{
+								"key": "sec-ch-ua-mobile",
+								"value": "?0"
+							},
+							{
+								"key": "sec-ch-ua-platform",
+								"value": "\"macOS\""
+							},
+							{
+								"key": "sec-fetch-dest",
+								"value": "empty"
+							},
+							{
+								"key": "sec-fetch-mode",
+								"value": "cors"
+							},
+							{
+								"key": "sec-fetch-site",
+								"value": "same-site"
+							},
+							{
+								"key": "user-agent",
+								"value": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36"
+							},
+							{
+								"key": "x-iec-idt",
+								"value": "1"
+							},
+							{
+								"key": "x-iec-webview",
+								"value": "1"
+							}
+						],
+						"url": {
+							"raw": "https://masaapi-wa.azurewebsites.net/api/orderLookup",
+							"protocol": "https",
+							"host": [
+								"masaapi-wa",
+								"azurewebsites",
+								"net"
+							],
+							"path": [
+								"api",
+								"orderLookup"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get User Profile",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "authority",
+								"value": "iecapi.iec.co.il"
+							},
+							{
+								"key": "accept",
+								"value": "application/json, text/plain, */*"
+							},
+							{
+								"key": "accept-language",
+								"value": "en,he;q=0.9"
+							},
+							{
+								"key": "dnt",
+								"value": "1"
+							},
+							{
+								"key": "origin",
+								"value": "https://www.iec.co.il"
+							},
+							{
+								"key": "referer",
+								"value": "https://www.iec.co.il/"
+							},
+							{
+								"key": "sec-ch-ua",
+								"value": "\"Chromium\";v=\"121\", \"Not A(Brand\";v=\"99\""
+							},
+							{
+								"key": "sec-ch-ua-mobile",
+								"value": "?0"
+							},
+							{
+								"key": "sec-ch-ua-platform",
+								"value": "\"macOS\""
+							},
+							{
+								"key": "sec-fetch-dest",
+								"value": "empty"
+							},
+							{
+								"key": "sec-fetch-mode",
+								"value": "cors"
+							},
+							{
+								"key": "sec-fetch-site",
+								"value": "same-site"
+							},
+							{
+								"key": "user-agent",
+								"value": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36"
+							},
+							{
+								"key": "x-iec-idt",
+								"value": "1"
+							},
+							{
+								"key": "x-iec-webview",
+								"value": "1"
+							}
+						],
+						"url": {
+							"raw": "https://masa-mainportalapi.iec.co.il/api/contacts/userprofile",
+							"protocol": "https",
+							"host": [
+								"masa-mainportalapi",
+								"iec",
+								"co",
+								"il"
+							],
+							"path": [
+								"api",
+								"contacts",
+								"userprofile"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get User's Equipment",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "authority",
+								"value": "iecapi.iec.co.il"
+							},
+							{
+								"key": "accept",
+								"value": "application/json, text/plain, */*"
+							},
+							{
+								"key": "accept-language",
+								"value": "en,he;q=0.9"
+							},
+							{
+								"key": "dnt",
+								"value": "1"
+							},
+							{
+								"key": "origin",
+								"value": "https://www.iec.co.il"
+							},
+							{
+								"key": "referer",
+								"value": "https://www.iec.co.il/"
+							},
+							{
+								"key": "sec-ch-ua",
+								"value": "\"Chromium\";v=\"121\", \"Not A(Brand\";v=\"99\""
+							},
+							{
+								"key": "sec-ch-ua-mobile",
+								"value": "?0"
+							},
+							{
+								"key": "sec-ch-ua-platform",
+								"value": "\"macOS\""
+							},
+							{
+								"key": "sec-fetch-dest",
+								"value": "empty"
+							},
+							{
+								"key": "sec-fetch-mode",
+								"value": "cors"
+							},
+							{
+								"key": "sec-fetch-site",
+								"value": "same-site"
+							},
+							{
+								"key": "user-agent",
+								"value": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36"
+							},
+							{
+								"key": "x-iec-idt",
+								"value": "1"
+							},
+							{
+								"key": "x-iec-webview",
+								"value": "1"
+							}
+						],
+						"url": {
+							"raw": "https://masaapi-wa.azurewebsites.net/equipments/get?accountId={{account_id}}&pageNumber=1&pageSize=10",
+							"protocol": "https",
+							"host": [
+								"masaapi-wa",
+								"azurewebsites",
+								"net"
+							],
+							"path": [
+								"equipments",
+								"get"
+							],
+							"query": [
+								{
+									"key": "accountId",
+									"value": "{{account_id}}"
+								},
+								{
+									"key": "pageNumber",
+									"value": "1"
+								},
+								{
+									"key": "pageSize",
+									"value": "10"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Full Lookup",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "authority",
+								"value": "iecapi.iec.co.il"
+							},
+							{
+								"key": "accept",
+								"value": "application/json, text/plain, */*"
+							},
+							{
+								"key": "accept-language",
+								"value": "en,he;q=0.9"
+							},
+							{
+								"key": "dnt",
+								"value": "1"
+							},
+							{
+								"key": "origin",
+								"value": "https://www.iec.co.il"
+							},
+							{
+								"key": "referer",
+								"value": "https://www.iec.co.il/"
+							},
+							{
+								"key": "sec-ch-ua",
+								"value": "\"Chromium\";v=\"121\", \"Not A(Brand\";v=\"99\""
+							},
+							{
+								"key": "sec-ch-ua-mobile",
+								"value": "?0"
+							},
+							{
+								"key": "sec-ch-ua-platform",
+								"value": "\"macOS\""
+							},
+							{
+								"key": "sec-fetch-dest",
+								"value": "empty"
+							},
+							{
+								"key": "sec-fetch-mode",
+								"value": "cors"
+							},
+							{
+								"key": "sec-fetch-site",
+								"value": "same-site"
+							},
+							{
+								"key": "user-agent",
+								"value": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36"
+							},
+							{
+								"key": "x-iec-idt",
+								"value": "1"
+							},
+							{
+								"key": "x-iec-webview",
+								"value": "1"
+							}
+						],
+						"url": {
+							"raw": "https://masaapi-wa.azurewebsites.net/lookup/all",
+							"protocol": "https",
+							"host": [
+								"masaapi-wa",
+								"azurewebsites",
+								"net"
+							],
+							"path": [
+								"lookup",
+								"all"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Building Option",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "authority",
+								"value": "iecapi.iec.co.il"
+							},
+							{
+								"key": "accept",
+								"value": "application/json, text/plain, */*"
+							},
+							{
+								"key": "accept-language",
+								"value": "en,he;q=0.9"
+							},
+							{
+								"key": "dnt",
+								"value": "1"
+							},
+							{
+								"key": "origin",
+								"value": "https://www.iec.co.il"
+							},
+							{
+								"key": "referer",
+								"value": "https://www.iec.co.il/"
+							},
+							{
+								"key": "sec-ch-ua",
+								"value": "\"Chromium\";v=\"121\", \"Not A(Brand\";v=\"99\""
+							},
+							{
+								"key": "sec-ch-ua-mobile",
+								"value": "?0"
+							},
+							{
+								"key": "sec-ch-ua-platform",
+								"value": "\"macOS\""
+							},
+							{
+								"key": "sec-fetch-dest",
+								"value": "empty"
+							},
+							{
+								"key": "sec-fetch-mode",
+								"value": "cors"
+							},
+							{
+								"key": "sec-fetch-site",
+								"value": "same-site"
+							},
+							{
+								"key": "user-agent",
+								"value": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36"
+							},
+							{
+								"key": "x-iec-idt",
+								"value": "1"
+							},
+							{
+								"key": "x-iec-webview",
+								"value": "1"
+							}
+						],
+						"url": {
+							"raw": "https://masaapi-wa.azurewebsites.net/lookup/newConnection/buildingOptions",
+							"protocol": "https",
+							"host": [
+								"masaapi-wa",
+								"azurewebsites",
+								"net"
+							],
+							"path": [
+								"lookup",
+								"newConnection",
+								"buildingOptions"
+							]
+						}
+					},
+					"response": []
 				}
 			]
 		},
