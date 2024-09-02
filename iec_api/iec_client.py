@@ -671,6 +671,10 @@ class IecClient:
             self._masa_connection_size_map = {obj.size_type: obj.name for obj in lookup.connection_size_types}
 
         equipment = await self.get_masa_equipment_by_account(account_id)
+
+        if not equipment or len(equipment.items) < 1 or len(equipment.items[0].connections) < 1:
+            return None
+
         connection_size = equipment.items[0].connections[0].power_connection_size
 
         return self._masa_connection_size_map.get(connection_size)
