@@ -123,7 +123,9 @@ async def get_power_size(session: ClientSession, connection: str) -> float:
         await _get_connection_to_power_size(session)
 
     connection_to_power_size_map = cache[key]
-    power_size = connection_to_power_size_map[connection]
+
+    # If connection is not found, return 0
+    power_size = connection_to_power_size_map.get(connection, 0)
 
     vat = await _get_vat(session)
     return round(power_size * (1 + float(vat)), 2)

@@ -524,6 +524,9 @@ class IecClient:
 
             connection = device_details.counter_devices[0].connection_size.representative_connection_size
 
+        if 'X' not in connection: # Solve cases where the connection size is "25"
+            connection = "1X" + connection
+
         return await static_data.get_power_size(self._session, connection)
 
     async def get_usage_calculator(self) -> UsageCalculator:
