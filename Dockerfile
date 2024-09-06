@@ -1,4 +1,4 @@
-FROM python:3.12.3-slim AS base
+FROM python:3.13.0rc1-slim AS base
 
 WORKDIR /src
 
