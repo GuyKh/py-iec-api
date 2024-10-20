@@ -89,7 +89,7 @@ def parse_error_response(resp: ClientResponse, json_resp: dict[str, Any]):
     A function to parse error responses from IEC or Okta Server
     """
     logger.warning(f"Failed call: (Code {resp.status}): {resp.reason}")
-    if len(json_resp) > 0:
+    if json_resp and len(json_resp) > 0:
         if json_resp.get(RESPONSE_DESCRIPTOR_FIELD) is not None:
             login_error_response = ErrorResponseDescriptor.from_dict(json_resp.get(RESPONSE_DESCRIPTOR_FIELD))
             raise IECError(login_error_response.code, login_error_response.error)
