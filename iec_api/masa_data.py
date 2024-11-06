@@ -59,9 +59,7 @@ async def get_masa_user_profile(session: ClientSession, token: JWT) -> MasaUserP
 
     headers = commons.add_auth_bearer_to_headers(HEADERS_WITH_AUTH, token.id_token)
     # sending get request and saving the response as response object
-    response = await commons.send_get_request(
-        session=session, url=GET_MASA_USER_PROFILE_LOOKUP_URL, headers=headers
-    )
+    response = await commons.send_get_request(session=session, url=GET_MASA_USER_PROFILE_LOOKUP_URL, headers=headers)
 
     return MasaUserProfile.from_dict(response)
 
@@ -96,8 +94,9 @@ async def get_masa_order_titles(session: ClientSession, token: JWT, account_id: 
 
     headers = commons.add_auth_bearer_to_headers(HEADERS_WITH_AUTH, token.id_token)
     # sending get request and saving the response as response object
-    response = await commons.send_get_request(session=session,
-        url=GET_MASA_ORDER_TITLES_URL.format(account_id=account_id), headers=headers)
+    response = await commons.send_get_request(
+        session=session, url=GET_MASA_ORDER_TITLES_URL.format(account_id=account_id), headers=headers
+    )
 
     return GetTitleResponse.from_dict(response)
 

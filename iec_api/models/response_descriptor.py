@@ -1,4 +1,5 @@
-""" Response Descriptor """
+"""Response Descriptor"""
+
 from dataclasses import dataclass, field
 from typing import Generic, Optional, TypeVar
 

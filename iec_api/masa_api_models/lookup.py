@@ -74,6 +74,7 @@ from mashumaro import DataClassDictMixin, field_options
 #     "stateMachineForOrderStage": null
 # }
 
+
 @dataclass
 class Region(DataClassDictMixin):
     """
@@ -84,9 +85,11 @@ class Region(DataClassDictMixin):
         name (str): The name of the region.
         code (int): The code associated with the region.
     """
+
     region_id: UUID = field(metadata=field_options(alias="regionId"))
     name: str = field(metadata=field_options(alias="name"))
     code: int = field(metadata=field_options(alias="code"))
+
 
 @dataclass
 class ConnectionSizeType(DataClassDictMixin):
@@ -104,6 +107,7 @@ class ConnectionSizeType(DataClassDictMixin):
         is_enlargeable (bool): Indicates if the connection size type can be enlarged.
         is_allow_residence (Optional[bool]): Indicates if the connection size type is allowed for residential use.
     """
+
     id: UUID = field(metadata=field_options(alias="id"))
     name: str = field(metadata=field_options(alias="name"))
     size_type: int = field(metadata=field_options(alias="sizeType"))
@@ -113,6 +117,7 @@ class ConnectionSizeType(DataClassDictMixin):
     index: int = field(metadata=field_options(alias="index"))
     is_enlargeable: bool = field(metadata=field_options(alias="isEnlargeable"))
     is_allow_residence: Optional[bool] = field(metadata=field_options(alias="isAllowResidence"))
+
 
 @dataclass
 class SiteType(DataClassDictMixin):
@@ -124,9 +129,11 @@ class SiteType(DataClassDictMixin):
         value (str): The value or name of the site type.
         index (int): The index order of the site type.
     """
+
     key: int = field(metadata=field_options(alias="key"))
     value: str = field(metadata=field_options(alias="value"))
     index: int = field(metadata=field_options(alias="index"))
+
 
 @dataclass
 class OrderStatusState(DataClassDictMixin):
@@ -138,9 +145,11 @@ class OrderStatusState(DataClassDictMixin):
         value (str): The value or name of the order status.
         index (int): The index order of the order status.
     """
+
     key: int = field(metadata=field_options(alias="key"))
     value: str = field(metadata=field_options(alias="value"))
     index: int = field(metadata=field_options(alias="index"))
+
 
 @dataclass
 class ActionCode(DataClassDictMixin):
@@ -152,9 +161,11 @@ class ActionCode(DataClassDictMixin):
         value (str): The value or name of the action code.
         index (int): The index order of the action code.
     """
+
     key: int = field(metadata=field_options(alias="key"))
     value: str = field(metadata=field_options(alias="value"))
     index: int = field(metadata=field_options(alias="index"))
+
 
 @dataclass
 class PhonePrefix(DataClassDictMixin):
@@ -166,9 +177,11 @@ class PhonePrefix(DataClassDictMixin):
         value (str): The value or number of the phone prefix.
         index (int): The index order of the phone prefix.
     """
+
     key: int = field(metadata=field_options(alias="key"))
     value: str = field(metadata=field_options(alias="value"))
     index: int = field(metadata=field_options(alias="index"))
+
 
 @dataclass
 class OrderPurpose(DataClassDictMixin):
@@ -181,10 +194,12 @@ class OrderPurpose(DataClassDictMixin):
         id (UUID): The unique identifier for the order purpose.
         name (str): The name of the order purpose.
     """
+
     desc: str = field(metadata=field_options(alias="desc"))
     building_type: Optional[int] = field(metadata=field_options(alias="buildingType"))
     id: UUID = field(metadata=field_options(alias="id"))
     name: str = field(metadata=field_options(alias="name"))
+
 
 @dataclass
 class MeterSetupType(DataClassDictMixin):
@@ -197,10 +212,12 @@ class MeterSetupType(DataClassDictMixin):
         desc (str): A description of the meter setup type.
         code (str): The code associated with the meter setup type.
     """
+
     id: UUID = field(metadata=field_options(alias="id"))
     name: str = field(metadata=field_options(alias="name"))
     desc: str = field(metadata=field_options(alias="desc"))
     code: str = field(metadata=field_options(alias="code"))
+
 
 @dataclass
 class GetLookupResponse(DataClassDictMixin):
@@ -218,6 +235,7 @@ class GetLookupResponse(DataClassDictMixin):
         meter_setup_types (List[MeterSetupType]): A list of meter setup types.
         state_machine_for_order_stage (Optional[str]): A placeholder for the state machine for order stages.
     """
+
     regions: List[Region] = field(metadata=field_options(alias="regions"))
     connection_size_types: List[ConnectionSizeType] = field(metadata=field_options(alias="connectionSizeTypes"))
     site_types: List[SiteType] = field(metadata=field_options(alias="siteTypes"))

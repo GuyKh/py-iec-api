@@ -17,5 +17,5 @@ class CommonsTest(unittest.TestCase):
         self.assertFalse(iec_api.commons.is_valid_israeli_id(user_id), "Israeli ID should be invalid")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

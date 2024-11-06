@@ -113,6 +113,7 @@ from mashumaro import DataClassDictMixin, field_options
 #     ]
 # }
 
+
 @dataclass
 class OrderPurpose(DataClassDictMixin):
     """
@@ -124,10 +125,12 @@ class OrderPurpose(DataClassDictMixin):
         id (UUID): The unique identifier for the order purpose.
         name (str): The name of the order purpose.
     """
+
     desc: str = field(metadata=field_options(alias="desc"))
     building_type: int = field(metadata=field_options(alias="buildingType"))
     id: UUID = field(metadata=field_options(alias="id"))
     name: str = field(metadata=field_options(alias="name"))
+
 
 @dataclass
 class ConnectionSize(DataClassDictMixin):
@@ -138,8 +141,10 @@ class ConnectionSize(DataClassDictMixin):
         id (UUID): The unique identifier for the connection size.
         name (str): The name of the connection size, typically including phase and amperage details.
     """
+
     id: UUID = field(metadata=field_options(alias="id"))
     name: str = field(metadata=field_options(alias="name"))
+
 
 @dataclass
 class ResidenceOption(DataClassDictMixin):
@@ -150,8 +155,10 @@ class ResidenceOption(DataClassDictMixin):
         order_purpose (OrderPurpose): The purpose of the order for a residential option.
         connection_sizes (List[ConnectionSize]): A list of connection sizes available for this residential option.
     """
+
     order_purpose: OrderPurpose = field(metadata=field_options(alias="orderPurpose"))
     connection_sizes: List[ConnectionSize] = field(metadata=field_options(alias="connectionSizes"))
+
 
 @dataclass
 class CommercialOption(DataClassDictMixin):
@@ -162,8 +169,10 @@ class CommercialOption(DataClassDictMixin):
         order_purpose (OrderPurpose): The purpose of the order for a commercial option.
         connection_sizes (List[ConnectionSize]): A list of connection sizes available for this commercial option.
     """
+
     order_purpose: OrderPurpose = field(metadata=field_options(alias="orderPurpose"))
     connection_sizes: List[ConnectionSize] = field(metadata=field_options(alias="connectionSizes"))
+
 
 @dataclass
 class TempOption(DataClassDictMixin):
@@ -174,8 +183,10 @@ class TempOption(DataClassDictMixin):
         order_purpose (OrderPurpose): The purpose of the order for a temporary option.
         connection_sizes (List[ConnectionSize]): A list of connection sizes available for this temporary option.
     """
+
     order_purpose: OrderPurpose = field(metadata=field_options(alias="orderPurpose"))
     connection_sizes: List[ConnectionSize] = field(metadata=field_options(alias="connectionSizes"))
+
 
 @dataclass
 class OptionSizeType(DataClassDictMixin):
@@ -186,8 +197,10 @@ class OptionSizeType(DataClassDictMixin):
         id (UUID): The unique identifier for the size type.
         name (str): The name of the size type, typically including phase and amperage details.
     """
+
     id: UUID = field(metadata=field_options(alias="id"))
     name: str = field(metadata=field_options(alias="name"))
+
 
 @dataclass
 class GetBuildingOptionsResponse(DataClassDictMixin):
@@ -204,6 +217,7 @@ class GetBuildingOptionsResponse(DataClassDictMixin):
         public_size_types (List[OptionSizeType]): A list of size types available for public buildings.
         parking_size_types (List[OptionSizeType]): A list of size types available for parking facilities.
     """
+
     residence_options: List[ResidenceOption] = field(metadata=field_options(alias="residenceOptions"))
     commercial_options: List[CommercialOption] = field(metadata=field_options(alias="commercialOptions"))
     temp_options: List[TempOption] = field(metadata=field_options(alias="tempOptions"))

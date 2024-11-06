@@ -37,16 +37,20 @@ class DeviceType(DataClassDictMixin):
     """Device dataclass."""
 
     device_number: str = field(metadata=field_options(alias="deviceNumber"))
-    device_balance: Optional[int] = field(metadata=field_options(alias="deviceBalance"))
     device_type: int = field(metadata=field_options(alias="deviceType"))
-    estimated_days_by_week: Optional[int] = field(metadata=field_options(alias="estimatedDaysByWeek"))
-    average_usage_cost_by_week: Optional[int] = field(metadata=field_options(alias="averageUsageCostByWeek"))
-    estimated_days_by_month: Optional[int] = field(metadata=field_options(alias="estimatedDaysByMonth"))
-    average_usage_cost_by_month: Optional[int] = field(metadata=field_options(alias="averageUsageCostByMonth"))
-    balance_time: Optional[str] = field(metadata=field_options(alias="balanceTime"))
-    balance_date: Optional[str] = field(metadata=field_options(alias="balanceDate"))
     is_active: bool = field(metadata=field_options(alias="isActive"))
     number_of_devices: int = field(metadata=field_options(alias="numberOfDevices"))
+    device_balance: Optional[int] = field(default=None, metadata=field_options(alias="deviceBalance"))
+    estimated_days_by_week: Optional[int] = field(default=None, metadata=field_options(alias="estimatedDaysByWeek"))
+    average_usage_cost_by_week: Optional[int] = field(
+        default=None, metadata=field_options(alias="averageUsageCostByWeek")
+    )
+    estimated_days_by_month: Optional[int] = field(default=None, metadata=field_options(alias="estimatedDaysByMonth"))
+    average_usage_cost_by_month: Optional[int] = field(
+        default=None, metadata=field_options(alias="averageUsageCostByMonth")
+    )
+    balance_time: Optional[str] = field(default=None, metadata=field_options(alias="balanceTime"))
+    balance_date: Optional[str] = field(default=None, metadata=field_options(alias="balanceDate"))
 
 
 decoder = BasicDecoder(ResponseWithDescriptor[DeviceType])

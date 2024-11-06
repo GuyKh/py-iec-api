@@ -276,7 +276,7 @@ class IecClient:
         email: str,
         contract_id: Optional[str | int] = None,
         device_id: Optional[str | int] = None,
-        device_code: Optional[str | int] = None
+        device_code: Optional[str | int] = None,
     ) -> bool:
         """
         Send Consumption Report to Mail
@@ -302,7 +302,6 @@ class IecClient:
 
         assert device_id, "Device ID must be provided"
 
-
         if not device_code:
             devices = await self.get_devices()
 
@@ -311,9 +310,9 @@ class IecClient:
 
         assert device_code, "Device Code must be provided"
 
-        return await data.send_consumption_report_to_mail(self._session, self._token, contract_id, email, device_code,
-            device_id)
-
+        return await data.send_consumption_report_to_mail(
+            self._session, self._token, contract_id, email, device_code, device_id
+        )
 
     async def get_devices(self, contract_id: Optional[str] = None) -> Optional[List[Device]]:
         """
@@ -524,7 +523,7 @@ class IecClient:
 
             connection = device_details.counter_devices[0].connection_size.representative_connection_size
 
-        if 'X' not in connection: # Solve cases where the connection size is "25"
+        if "X" not in connection:  # Solve cases where the connection size is "25"
             connection = "1X" + connection
 
         return await static_data.get_power_size(self._session, connection)

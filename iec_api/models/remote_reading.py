@@ -1,4 +1,4 @@
-""" Remote Reading model. """
+"""Remote Reading model."""
 
 # Request:
 # curl 'https://iecapi.iec.co.il//api/Consumption/RemoteReadingRange' \
@@ -49,9 +49,9 @@ class RemoteReadingRequest(DataClassDictMixin):
 
     meter_serial_number: str = field(metadata=field_options(alias="meterSerialNumber"))
     meter_code: str = field(metadata=field_options(alias="meterCode"))
-    last_invoice_date: str = field(metadata=field_options(alias="lastInvoiceDate"))
     from_date: str = field(metadata=field_options(alias="fromDate"))
     resolution: ReadingResolution = field(metadata=field_options(alias="resolution"))
+    last_invoice_date: Optional[str] = field(default=None, metadata=field_options(alias="lastInvoiceDate"))
 
     class Config(BaseConfig):
         serialize_by_alias = True
@@ -61,11 +61,11 @@ class RemoteReadingRequest(DataClassDictMixin):
 class FutureConsumptionInfo(DataClassDictMixin):
     """Future Consumption Info dataclass."""
 
-    last_invoice_date: Optional[str] = field(metadata=field_options(alias="lastInvoiceDate"))
-    current_date: Optional[date] = field(metadata=field_options(alias="currentDate"))
-    future_consumption: Optional[float] = field(metadata=field_options(alias="futureConsumption"))
-    total_import: Optional[float] = field(metadata=field_options(alias="totalImport"))
-    total_import_date: Optional[date] = field(metadata=field_options(alias="totalImportDate"))
+    last_invoice_date: Optional[str] = field(default=None, metadata=field_options(alias="lastInvoiceDate"))
+    current_date: Optional[date] = field(default=None, metadata=field_options(alias="currentDate"))
+    future_consumption: Optional[float] = field(default=None, metadata=field_options(alias="futureConsumption"))
+    total_import: Optional[float] = field(default=None, metadata=field_options(alias="totalImport"))
+    total_import_date: Optional[date] = field(default=None, metadata=field_options(alias="totalImportDate"))
 
 
 @dataclass
@@ -92,10 +92,14 @@ class RemoteReadingResponse(DataClassDictMixin):
 
     status: int
     future_consumption_info: FutureConsumptionInfo = field(metadata=field_options(alias="futureConsumptionInfo"))
-    from_date: Optional[date] = field(metadata=field_options(alias="fromDate"))
-    to_date: Optional[date] = field(metadata=field_options(alias="toDate"))
-    total_consumption_for_period: Optional[float] = field(metadata=field_options(alias="totalConsumptionForPeriod"))
-    total_import_date_for_period: Optional[date] = field(metadata=field_options(alias="totalImportDateForPeriod"))
-    meter_start_date: Optional[date] = field(metadata=field_options(alias="meterStartDate"))
-    total_import: Optional[float] = field(metadata=field_options(alias="totalImport"))
     data: list[RemoteReading]
+    from_date: Optional[date] = field(default=None, metadata=field_options(alias="fromDate"))
+    to_date: Optional[date] = field(default=None, metadata=field_options(alias="toDate"))
+    total_consumption_for_period: Optional[float] = field(
+        default=None, metadata=field_options(alias="totalConsumptionForPeriod")
+    )
+    total_import_date_for_period: Optional[date] = field(
+        default=None, metadata=field_options(alias="totalImportDateForPeriod")
+    )
+    meter_start_date: Optional[date] = field(default=None, metadata=field_options(alias="meterStartDate"))
+    total_import: Optional[float] = field(default=None, metadata=field_options(alias="totalImport"))

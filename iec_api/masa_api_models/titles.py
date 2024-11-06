@@ -9,6 +9,7 @@ from mashumaro import DataClassDictMixin, field_options
 #
 # {"orders":[],"id":"ebee08af-9972-e811-8106-3863bb358f68"}
 
+
 @dataclass
 class Order(DataClassDictMixin):
     """
@@ -17,6 +18,7 @@ class Order(DataClassDictMixin):
     Attributes:
         ?
     """
+
 
 @dataclass
 class GetTitleResponse(DataClassDictMixin):
@@ -27,6 +29,6 @@ class GetTitleResponse(DataClassDictMixin):
         id (UUID): id
         orders (List[Order]) : list of orders
     """
+
     id: UUID = field(metadata=field_options(alias="id"))
     orders: List[Order] = field(metadata=field_options(alias="orders"))
-

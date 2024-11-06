@@ -71,6 +71,7 @@ def is_valid_israeli_id(id_number: str | int) -> bool:
         == 0
     )
 
+
 def is_json(s: str):
     try:
         json.loads(s)

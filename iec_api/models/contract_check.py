@@ -59,7 +59,7 @@ class ContractCheck(DataClassDictMixin):
     is_private: str = field(metadata=field_options(alias="isPrivate"))  # "X" if private producer
     has_direct_debit: bool = field(metadata=field_options(alias="hasDirectDebit"))
     is_matam: bool = field(metadata=field_options(alias="isMatam"))
-    frequency: Optional[InvoiceFrequency] = field(metadata=field_options(alias="frequency"))
+    frequency: Optional[InvoiceFrequency] = field(default=None, metadata=field_options(alias="frequency"))
 
 
 decoder = BasicDecoder(ResponseWithDescriptor[ContractCheck])

@@ -36,11 +36,11 @@ class Account(DataClassDictMixin):
     account_number: str = field(metadata=field_options(alias="accountNumber"))
     account_type: int = field(metadata=field_options(alias="accountType"))
     id: UUID
-    email: Optional[str]
-    telephone: Optional[str]
     government_number: str = field(metadata=field_options(alias="governmentNumber"))
     name: str
     view_type_code: int = field(metadata=field_options(alias="viewTypeCode"))
+    email: Optional[str] = field(default=None, metadata=field_options(alias="email"))
+    telephone: Optional[str] = field(default=None, metadata=field_options(alias="telephone"))
 
 
 decoder = BasicDecoder(ResponseWithDescriptor[list[Account]])

@@ -1,4 +1,5 @@
-""" IEC Login Module. """
+"""IEC Login Module."""
+
 import json
 import logging
 import random

@@ -74,8 +74,10 @@ class VoltLevel(DataClassDictMixin):
         id (Optional[str]): The ID of the voltage level.
         name (Optional[str]): The name of the voltage level.
     """
+
     id: Optional[str] = field(metadata=field_options(alias="id"))
     name: Optional[str] = field(metadata=field_options(alias="name"))
+
 
 @dataclass
 class Connection(DataClassDictMixin):
@@ -97,6 +99,7 @@ class Connection(DataClassDictMixin):
         current_ampere (Optional[str]): The current ampere value.
         current_volt_level (VoltLevel): The voltage level details of the connection.
     """
+
     connection_id: UUID = field(metadata=field_options(alias="connectionId"))
     connection_number: str = field(metadata=field_options(alias="connectionNumber"))
     has_open_orders: bool = field(metadata=field_options(alias="hasOpenOrders"))
@@ -110,6 +113,7 @@ class Connection(DataClassDictMixin):
     current_reader: str = field(metadata=field_options(alias="currentReader"))
     current_ampere: Optional[str] = field(metadata=field_options(alias="currentAmpere"))
     current_volt_level: VoltLevel = field(metadata=field_options(alias="currentVoltLevel"))
+
 
 @dataclass
 class Building(DataClassDictMixin):
@@ -126,6 +130,7 @@ class Building(DataClassDictMixin):
         is_residential_building (bool): Indicates if the building is residential.
         num_of_related_sites_int (int): The number of related sites within the building.
     """
+
     id: UUID = field(metadata=field_options(alias="id"))
     name: str = field(metadata=field_options(alias="name"))
     has_sa_orders: Optional[str] = field(metadata=field_options(alias="hasSAOrders"))
@@ -134,6 +139,7 @@ class Building(DataClassDictMixin):
     is_max_public_sites_sum: bool = field(metadata=field_options(alias="isMaxPublicSitesSum"))
     is_residential_building: bool = field(metadata=field_options(alias="isResidentialBuilding"))
     num_of_related_sites_int: int = field(metadata=field_options(alias="numOfRelatedSitesInt"))
+
 
 @dataclass
 class Item(DataClassDictMixin):
@@ -158,6 +164,7 @@ class Item(DataClassDictMixin):
         backupline_order (Optional[str]): The backupline order associated with the account.
         has_backupline_orders (bool): Indicates if the account has backupline orders.
     """
+
     account_id: UUID = field(metadata=field_options(alias="accountId"))
     account_type: int = field(metadata=field_options(alias="accountType"))
     account_name: str = field(metadata=field_options(alias="accountName"))
@@ -175,6 +182,7 @@ class Item(DataClassDictMixin):
     backupline_order: Optional[str] = field(metadata=field_options(alias="backuplineOrder"))
     has_backupline_orders: bool = field(metadata=field_options(alias="hasBackuplineOrders"))
 
+
 @dataclass
 class GetEquipmentResponse(DataClassDictMixin):
     """
@@ -188,6 +196,7 @@ class GetEquipmentResponse(DataClassDictMixin):
         page_cookie (int): A cookie value for pagination.
         items (List[Item]): A list of account items included in the response.
     """
+
     page_size: int = field(metadata=field_options(alias="pageSize"))
     page_number: int = field(metadata=field_options(alias="pageNumber"))
     more_records: bool = field(metadata=field_options(alias="moreRecords"))
