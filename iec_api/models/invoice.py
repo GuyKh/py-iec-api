@@ -65,12 +65,6 @@ class Invoice(DataClassDictMixin):
     invoice_id: int = field(metadata=field_options(alias="invoiceId"))
     contract_number: int = field(metadata=field_options(alias="contractNumber"))
     order_number: int = field(metadata=field_options(alias="orderNumber"))
-    full_date: Optional[datetime] = field(default=None, metadata=field_options(alias="fullDate"))
-    from_date: Optional[datetime] = field(default=None, metadata=field_options(alias="fromDate"))
-    to_date: Optional[datetime] = field(default=None, metadata=field_options(alias="toDate"))
-    last_date: Optional[date] = field(
-        default=None, metadata=field_options(alias="lastDate", serialization_strategy=FormattedDate("%d/%m/%Y"))
-    )
     invoice_payment_status: int = field(metadata=field_options(alias="invoicePaymentStatus"))
     document_id: str = field(metadata=field_options(alias="documentID"))
     days_period: str = field(metadata=field_options(alias="daysPeriod"))
@@ -81,6 +75,12 @@ class Invoice(DataClassDictMixin):
     consumption: int = field(metadata=field_options(alias="consumption"), default=0)
     meter_readings: list[MeterReading] = field(
         metadata=field_options(alias="meterReadings"), default_factory=lambda: []
+    )
+    full_date: Optional[datetime] = field(default=None, metadata=field_options(alias="fullDate"))
+    from_date: Optional[datetime] = field(default=None, metadata=field_options(alias="fromDate"))
+    to_date: Optional[datetime] = field(default=None, metadata=field_options(alias="toDate"))
+    last_date: Optional[date] = field(
+        default=None, metadata=field_options(alias="lastDate", serialization_strategy=FormattedDate("%d/%m/%Y"))
     )
 
     @classmethod
