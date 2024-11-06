@@ -2,6 +2,7 @@
 
 from dataclasses import dataclass, field
 from datetime import datetime
+from typing import Optional
 
 from mashumaro import DataClassDictMixin, field_options
 from mashumaro.codecs import BasicDecoder
@@ -44,10 +45,10 @@ class MeterReading(DataClassDictMixin):
     """Meter Reading dataclass."""
 
     reading: int = field(metadata=field_options(alias="reading"))
-    reading_code: str = field(metadata=field_options(alias="readingCode"))
     reading_date: datetime = field(metadata=field_options(alias="readingDate"))
-    usage: str
     serial_number: str = field(metadata=field_options(alias="serialNumber"))
+    reading_code: Optional[str] = field(default=None, metadata=field_options(alias="readingCode"))
+    usage: Optional[str] = field(default=None, metadata=field_options(alias="usage"))
 
     @classmethod
     def __post_deserialize__(cls, obj: "MeterReading") -> "MeterReading":
