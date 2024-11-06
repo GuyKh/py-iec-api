@@ -27,9 +27,11 @@ class OrderCategory(DataClassDictMixin):
         type_code_int (int): The type code associated with the order category.
         id (UUID): The unique identifier for the order category.
     """
+
     name: str = field(metadata=field_options(alias="name"))
     type_code_int: int = field(metadata=field_options(alias="typeCodeInt"))
     id: UUID = field(metadata=field_options(alias="id"))
+
 
 @dataclass
 class OrderLookupResponse(DataClassDictMixin):
@@ -39,4 +41,5 @@ class OrderLookupResponse(DataClassDictMixin):
     Attributes:
         order_categories (List[OrderCategory]): A list of order categories.
     """
+
     order_categories: List[OrderCategory] = field(metadata=field_options(alias="orderCategories"))

@@ -29,6 +29,7 @@ from mashumaro import DataClassDictMixin, field_options
 #     ]
 # }
 
+
 @dataclass
 class VoltLevel(DataClassDictMixin):
     """
@@ -40,10 +41,12 @@ class VoltLevel(DataClassDictMixin):
         max_volt_level (int): The maximum voltage level.
         id (UUID): The unique identifier for the voltage level.
     """
+
     name: str = field(metadata=field_options(alias="name"))
     min_volt_level: int = field(metadata=field_options(alias="minVoltLevel"))
     max_volt_level: int = field(metadata=field_options(alias="maxVoltLevel"))
     id: UUID = field(metadata=field_options(alias="id"))
+
 
 @dataclass
 class VoltLevelsResponse(DataClassDictMixin):
@@ -53,4 +56,5 @@ class VoltLevelsResponse(DataClassDictMixin):
     Attributes:
         data_collection (List[VoltLevel]): A list of voltage levels.
     """
+
     data_collection: List[VoltLevel] = field(metadata=field_options(alias="dataCollection"))

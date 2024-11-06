@@ -29,6 +29,7 @@ from mashumaro import DataClassDictMixin, field_options
 #     ]
 # }
 
+
 @dataclass
 class Area(DataClassDictMixin):
     """
@@ -40,10 +41,12 @@ class Area(DataClassDictMixin):
         id (UUID): The unique identifier for the area.
         logical_name (str): The logical name of the area entity.
     """
+
     name: str = field(metadata=field_options(alias="name"))
     shoval_area_code: int = field(metadata=field_options(alias="shovalAreaCode"))
     id: UUID = field(metadata=field_options(alias="id"))
     logical_name: str = field(metadata=field_options(alias="logicalName"))
+
 
 @dataclass
 class Region(DataClassDictMixin):
@@ -56,10 +59,12 @@ class Region(DataClassDictMixin):
         id (UUID): The unique identifier for the region.
         logical_name (str): The logical name of the region entity.
     """
+
     name: str = field(metadata=field_options(alias="name"))
     shoval_region_code: int = field(metadata=field_options(alias="shovalRegionCode"))
     id: UUID = field(metadata=field_options(alias="id"))
     logical_name: str = field(metadata=field_options(alias="logicalName"))
+
 
 @dataclass
 class City(DataClassDictMixin):
@@ -74,12 +79,14 @@ class City(DataClassDictMixin):
         id (UUID): The unique identifier for the city.
         logical_name (str): The logical name of the city entity.
     """
+
     area: Area = field(metadata=field_options(alias="area"))
     region: Region = field(metadata=field_options(alias="region"))
     name: str = field(metadata=field_options(alias="name"))
     shoval_city_code: str = field(metadata=field_options(alias="shovalCityCode"))
     id: UUID = field(metadata=field_options(alias="id"))
     logical_name: str = field(metadata=field_options(alias="logicalName"))
+
 
 @dataclass
 class CitiesResponse(DataClassDictMixin):
@@ -89,4 +96,5 @@ class CitiesResponse(DataClassDictMixin):
     Attributes:
         data_collection (List[City]): A list of cities.
     """
+
     data_collection: List[City] = field(metadata=field_options(alias="dataCollection"))

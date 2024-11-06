@@ -292,8 +292,8 @@ async def get_invoice_pdf(
 
 
 async def send_consumption_report_to_mail(
-    session: ClientSession, token: JWT, contract_id: int | str, email: str , device_code: int | str,
-    device_id: int | str) -> bool:
+    session: ClientSession, token: JWT, contract_id: int | str, email: str, device_code: int | str, device_id: int | str
+) -> bool:
     """Send Consumption Report to Mail from IEC API."""
     headers = commons.add_auth_bearer_to_headers(HEADERS_WITH_AUTH, token.id_token)
 
@@ -301,8 +301,10 @@ async def send_consumption_report_to_mail(
         email=email, device_code=str(device_code), device_id=str(device_id)
     ).to_dict()
     response = await commons.send_non_json_post_request(
-        session, url=SEND_CONSUMPTION_REPORT_TO_MAIL_URL.format(contract_id=contract_id), headers=headers,
-        json_data=request
+        session,
+        url=SEND_CONSUMPTION_REPORT_TO_MAIL_URL.format(contract_id=contract_id),
+        headers=headers,
+        json_data=request,
     )
     return await bool(response.read())
 

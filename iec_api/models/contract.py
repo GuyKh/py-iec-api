@@ -1,4 +1,4 @@
-""" Contract model. """
+"""Contract model."""
 
 from dataclasses import dataclass, field
 from datetime import date

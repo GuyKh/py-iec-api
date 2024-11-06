@@ -47,9 +47,9 @@ class DeviceDetails(DataClassDictMixin):
 class DeviceIdentity(DataClassDictMixin):
     """Devices dataclass."""
 
-    device_details: Optional[list[DeviceDetails]] = field(metadata=field_options(alias="devicesDetails"))
     last_date: datetime = field(metadata=field_options(alias="lastDate"))
     is_private_producer: bool = field(metadata=field_options(alias="privateProducer"))
+    device_details: Optional[list[DeviceDetails]] = field(default=None, metadata=field_options(alias="devicesDetails"))
 
 
 decoder = BasicDecoder(ResponseWithDescriptor[DeviceIdentity])

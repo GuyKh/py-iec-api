@@ -51,10 +51,10 @@ from iec_api.models.response_descriptor import ResponseWithDescriptor
 class Device(DataClassDictMixin):
     """Device dataclass."""
 
-    device_type: Optional[int] = field(metadata=field_options(alias="deviceType"))
-    device_number: Optional[str] = field(metadata=field_options(alias="deviceNumber"))
-    device_code: Optional[str] = field(metadata=field_options(alias="deviceCode"))
     is_active: bool = field(metadata=field_options(alias="isActive"))
+    device_type: Optional[int] = field(default=None, metadata=field_options(alias="deviceType"))
+    device_number: Optional[str] = field(default=None, metadata=field_options(alias="deviceNumber"))
+    device_code: Optional[str] = field(default=None, metadata=field_options(alias="deviceCode"))
 
 
 @dataclass
@@ -73,18 +73,18 @@ class CounterDevice(DataClassDictMixin):
     device: str = field(metadata=field_options(alias="device"))
     register: str = field(metadata=field_options(alias="register"))
     last_mr: str = field(metadata=field_options(alias="lastMR"))
-    last_mr_date: Optional[date] = field(metadata=field_options(alias="lastMRDate"))
     last_mr_type: str = field(metadata=field_options(alias="lastMRType"))
     last_mr_type_desc: str = field(metadata=field_options(alias="lastMRTypeDesc"))
     connection_size: ConnectionSize = field(metadata=field_options(alias="connectionSize"))
+    last_mr_date: Optional[date] = field(default=None, metadata=field_options(alias="lastMRDate"))
 
 
 @dataclass
 class Devices(DataClassDictMixin):
     """Devices dataclass."""
 
-    counter_devices: Optional[list[CounterDevice]] = field(metadata=field_options(alias="counterDevices"))
     mr_type: str = field(metadata=field_options(alias="mrType"))
+    counter_devices: Optional[list[CounterDevice]] = field(default=None, metadata=field_options(alias="counterDevices"))
 
 
 decoder = BasicDecoder(ResponseWithDescriptor[Devices])

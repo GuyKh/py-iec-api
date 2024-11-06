@@ -1,4 +1,5 @@
-""" Error response object """
+"""Error response object"""
+
 from dataclasses import dataclass, field
 
 from mashumaro import DataClassDictMixin, field_options

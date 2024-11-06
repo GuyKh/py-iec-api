@@ -5,7 +5,8 @@ from mashumaro import DataClassDictMixin
 
 @dataclass
 class JWT(DataClassDictMixin):
-    """ Okta JWT Token """
+    """Okta JWT Token"""
+
     access_token: str
     refresh_token: str
     token_type: str

@@ -1,4 +1,5 @@
-""" Meter Reading model. """
+"""Meter Reading model."""
+
 from dataclasses import dataclass, field
 from datetime import datetime
 

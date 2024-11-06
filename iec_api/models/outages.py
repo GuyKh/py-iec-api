@@ -1,4 +1,5 @@
-""" Outages model. """
+"""Outages model."""
+
 from dataclasses import dataclass, field
 from datetime import datetime
 from typing import List, Optional
@@ -102,12 +103,14 @@ class Disconnect(DataClassDictMixin):
     """Disconnect dataclass."""
 
     id: UUID = field(metadata=field_options(alias="id"))
-    estimate_treatment_date: Optional[datetime] = field(metadata=field_options(alias="estimateTreatmentDate"))
-    energized_date: Optional[str] = field(metadata=field_options(alias="energizedDate"))
-    disconnect_key: Optional[str] = field(metadata=field_options(alias="disconnectKey"))
-    disconnect_type: Optional[DisconnectType] = field(metadata=field_options(alias="disconnectType"))
+    estimate_treatment_date: Optional[datetime] = field(
+        default=None, metadata=field_options(alias="estimateTreatmentDate")
+    )
+    energized_date: Optional[str] = field(default=None, metadata=field_options(alias="energizedDate"))
+    disconnect_key: Optional[str] = field(default=None, metadata=field_options(alias="disconnectKey"))
+    disconnect_type: Optional[DisconnectType] = field(default=None, metadata=field_options(alias="disconnectType"))
     disconnect_treatment_state: Optional[DisconnectTreatmentState] = field(
-        metadata=field_options(alias="disconnectTreatmentState")
+        default=None, metadata=field_options(alias="disconnectTreatmentState")
     )
 
 
@@ -155,8 +158,8 @@ class Site(DataClassDictMixin):
     contract_number: str = field(metadata=field_options(alias="contractNumber"))
     address: OutageAddressFull = field(metadata=field_options(alias="address"))
     id: UUID = field(metadata=field_options(alias="id"))
-    x: Optional[float] = field(metadata=field_options(alias="x"))
-    y: Optional[float] = field(metadata=field_options(alias="y"))
+    x: Optional[float] = field(default=None, metadata=field_options(alias="x"))
+    y: Optional[float] = field(default=None, metadata=field_options(alias="y"))
 
 
 @dataclass

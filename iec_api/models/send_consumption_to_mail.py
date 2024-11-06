@@ -15,7 +15,6 @@ from mashumaro.config import BaseConfig
 #
 
 
-
 @dataclass
 class SendConsumptionReportToMailRequest(DataClassDictMixin):
     """

@@ -1,4 +1,4 @@
-""" Customer model. """
+"""Customer model."""
 
 # URL:
 # POST https://iecapi.iec.co.il/api/customer
