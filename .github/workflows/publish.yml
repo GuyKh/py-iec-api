@@ -1,29 +1,97 @@
-name: Release to PyPi.org
+name: release
+
 on:
-  release:
-    types: [published]
+    push:
+        tags:
+            - "[0-9]+.[0-9]+.[0-9]+"
+            - "[0-9]+.[0-9]+.[0-9]+a[0-9]+"
+            - "[0-9]+.[0-9]+.[0-9]+b[0-9]+"
+            - "[0-9]+.[0-9]+.[0-9]+rc[0-9]+"
+
+env:
+    PACKAGE_NAME: "iec-api"
+    OWNER: "GuyKh"
 
 jobs:
-  publish:
-    strategy:
-      fail-fast: false
-      matrix:
-        python-version: [3.11]
-        poetry-version: [1.7.1]
-        os: [ubuntu-latest]
-    runs-on: ${{ matrix.os }}
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with:
-          python-version: ${{ matrix.python-version }}
-      - name: Run image
-        uses: abatilo/actions-poetry@v3
-        with:
-          poetry-version: ${{ matrix.poetry-version }}
-      - name: Publish
-        env:
-          PYPI_TOKEN: ${{ secrets.PYPI_API_TOKEN }}
-        run: |
-          poetry config pypi-token.pypi $PYPI_TOKEN
-          poetry publish --build
+    details:
+        runs-on: ubuntu-latest
+        outputs:
+            new_version: ${{ steps.release.outputs.new_version }}
+            suffix: ${{ steps.release.outputs.suffix }}
+            tag_name: ${{ steps.release.outputs.tag_name }}
+        steps:
+            - uses: actions/checkout@v2
+
+            - name: Extract tag and Details
+              id: release
+              run: |
+                  if [ "${{ github.ref_type }}" = "tag" ]; then
+                    TAG_NAME=${GITHUB_REF#refs/tags/}
+                    NEW_VERSION=$(echo $TAG_NAME | awk -F'-' '{print $1}')
+                    SUFFIX=$(echo $TAG_NAME | grep -oP '[a-z]+[0-9]+' || echo "")
+                    echo "new_version=$NEW_VERSION" >> "$GITHUB_OUTPUT"
+                    echo "suffix=$SUFFIX" >> "$GITHUB_OUTPUT"
+                    echo "tag_name=$TAG_NAME" >> "$GITHUB_OUTPUT"
+                    echo "Version is $NEW_VERSION"
+                    echo "Suffix is $SUFFIX"
+                    echo "Tag name is $TAG_NAME"
+                  else
+                    echo "No tag found"
+                    exit 1
+                  fi
+
+    check_pypi:
+        needs: details
+        runs-on: ubuntu-latest
+        steps:
+            - name: Fetch information from PyPI
+              run: |
+                  response=$(curl -s https://pypi.org/pypi/${{ env.PACKAGE_NAME }}/json || echo "{}")
+                  latest_previous_version=$(echo $response | grep -oP '"releases":\{"\K[^"]+' | sort -rV | head -n 1)
+                  if [ -z "$latest_previous_version" ]; then
+                    echo "Package not found on PyPI."
+                    latest_previous_version="0.0.0"
+                  fi
+                  echo "Latest version on PyPI: $latest_previous_version"
+                  echo "latest_previous_version=$latest_previous_version" >> $GITHUB_ENV
+
+            - name: Compare versions and exit if not newer
+              run: |
+                  NEW_VERSION=${{ needs.details.outputs.new_version }}
+                  LATEST_VERSION=$latest_previous_version
+                  if [ "$(printf '%s\n' "$LATEST_VERSION" "$NEW_VERSION" | sort -rV | head -n 1)" != "$NEW_VERSION" ] || [ "$NEW_VERSION" == "$LATEST_VERSION" ]; then
+                    echo "The new version $NEW_VERSION is not greater than the latest version $LATEST_VERSION on PyPI."
+                    exit 1
+                  else
+                    echo "The new version $NEW_VERSION is greater than the latest version $LATEST_VERSION on PyPI."
+                  fi
+
+    setup_and_build:
+        needs: [details, check_pypi]
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v2
+
+            - name: Set up Python
+              uses: actions/setup-python@v4
+              with:
+                  python-version: "3.11"
+
+            - name: Install Poetry
+              run: |
+                  curl -sSL https://install.python-poetry.org | python3 -
+                  echo "$HOME/.local/bin" >> $GITHUB_PATH
+
+            - name: Set project version with Poetry
+              run: |
+                  poetry version ${{ needs.details.outputs.new_version }}
+
+            - name: Install dependencies
+              run: poetry install --sync --no-interaction
+
+            - name: Build source publish
+              env:
+                  PYPI_TOKEN: ${{ secrets.PYPI_API_TOKEN }}
+              run: |
+                  poetry config pypi-token.pypi $PYPI_TOKEN
+                  poetry publish --build
