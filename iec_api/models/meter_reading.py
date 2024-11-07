@@ -44,9 +44,9 @@ from iec_api.models.response_descriptor import ResponseWithDescriptor
 class MeterReading(DataClassDictMixin):
     """Meter Reading dataclass."""
 
-    reading: int = field(metadata=field_options(alias="reading"))
-    reading_date: datetime = field(metadata=field_options(alias="readingDate"))
-    serial_number: str = field(metadata=field_options(alias="serialNumber"))
+    reading: Optional[int] = field(default=None, metadata=field_options(alias="reading"))
+    reading_date: Optional[datetime] = field(default=None, metadata=field_options(alias="readingDate"))
+    serial_number: Optional[str] = field(default=None, metadata=field_options(alias="serialNumber"))
     reading_code: Optional[str] = field(default=None, metadata=field_options(alias="readingCode"))
     usage: Optional[str] = field(default=None, metadata=field_options(alias="usage"))
 
