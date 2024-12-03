@@ -12,7 +12,7 @@ class ResponseDescriptor(DataClassDictMixin):
 
     is_success: bool = field(metadata=field_options(alias="isSuccess"))
     code: Optional[str]
-    description: Optional[str]
+    description: Optional[str] = None
 
 
 @dataclass
@@ -34,5 +34,5 @@ T = TypeVar("T")
 class ResponseWithDescriptor(Generic[T], DataClassDictMixin):
     """Response With Descriptor"""
 
-    data: Optional[T]
     response_descriptor: ResponseDescriptor = field(metadata=field_options(alias=RESPONSE_DESCRIPTOR_FIELD))
+    data: Optional[T] = None
