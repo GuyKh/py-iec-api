@@ -46,7 +46,7 @@ class CustomerAccount(DataClassDictMixin):
     is_active_account: bool = field(metadata=field_options(alias="isActiveAccount"))
     customer_role: int = field(metadata=field_options(alias="customerRole"))
     account_type: int = field(metadata=field_options(alias="accountType"))
-    name:  Optional[str] = field(default=None, metadata=field_options(alias="name"))
+    name: Optional[str] = field(default=None, metadata=field_options(alias="name"))
     last_name: Optional[str] = field(default=None, metadata=field_options(alias="lastName"))
 
 
