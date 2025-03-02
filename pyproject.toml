@@ -10,6 +10,9 @@ maintainers = [
 ]
 repository = "https://github.com/GuyKh/py-iec-api"
 keywords = ["python", "poetry", "api", "iec", "israel", "electric"]
+packages = [
+    { include = "iec_api" }
+]
 
 [tool.poetry.dependencies]
 python = "^3.10"
@@ -21,10 +24,10 @@ aiohttp = "^3.9.1"
 aiofiles = ">=23.2.1,<25.0.0"
 pytz = "^2024.1"
 
-[tool.poetry.dev-dependencies]
+[tool.poetry.group.dev.dependencies]
 pytest = "8.3.4"
 pytest-cov = "^6.0.0"
-ruff = "^0.8.0"
+ruff = "^0.9.9"
 pre-commit = "^4.0.0"
 
 [tool.pytest.ini_options]
