@@ -3,7 +3,6 @@
 import json
 import logging
 import random
-import re
 import string
 import time
 from typing import Optional, Tuple
@@ -12,6 +11,7 @@ import aiofiles
 import jwt
 import pkce
 from aiohttp import ClientSession
+from bs4 import BeautifulSoup
 
 from iec_api import commons
 from iec_api.models.exceptions import IECLoginError
@@ -47,10 +47,20 @@ async def authorize_session(session: ClientSession, session_token) -> str:
     authorize_response = await commons.send_non_json_get_request(
         session=session, url=cmd_url, encoding="unicode-escape"
     )
-    code = re.findall(
-        r"<input type=\"hidden\" name=\"code\" value=\"(.+)\"/>",
-        authorize_response.encode("latin1").decode("utf-8"),
-    )[0]
+
+    # A) Validate that the response is indeed an HTML
+    if not authorize_response.strip().startswith("<!DOCTYPE html>") and not authorize_response.strip().startswith(
+        "<html"
+    ):
+        raise IECLoginError(-1, "Autorize Response is not an HTML document")
+
+    # B) Use BeautifulSoup to extract the code value
+    soup = BeautifulSoup(authorize_response, "html.parser")
+    code_input = soup.find("input", {"name": "code"})
+    if not code_input:
+        raise IECLoginError(-1, "Code input not found in Autorize HTML response")
+
+    code = code_input.get("value")
     return code
 
 
@@ -183,8 +193,7 @@ async def manual_authorization(session: ClientSession, id_number) -> Optional[JW
         raise IECLoginError(-1, "Failed to send OTP, no state_token")
 
     otp_code = await commons.read_user_input("Enter your OTP code: ")
-    code = await authorize_session(session, otp_code)
-    jwt_token = await verify_otp_code(session, factor_id, state_token, code)
+    jwt_token = await verify_otp_code(session, factor_id, state_token, otp_code)
     logger.debug(
         f"Access token: {jwt_token.access_token}\n"
         f"Refresh token: {jwt_token.refresh_token}\n"
