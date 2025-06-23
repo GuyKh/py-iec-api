@@ -21,7 +21,7 @@ HEADERS_NO_AUTH = {
 
 HEADERS_WITH_AUTH = HEADERS_NO_AUTH.copy()  # Make a copy of the original dictionary
 HEADERS_WITH_AUTH["Authorization"] = "Bearer 1234"
-HEADERS_WITH_AUTH["Cookie"] = "ARRAffinity=?; " "ARRAffinitySameSite=?;" " GCLB=?"
+HEADERS_WITH_AUTH["Cookie"] = "ARRAffinity=?; ARRAffinitySameSite=?; GCLB=?"
 
 TIMEZONE = pytz.timezone("Asia/Jerusalem")
 IEC_API_BASE_URL = "https://iecapi.iec.co.il/api/"
