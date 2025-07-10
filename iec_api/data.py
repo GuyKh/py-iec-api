@@ -142,6 +142,7 @@ async def get_remote_reading(
     resolution: ReadingResolution = ReadingResolution.DAILY,
 ) -> Optional[RemoteReadingResponse]:
     req = RemoteReadingRequest(
+        contract_number=contract_id,
         meter_serial_number=meter_serial_number,
         meter_code=str(meter_code),
         last_invoice_date=last_invoice_date.strftime("%Y-%m-%d"),
