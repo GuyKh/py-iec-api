@@ -47,6 +47,7 @@ class ReadingResolution(IntEnum):
 class RemoteReadingRequest(DataClassDictMixin):
     """Remote Reading Request ."""
 
+    contract_number: str = field(metadata=field_options(alias="contractNumber"))
     meter_serial_number: str = field(metadata=field_options(alias="meterSerialNumber"))
     meter_code: str = field(metadata=field_options(alias="meterCode"))
     from_date: str = field(metadata=field_options(alias="fromDate"))

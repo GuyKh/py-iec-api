@@ -11,7 +11,7 @@ class ResponseDescriptor(DataClassDictMixin):
     """Response Descriptor"""
 
     is_success: bool = field(metadata=field_options(alias="isSuccess"))
-    code: Optional[str]
+    code: Optional[str] = None
     description: Optional[str] = None
 
 
