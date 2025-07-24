@@ -23,6 +23,7 @@ pkce = "^1.0.3"
 aiohttp = "^3.9.1"
 aiofiles = ">=23.2.1,<25.0.0"
 pytz = "^2024.1"
+beautifulsoup4 = "^4.13.4"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "8.4.1"
