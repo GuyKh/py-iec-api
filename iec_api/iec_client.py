@@ -73,12 +73,12 @@ class IecClient:
         self._state_token: Optional[str] = None  # Token for maintaining the state of the user's session
         self._factor_id: Optional[str] = None  # Factor ID for multifactor authentication
         self._session_token: Optional[str] = None  # Token for maintaining the user's session
+        self._otp_factor_type: Optional[str] = None  # OTP Factor Type (email, sms) of the otp
         self.logged_in: bool = False  # Flag to indicate if the user is logged in
         self._token: JWT = JWT(
             access_token="", refresh_token="", token_type="", expires_in=0, scope="", id_token=""
         )  # Token for authentication
         self._user_id: str = str(user_id)  # User ID associated with the instance
-        self._login_response: Optional[str] = None  # Response from the login attempt
         self._bp_number: Optional[str] = None  # BP Number associated with the instance
         self._contract_id: Optional[str] = None  # Contract ID associated with the instance
         self._account_id: Optional[str] = None  # Account ID associated with the instance
@@ -134,7 +134,7 @@ class IecClient:
 
         await self.check_token()
 
-        if not bp_number:
+        if not bp_number and self._bp_number:
             bp_number = self._bp_number
 
         assert bp_number, "BP number must be provided"
@@ -147,7 +147,7 @@ class IecClient:
             return contracts[0]
         return None
 
-    async def get_contracts(self, bp_number: str = None) -> list[Contract]:
+    async def get_contracts(self, bp_number: Optional[str] = None) -> list[Contract]:
         """
         This function retrieves a contract based on the given BP number.
         :param bp_number: A string representing the BP number
@@ -403,7 +403,7 @@ class IecClient:
             RemoteReadingResponse: The response containing the remote reading or None if not found
         """
         await self.check_token()
-        if not contract_id:
+        if not contract_id and self._contract_id:
             contract_id = self._contract_id
 
         return await data.get_remote_reading(
@@ -716,16 +716,20 @@ class IecClient:
     # Login/Token Flow
     # ----------------
 
-    async def login_with_id(self):
+    async def login_with_id(self) -> Optional[str]:
         """
         Login with ID and wait for OTP
+        Returns:
+            str: The OTP factor type
         """
-        state_token, factor_id, session_token = self._login_response = await login.first_login(
+        state_token, factor_id, session_token, otp_factor_type = await login.first_login(
             self._session, self._user_id
         )
         self._state_token = state_token
         self._factor_id = factor_id
         self._session_token = session_token
+        self._otp_factor_type = otp_factor_type
+        return self._otp_factor_type
 
     async def verify_otp(self, otp_code: str | int) -> bool:
         """
@@ -733,6 +737,9 @@ class IecClient:
         :param otp_code: The OTP code to be verified
         :return: The token
         """
+        if not self._factor_id or not self._state_token:
+            raise IECLoginError(-1, "OTP wasn't sent during login")
+
         jwt_token = await login.verify_otp_code(self._session, self._factor_id, self._state_token, str(otp_code))
         self._token = jwt_token
         self.logged_in = True

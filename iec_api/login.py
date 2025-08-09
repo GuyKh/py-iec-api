@@ -54,7 +54,7 @@ async def authorize_session(session: ClientSession, session_token) -> str:
     return code
 
 
-async def get_first_factor_id(session: ClientSession, user_id: str):
+async def get_first_factor_id(session: ClientSession, user_id: str) -> Tuple[str, str]:
     """
     Function to get the first factor ID using the provided ID.
         Args:
@@ -74,9 +74,9 @@ async def get_first_factor_id(session: ClientSession, user_id: str):
 
 async def send_otp_code(
     session: ClientSession, factor_id: object, state_token: object, pass_code: object = None
-) -> Optional[str]:
+) -> Tuple[Optional[str], Optional[str]]:
     """
-    Send OTP code for factor verification and return the session token if successful.
+    Send OTP code for factor verification and return the session token and factor type.
 
     Args:
         session: The aiohttp ClientSession object.
@@ -85,7 +85,7 @@ async def send_otp_code(
         pass_code (object, optional): The pass code for verification. Defaults to None.
 
     Returns:
-        Optional[str]: The session token if verification is successful, otherwise None.
+        Tuple[Optional[str], Optional[str]]: A tuple containing the session token and the factor type.
     """
     data = {"stateToken": state_token}
     if pass_code:
@@ -98,9 +98,14 @@ async def send_otp_code(
         json_data=data,
         headers=headers,
     )
-    if response.get("status") == "SUCCESS":
-        return response.get("sessionToken")
-    return None
+
+    session_token = response.get("sessionToken")
+    factor_type = response.get("_embedded", {}).get("factor", {}).get("factorType")
+
+    if response.get("status") in ("SUCCESS", "MFA_CHALLENGE"):
+        return session_token, factor_type
+
+    return None, None
 
 
 async def get_access_token(session: ClientSession, code) -> JWT:
@@ -125,7 +130,9 @@ async def get_access_token(session: ClientSession, code) -> JWT:
     return JWT.from_dict(response)
 
 
-async def first_login(session: ClientSession, id_number: str) -> Tuple[str, str, str]:
+async def first_login(
+    session: ClientSession, id_number: str
+) -> Tuple[str, str, Optional[str], Optional[str]]:
     """
     Perform the first login for a user.
 
@@ -134,7 +141,8 @@ async def first_login(session: ClientSession, id_number: str) -> Tuple[str, str,
         id_number (str): The user's ID number.
 
     Returns:
-        Tuple[str, str, str]: A tuple containing the state token, factor ID, and session token.
+        Tuple[str, str, str, str]: A tuple containing the state token, factor ID, session token,
+         and factor type.
     """
 
     try:
@@ -142,9 +150,9 @@ async def first_login(session: ClientSession, id_number: str) -> Tuple[str, str,
         state_token, factor_id = await get_first_factor_id(session, id_number)
 
         # Send OTP code and get session token
-        session_token = await send_otp_code(session, factor_id, state_token)
+        session_token, factor_type = await send_otp_code(session, factor_id, state_token)
 
-        return state_token, factor_id, session_token
+        return state_token, factor_id, session_token, factor_type
     except Exception as error:
         logger.warning(f"Failed at first login: {error}")
         raise IECLoginError(-1, "Failed at first login") from error
@@ -164,7 +172,9 @@ async def verify_otp_code(session: ClientSession, factor_id: str, state_token: s
         JWT: The JSON Web Token (JWT) for the authorized session.
     """
     try:
-        otp_session_token = await send_otp_code(session, factor_id, state_token, otp_code)
+        otp_session_token, _ = await send_otp_code(session, factor_id, state_token, otp_code)
+        if not otp_session_token:
+            raise IECLoginError(-1, "OTP verification failed: no session token")
         code = await authorize_session(session, otp_session_token)
         jwt_token = await get_access_token(session, code)
         return jwt_token
@@ -173,16 +183,16 @@ async def verify_otp_code(session: ClientSession, factor_id: str, state_token: s
         raise IECLoginError(-1, "Failed at OTP verification") from error
 
 
-async def manual_authorization(session: ClientSession, id_number) -> Optional[JWT]:  # pragma: no cover
+async def manual_authorization(session: ClientSession, id_number) -> JWT:  # pragma: no cover
     """Get authorization token from IEC API."""
     if not id_number:
         id_number = await commons.read_user_input("Enter your ID Number: ")
-    state_token, factor_id, session_token = await first_login(session, id_number)
+    state_token, factor_id, session_token, factor_type = await first_login(session, id_number)
     if not state_token:
         logger.error("Failed to send OTP")
         raise IECLoginError(-1, "Failed to send OTP, no state_token")
 
-    otp_code = await commons.read_user_input("Enter your OTP code: ")
+    otp_code = await commons.read_user_input(f"Enter your OTP code sent to your {factor_type}: ")
     code = await authorize_session(session, otp_code)
     jwt_token = await verify_otp_code(session, factor_id, state_token, code)
     logger.debug(
@@ -193,7 +203,7 @@ async def manual_authorization(session: ClientSession, id_number) -> Optional[JW
     return jwt_token
 
 
-async def refresh_token(session: ClientSession, token: JWT) -> Optional[JWT]:
+async def refresh_token(session: ClientSession, token: JWT) -> JWT:
     """Refresh IEC JWT token."""
     headers = {"accept": "application/json", "content-type": "application/x-www-form-urlencoded"}
     data = {
