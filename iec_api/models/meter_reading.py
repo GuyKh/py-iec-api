@@ -71,7 +71,7 @@ class MeterReadings(DataClassDictMixin):
     """Meter Readings dataclass."""
 
     contract_account: str = field(metadata=field_options(alias="contractAccount"))
-    last_meters: list[LastMeter] = field(metadata=field_options(alias="lastMeters"))
+    last_meters: Optional[list[LastMeter]] = field(default=None, metadata=field_options(alias="lastMeters"))
 
 
 decoder = BasicDecoder(ResponseWithDescriptor[MeterReadings])

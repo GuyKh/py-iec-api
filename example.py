@@ -29,9 +29,10 @@ async def main():
             await client.load_token_from_file(token_json_file)
         else:
             try:
-                await client.login_with_id()
+                otp_type = await client.login_with_id()
                 with concurrent.futures.ThreadPoolExecutor() as pool:
-                    otp = await asyncio.get_event_loop().run_in_executor(pool, input, "Enter the OTP received: ")
+                    otp = await asyncio.get_event_loop().run_in_executor(pool, input,
+                        f"Enter the OTP sent to {otp_type}: ")
                 await client.verify_otp(otp)
                 await client.save_token_to_file(token_json_file)
             except IECLoginError as err:
