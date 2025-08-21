@@ -22,6 +22,7 @@ from iec_api.const import (
     GET_LAST_METER_READING_URL,
     GET_OUTAGES_URL,
     GET_REQUEST_READING_URL,
+    GET_SOCIAL_DISCOUNT_URL,
     GET_TENANT_IDENTITY_URL,
     HEADERS_WITH_AUTH,
     SEND_CONSUMPTION_REPORT_TO_MAIL_URL,
@@ -55,6 +56,7 @@ from iec_api.models.outages import decoder as outages_decoder
 from iec_api.models.remote_reading import ReadingResolution, RemoteReadingRequest, RemoteReadingResponse
 from iec_api.models.response_descriptor import ResponseWithDescriptor
 from iec_api.models.send_consumption_to_mail import SendConsumptionReportToMailRequest
+from iec_api.models.social_discount import SocialDiscount
 
 T = TypeVar("T")
 logger = logging.getLogger(__name__)
@@ -315,3 +317,14 @@ async def get_outages_by_account(session: ClientSession, token: JWT, account_id:
     return await _get_response_with_descriptor(
         session, token, GET_OUTAGES_URL.format(account_id=account_id), outages_decoder
     )
+
+
+async def get_social_discount(session: ClientSession, token: JWT, bp_number: str) -> Optional[SocialDiscount]:
+    """Get Social Discount data response from IEC API."""
+    headers = commons.add_auth_bearer_to_headers(HEADERS_WITH_AUTH, token.id_token)
+    # sending get request and saving the response as response object
+    response = await commons.send_get_request(
+        session=session, url=GET_SOCIAL_DISCOUNT_URL.format(bp_number=bp_number), headers=headers
+    )
+
+    return SocialDiscount.from_dict(response)

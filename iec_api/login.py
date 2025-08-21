@@ -130,9 +130,7 @@ async def get_access_token(session: ClientSession, code) -> JWT:
     return JWT.from_dict(response)
 
 
-async def first_login(
-    session: ClientSession, id_number: str
-) -> Tuple[str, str, Optional[str], Optional[str]]:
+async def first_login(session: ClientSession, id_number: str) -> Tuple[str, str, Optional[str], Optional[str]]:
     """
     Perform the first login for a user.
 
