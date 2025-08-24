@@ -21,7 +21,7 @@ HEADERS_NO_AUTH = {
 
 HEADERS_WITH_AUTH = HEADERS_NO_AUTH.copy()  # Make a copy of the original dictionary
 HEADERS_WITH_AUTH["Authorization"] = "Bearer 1234"
-HEADERS_WITH_AUTH["Cookie"] = "ARRAffinity=?; " "ARRAffinitySameSite=?;" " GCLB=?"
+HEADERS_WITH_AUTH["Cookie"] = "ARRAffinity=?; ARRAffinitySameSite=?; GCLB=?"
 
 TIMEZONE = pytz.timezone("Asia/Jerusalem")
 IEC_API_BASE_URL = "https://iecapi.iec.co.il/api/"
@@ -52,6 +52,7 @@ GET_PREIOD_CALCULATOR_URL = IEC_API_BASE_URL + "content/he-IL/calculators/period
 GET_CALCULATOR_GADGET_URL = IEC_API_BASE_URL + "content/he-IL/calculators/gadget"
 GET_OUTAGES_URL = IEC_API_BASE_URL + "outages/transactions/{account_id}/2"
 SEND_CONSUMPTION_REPORT_TO_MAIL_URL = IEC_API_BASE_URL + "/Consumption/SendConsumptionReportToMail/{contract_id}"
+GET_SOCIAL_DISCOUNT_URL = IEC_API_BASE_URL + "SocialDiscount/{bp_number}"
 
 GET_MASA_CITIES_LOOKUP_URL = IEC_MASA_MAINPORTAL_API_BASE_URL + "cities"
 GET_MASA_USER_PROFILE_LOOKUP_URL = IEC_MASA_MAINPORTAL_API_BASE_URL + "contacts/userprofile"

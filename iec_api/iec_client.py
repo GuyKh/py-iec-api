@@ -34,6 +34,7 @@ from iec_api.models.jwt import JWT
 from iec_api.models.meter_reading import MeterReadings
 from iec_api.models.outages import Outage
 from iec_api.models.remote_reading import ReadingResolution, RemoteReadingResponse
+from iec_api.models.social_discount import SocialDiscount
 from iec_api.usage_calculator.calculator import UsageCalculator
 
 logger = logging.getLogger(__name__)
@@ -556,6 +557,24 @@ class IecClient:
 
         return await data.get_efs_messages(self._session, self._token, contract_id, service_code)
 
+    async def get_social_discount(self, bp_number: Optional[str] = None) -> Optional[SocialDiscount]:
+        """
+        Get social discount for the contract
+        Args:
+            self: The instance of the class.
+            bp_number (str): The BP number of the meter.
+        Returns:
+            SocialDiscount: a social discount
+        """
+        await self.check_token()
+
+        if not bp_number:
+            bp_number = self._bp_number
+
+        assert bp_number, "BP number must be provided"
+
+        return await data.get_social_discount(self._session, self._token, bp_number)
+
     async def get_outages_by_account(self, account_id: Optional[str] = None) -> Optional[List[Outage]]:
         """Get Outages for the Account
         Args:
@@ -722,9 +741,7 @@ class IecClient:
         Returns:
             str: The OTP factor type
         """
-        state_token, factor_id, session_token, otp_factor_type = await login.first_login(
-            self._session, self._user_id
-        )
+        state_token, factor_id, session_token, otp_factor_type = await login.first_login(self._session, self._user_id)
         self._state_token = state_token
         self._factor_id = factor_id
         self._session_token = session_token
