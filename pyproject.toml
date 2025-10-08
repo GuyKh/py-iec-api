@@ -22,7 +22,7 @@ requests = "^2.31.0"
 pkce = "^1.0.3"
 aiohttp = "^3.9.1"
 aiofiles = ">=23.2.1,<25.0.0"
-pytz = "^2024.1"
+pytz = ">=2024.1,<2026.0"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "8.4.2"
