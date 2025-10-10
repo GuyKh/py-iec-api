@@ -21,7 +21,7 @@ pyjwt = "^2.8.0"
 requests = "^2.31.0"
 pkce = "^1.0.3"
 aiohttp = "^3.9.1"
-aiofiles = ">=23.2.1,<25.0.0"
+aiofiles = ">=25.1.0,<25.2.0"
 pytz = "^2024.1"
 
 [tool.poetry.group.dev.dependencies]
