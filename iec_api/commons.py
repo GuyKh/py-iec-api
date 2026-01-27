@@ -242,7 +242,8 @@ async def on_request_chunk_sent_debug(
 
 
 async def on_request_end_debug(session: aiohttp.ClientSession, context, params: aiohttp.TraceRequestEndParams):
-    logger.debug(
-        f"HTTP {params.method} call from {params.url} - Response <{params.response.status}>: \
-        {await params.response.text()}"
-    )
+    try:
+        text = await params.response.text()
+    except Exception:
+        text = "<unable to read response>"
+    logger.debug(f"HTTP {params.method} call from {params.url} - Response <{params.response.status}>: {text}")
