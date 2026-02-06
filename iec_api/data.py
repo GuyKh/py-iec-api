@@ -1,4 +1,5 @@
 import logging
+import warnings
 from datetime import datetime
 from typing import List, Optional, TypeVar
 
@@ -26,6 +27,7 @@ from iec_api.const import (
     GET_TENANT_IDENTITY_URL,
     HEADERS_WITH_AUTH,
     SEND_CONSUMPTION_REPORT_TO_MAIL_URL,
+    TIMEZONE,
 )
 from iec_api.models.account import Account
 from iec_api.models.account import decoder as account_decoder
@@ -53,7 +55,15 @@ from iec_api.models.meter_reading import MeterReadings
 from iec_api.models.meter_reading import decoder as meter_reading_decoder
 from iec_api.models.outages import Outage
 from iec_api.models.outages import decoder as outages_decoder
-from iec_api.models.remote_reading import ReadingResolution, RemoteReadingRequest, RemoteReadingResponse
+from iec_api.models.remote_reading import (
+    FutureConsumptionInfo,
+    ReadingResolution,
+    RemoteReading,
+    RemoteReadingRequest,
+    RemoteReadingResponse,
+    RemoteReadingResponseV2,
+    SmartMeter,
+)
 from iec_api.models.response_descriptor import ResponseWithDescriptor
 from iec_api.models.send_consumption_to_mail import SendConsumptionReportToMailRequest
 from iec_api.models.social_discount import SocialDiscount
@@ -133,6 +143,36 @@ async def get_customer(session: ClientSession, token: JWT) -> Optional[Customer]
     return Customer.from_dict(response)
 
 
+async def get_remote_reading_v2(
+    session: ClientSession,
+    token: JWT,
+    contract_id: str,
+    meter_serial_number: str,
+    meter_code: int,
+    last_invoice_date: datetime,
+    from_date: datetime,
+    resolution: ReadingResolution = ReadingResolution.DAILY,
+) -> Optional[RemoteReadingResponseV2]:
+    smart_meter = SmartMeter(
+        meter_serial=meter_serial_number,
+        meter_code=str(meter_code),
+    )
+    req = RemoteReadingRequest(
+        contract_number=contract_id,
+        last_invoice_date=last_invoice_date.strftime("%Y-%m-%d"),
+        from_date=from_date.strftime("%Y-%m-%d"),
+        smart_meters_list=[smart_meter],
+        resolution=resolution,
+    )
+
+    url = GET_REQUEST_READING_URL.format(contract_id=contract_id)
+    headers = commons.add_auth_bearer_to_headers(HEADERS_WITH_AUTH, token.id_token)
+
+    response = await commons.send_post_request(session=session, url=url, headers=headers, json_data=req.to_dict())
+
+    return RemoteReadingResponseV2.from_dict(response)
+
+
 async def get_remote_reading(
     session: ClientSession,
     token: JWT,
@@ -143,21 +183,49 @@ async def get_remote_reading(
     from_date: datetime,
     resolution: ReadingResolution = ReadingResolution.DAILY,
 ) -> Optional[RemoteReadingResponse]:
-    req = RemoteReadingRequest(
-        contract_number=contract_id,
-        meter_serial_number=meter_serial_number,
-        meter_code=str(meter_code),
-        last_invoice_date=last_invoice_date.strftime("%Y-%m-%d"),
-        from_date=from_date.strftime("%Y-%m-%d"),
-        resolution=resolution,
+    warnings.warn(
+        "get_remote_reading is deprecated, use get_remote_reading_v2 instead",
+        DeprecationWarning,
+        stacklevel=2,
     )
 
-    url = GET_REQUEST_READING_URL.format(contract_id=contract_id)
-    headers = commons.add_auth_bearer_to_headers(HEADERS_WITH_AUTH, token.id_token)
+    response = await get_remote_reading_v2(
+        session,
+        token,
+        contract_id,
+        meter_serial_number,
+        meter_code,
+        last_invoice_date,
+        from_date,
+        resolution,
+    )
 
-    response = await commons.send_post_request(session=session, url=url, headers=headers, json_data=req.to_dict())
+    if response is None or not response.meter_list:
+        return None
 
-    return RemoteReadingResponse.from_dict(response)
+    meter = response.meter_list[0]
+
+    # Map period consumptions to RemoteReading list for backward compatibility
+    readings = [
+        RemoteReading(
+            status=pc.status,
+            date=pc.interval.astimezone(TIMEZONE),
+            value=pc.consumption,
+        )
+        for pc in meter.period_consumptions
+    ]
+
+    return RemoteReadingResponse(
+        status=response.report_status,
+        future_consumption_info=meter.future_consumption_info or FutureConsumptionInfo(),
+        data=readings,
+        from_date=meter.start_date,
+        to_date=meter.end_date,
+        total_consumption_for_period=meter.total_consumption_for_period,
+        total_import_date_for_period=meter.total_import_date_for_period,
+        meter_start_date=meter.meter_start_date,
+        total_import=meter.total_import,
+    )
 
 
 async def get_efs_messages(

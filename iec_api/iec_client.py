@@ -33,7 +33,7 @@ from iec_api.models.invoice import GetInvoicesBody
 from iec_api.models.jwt import JWT
 from iec_api.models.meter_reading import MeterReadings
 from iec_api.models.outages import Outage
-from iec_api.models.remote_reading import ReadingResolution, RemoteReadingResponse
+from iec_api.models.remote_reading import ReadingResolution, RemoteReadingResponse, RemoteReadingResponseV2
 from iec_api.models.social_discount import SocialDiscount
 from iec_api.usage_calculator.calculator import UsageCalculator
 
@@ -381,6 +381,43 @@ class IecClient:
 
         return await data.get_device_details_by_code(self._session, self._token, device_id, device_code)
 
+    async def get_remote_reading_v2(
+        self,
+        meter_serial_number: str,
+        meter_code: int,
+        last_invoice_date: datetime,
+        from_date: datetime,
+        resolution: ReadingResolution = ReadingResolution.DAILY,
+        contract_id: Optional[str] = None,
+    ) -> Optional[RemoteReadingResponseV2]:
+        """
+        Retrieves a raw remote reading for a specific meter using the provided parameters.
+        Args:
+            self: The instance of the class.
+            meter_serial_number (str): The serial number of the meter.
+            meter_code (int): The code associated with the meter.
+            last_invoice_date (str): The date of the last invoice.
+            from_date (str): The start date for the remote reading.
+            resolution (int): The resolution of the remote reading.
+            contract_id (str): The contract id.
+        Returns:
+            RemoteReadingResponseV2: The full API response or None if no meter data found
+        """
+        await self.check_token()
+        if not contract_id and self._contract_id:
+            contract_id = self._contract_id
+
+        return await data.get_remote_reading_v2(
+            self._session,
+            self._token,
+            contract_id,
+            meter_serial_number,
+            meter_code,
+            last_invoice_date,
+            from_date,
+            resolution,
+        )
+
     async def get_remote_reading(
         self,
         meter_serial_number: str,
@@ -392,6 +429,10 @@ class IecClient:
     ) -> Optional[RemoteReadingResponse]:
         """
         Retrieves a remote reading for a specific meter using the provided parameters.
+
+        .. deprecated::
+            Use :meth:`get_remote_reading_v2` instead for the full API response.
+
         Args:
             self: The instance of the class.
             meter_serial_number (str): The serial number of the meter.
