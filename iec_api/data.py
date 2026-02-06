@@ -27,7 +27,6 @@ from iec_api.const import (
     GET_TENANT_IDENTITY_URL,
     HEADERS_WITH_AUTH,
     SEND_CONSUMPTION_REPORT_TO_MAIL_URL,
-    TIMEZONE,
 )
 from iec_api.models.account import Account
 from iec_api.models.account import decoder as account_decoder
@@ -209,7 +208,7 @@ async def get_remote_reading(
     readings = [
         RemoteReading(
             status=pc.status,
-            date=pc.interval.astimezone(TIMEZONE),
+            date=commons.convert_to_tz_aware_datetime(pc.interval),
             value=pc.consumption,
         )
         for pc in meter.period_consumptions

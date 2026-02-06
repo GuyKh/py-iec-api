@@ -224,6 +224,8 @@ def convert_to_tz_aware_datetime(dt: Optional[datetime]) -> Optional[datetime]:
     """
     if dt is None:
         return None
+    elif dt.tzinfo is not None:
+        return dt.astimezone(TIMEZONE)
     elif dt.year > 2000:  # Fix '0001-01-01T00:00:00' values
         return TIMEZONE.localize(dt)
     else:
