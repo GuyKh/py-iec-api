@@ -104,7 +104,7 @@ class RemoteReading(DataClassDictMixin):
 
     @classmethod
     def __post_deserialize__(cls, obj: "RemoteReading") -> "RemoteReading":
-        obj.date = convert_to_tz_aware_datetime(obj.date)
+        object.__setattr__(obj, "date", convert_to_tz_aware_datetime(obj.date))
         return obj
 
 
@@ -127,6 +127,11 @@ class PeriodConsumption(DataClassDictMixin):
     consumption: float
     back_stream: float = field(default=0.0, metadata=field_options(alias="backStream"))
     status: int = 0
+
+    @classmethod
+    def __post_deserialize__(cls, obj: "PeriodConsumption") -> "PeriodConsumption":
+        object.__setattr__(obj, "interval", convert_to_tz_aware_datetime(obj.interval))
+        return obj
 
 
 @dataclass
