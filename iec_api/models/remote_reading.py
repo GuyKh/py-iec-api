@@ -164,3 +164,9 @@ class MeterReadingData(DataClassDictMixin):
     period_consumptions: list[PeriodConsumption] = field(
         default_factory=list, metadata=field_options(alias="periodConsumptions")
     )
+
+    @classmethod
+    def __post_deserialize__(cls, obj: "MeterReadingData") -> "MeterReadingData":
+        if obj.period_consumptions:
+            obj.period_consumptions.sort(key=lambda pc: pc.interval)
+        return obj
