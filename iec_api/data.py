@@ -14,6 +14,7 @@ from iec_api.const import (
     GET_CONTRACTS_URL,
     GET_DEFAULT_CONTRACT_URL,
     GET_DEVICE_BY_DEVICE_ID_URL,
+    GET_DEVICE_IN_URL,
     GET_DEVICE_TYPE_URL,
     GET_DEVICES_URL,
     GET_EFS_MESSAGES_URL,
@@ -24,6 +25,7 @@ from iec_api.const import (
     GET_REQUEST_READING_URL,
     GET_SOCIAL_DISCOUNT_URL,
     GET_TENANT_IDENTITY_URL,
+    GET_TOUZ_COMPATIBILITY_URL,
     HEADERS_WITH_AUTH,
     SEND_CONSUMPTION_REPORT_TO_MAIL_URL,
 )
@@ -38,6 +40,7 @@ from iec_api.models.device import Device, Devices
 from iec_api.models.device import decoder as devices_decoder
 from iec_api.models.device_identity import DeviceDetails, DeviceIdentity
 from iec_api.models.device_identity import decoder as device_identity_decoder
+from iec_api.models.device_in import DeviceInResponse
 from iec_api.models.device_type import DeviceType
 from iec_api.models.device_type import decoder as device_type_decoder
 from iec_api.models.efs import EfsMessage, EfsRequestAllServices, EfsRequestSingleService
@@ -57,6 +60,7 @@ from iec_api.models.remote_reading import ReadingResolution, RemoteReadingReques
 from iec_api.models.response_descriptor import ResponseWithDescriptor
 from iec_api.models.send_consumption_to_mail import SendConsumptionReportToMailRequest
 from iec_api.models.social_discount import SocialDiscount
+from iec_api.models.touz_compatibility import TouzCompatibility
 
 T = TypeVar("T")
 logger = logging.getLogger(__name__)
@@ -328,3 +332,25 @@ async def get_social_discount(session: ClientSession, token: JWT, bp_number: str
     )
 
     return SocialDiscount.from_dict(response)
+
+
+async def get_device_in(session: ClientSession, token: JWT, bp_number: str) -> Optional[DeviceInResponse]:
+    """Get device information from DeviceIn endpoint."""
+    headers = commons.add_auth_bearer_to_headers(HEADERS_WITH_AUTH, token.id_token)
+    response = await commons.send_get_request(
+        session=session, url=GET_DEVICE_IN_URL.format(bp_number=bp_number), headers=headers
+    )
+    return DeviceInResponse.from_dict(response)
+
+
+async def get_touz_compatibility(
+    session: ClientSession, token: JWT, contract_id: str, bp_number: str
+) -> Optional[TouzCompatibility]:
+    """Get TOU (Time of Use) tariff compatibility for a contract."""
+    headers = commons.add_auth_bearer_to_headers(HEADERS_WITH_AUTH, token.id_token)
+    response = await commons.send_get_request(
+        session=session,
+        url=GET_TOUZ_COMPATIBILITY_URL.format(contract_id=contract_id, bp_number=bp_number),
+        headers=headers,
+    )
+    return TouzCompatibility.from_dict(response)

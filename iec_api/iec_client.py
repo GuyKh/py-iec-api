@@ -25,6 +25,7 @@ from iec_api.models.contract_check import ContractCheck
 from iec_api.models.customer import Customer
 from iec_api.models.device import Device, Devices
 from iec_api.models.device_identity import DeviceDetails
+from iec_api.models.device_in import DeviceInResponse
 from iec_api.models.device_type import DeviceType
 from iec_api.models.efs import EfsMessage
 from iec_api.models.electric_bill import ElectricBill
@@ -35,6 +36,7 @@ from iec_api.models.meter_reading import MeterReadings
 from iec_api.models.outages import Outage
 from iec_api.models.remote_reading import ReadingResolution, RemoteReadingResponse
 from iec_api.models.social_discount import SocialDiscount
+from iec_api.models.touz_compatibility import TouzCompatibility
 from iec_api.usage_calculator.calculator import UsageCalculator
 
 logger = logging.getLogger(__name__)
@@ -574,6 +576,42 @@ class IecClient:
         assert bp_number, "BP number must be provided"
 
         return await data.get_social_discount(self._session, self._token, bp_number)
+
+    async def get_device_in(self, bp_number: Optional[str] = None) -> Optional[DeviceInResponse]:
+        """
+        Get device information for active devices
+        Args:
+            self: The instance of the class.
+            bp_number (str): The BP number. Defaults to client's BP number.
+        Returns:
+            DeviceInResponse: Device information including status and device list
+        """
+        await self.check_token()
+
+        if not bp_number:
+            bp_number = self._bp_number
+
+        assert bp_number, "BP number must be provided"
+
+        return await data.get_device_in(self._session, self._token, bp_number)
+
+    async def get_touz_compatibility(
+        self, contract_id: Optional[str] = None, bp_number: Optional[str] = None
+    ) -> Optional[TouzCompatibility]:
+        """Get TOU (Time of Use) tariff compatibility for a contract."""
+        await self.check_token()
+
+        if not contract_id:
+            contract_id = self._contract_id
+
+        assert contract_id, "Contract ID must be provided"
+
+        if not bp_number:
+            bp_number = self._bp_number
+
+        assert bp_number, "BP number must be provided"
+
+        return await data.get_touz_compatibility(self._session, self._token, contract_id, bp_number)
 
     async def get_outages_by_account(self, account_id: Optional[str] = None) -> Optional[List[Outage]]:
         """Get Outages for the Account
