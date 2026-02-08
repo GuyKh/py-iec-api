@@ -138,3 +138,6 @@ poetry.lock
 
 # Ruff Settings
 .ruff_cache
+
+# Git Worktrees
+.worktrees/
