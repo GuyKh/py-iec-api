@@ -5,8 +5,8 @@
 #   -H 'accept: application/json, text/plain, /' \
 #   -H 'authorization: Bearer <base64_token>' \
 #   -H 'content-type: application/json' \
-#   --data-raw '{"meterSerialNumber":"XXXXXXXX","meterCode":"123","lastInvoiceDate":"2000-01-01"\
-#                   ,"fromDate":"2023-07-20","resolution":1}'
+#   --data-raw '{"contractNumber":"000346669815","lastInvoiceDate":"2025-12-20","fromDate":"2026-02-01","resolution":3,\
+#                 "smartMetersList":[{"meterKind":"Consumption","meterCode":"503","meterSerial":"23589529"}]}'
 #
 # Response:
 # {
@@ -44,14 +44,25 @@ class ReadingResolution(IntEnum):
 
 
 @dataclass
+class SmartMeter(DataClassDictMixin):
+    """Smart Meter dataclass."""
+
+    meter_kind: str = field(metadata=field_options(alias="meterKind"))
+    meter_code: str = field(metadata=field_options(alias="meterCode"))
+    meter_serial: str = field(metadata=field_options(alias="meterSerial"))
+
+    class Config(BaseConfig):
+        serialize_by_alias = True
+
+
+@dataclass
 class RemoteReadingRequest(DataClassDictMixin):
     """Remote Reading Request ."""
 
     contract_number: str = field(metadata=field_options(alias="contractNumber"))
-    meter_serial_number: str = field(metadata=field_options(alias="meterSerialNumber"))
-    meter_code: str = field(metadata=field_options(alias="meterCode"))
     from_date: str = field(metadata=field_options(alias="fromDate"))
     resolution: ReadingResolution = field(metadata=field_options(alias="resolution"))
+    smart_meters_list: list[SmartMeter] = field(metadata=field_options(alias="smartMetersList"))
     last_invoice_date: Optional[str] = field(default=None, metadata=field_options(alias="lastInvoiceDate"))
 
     class Config(BaseConfig):

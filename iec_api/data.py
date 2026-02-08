@@ -53,7 +53,7 @@ from iec_api.models.meter_reading import MeterReadings
 from iec_api.models.meter_reading import decoder as meter_reading_decoder
 from iec_api.models.outages import Outage
 from iec_api.models.outages import decoder as outages_decoder
-from iec_api.models.remote_reading import ReadingResolution, RemoteReadingRequest, RemoteReadingResponse
+from iec_api.models.remote_reading import ReadingResolution, RemoteReadingRequest, RemoteReadingResponse, SmartMeter
 from iec_api.models.response_descriptor import ResponseWithDescriptor
 from iec_api.models.send_consumption_to_mail import SendConsumptionReportToMailRequest
 from iec_api.models.social_discount import SocialDiscount
@@ -137,16 +137,14 @@ async def get_remote_reading(
     session: ClientSession,
     token: JWT,
     contract_id: str,
-    meter_serial_number: str,
-    meter_code: int,
+    smart_meters_list: list[SmartMeter],
     last_invoice_date: datetime,
     from_date: datetime,
     resolution: ReadingResolution = ReadingResolution.DAILY,
 ) -> Optional[RemoteReadingResponse]:
     req = RemoteReadingRequest(
         contract_number=contract_id,
-        meter_serial_number=meter_serial_number,
-        meter_code=str(meter_code),
+        smart_meters_list=smart_meters_list,
         last_invoice_date=last_invoice_date.strftime("%Y-%m-%d"),
         from_date=from_date.strftime("%Y-%m-%d"),
         resolution=resolution,

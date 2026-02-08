@@ -383,19 +383,17 @@ class IecClient:
 
     async def get_remote_reading(
         self,
-        meter_serial_number: str,
-        meter_code: int,
+        smart_meters_list: list,
         last_invoice_date: datetime,
         from_date: datetime,
         resolution: ReadingResolution = ReadingResolution.DAILY,
         contract_id: Optional[str] = None,
     ) -> Optional[RemoteReadingResponse]:
         """
-        Retrieves a remote reading for a specific meter using the provided parameters.
+        Retrieves a remote reading for specific smart meters using the provided parameters.
         Args:
             self: The instance of the class.
-            meter_serial_number (str): The serial number of the meter.
-            meter_code (int): The code associated with the meter.
+            smart_meters_list (list): List of SmartMeter objects with meterKind, meterCode, and meterSerial.
             last_invoice_date (str): The date of the last invoice.
             from_date (str): The start date for the remote reading.
             resolution (int): The resolution of the remote reading.
@@ -411,8 +409,7 @@ class IecClient:
             self._session,
             self._token,
             contract_id,
-            meter_serial_number,
-            meter_code,
+            smart_meters_list,
             last_invoice_date,
             from_date,
             resolution,
