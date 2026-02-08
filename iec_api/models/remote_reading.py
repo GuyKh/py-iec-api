@@ -116,19 +116,11 @@ class RemoteReading(DataClassDictMixin):
 class RemoteReadingResponse(DataClassDictMixin):
     """Remote Reading Response dataclass."""
 
-    status: int
-    future_consumption_info: FutureConsumptionInfo = field(metadata=field_options(alias="futureConsumptionInfo"))
-    data: list[RemoteReading]
-    from_date: Optional[date] = field(default=None, metadata=field_options(alias="fromDate"))
-    to_date: Optional[date] = field(default=None, metadata=field_options(alias="toDate"))
-    total_consumption_for_period: Optional[float] = field(
-        default=None, metadata=field_options(alias="totalConsumptionForPeriod")
-    )
-    total_import_date_for_period: Optional[date] = field(
-        default=None, metadata=field_options(alias="totalImportDateForPeriod")
-    )
-    meter_start_date: Optional[date] = field(default=None, metadata=field_options(alias="meterStartDate"))
-    total_import: Optional[float] = field(default=None, metadata=field_options(alias="totalImport"))
+    report_status: int = field(metadata=field_options(alias="reportStatus"))
+    contract_number: str = field(default="", metadata=field_options(alias="contractNumber"))
+    meter_list: list["MeterReadingData"] = field(default_factory=list, metadata=field_options(alias="meterList"))
+    taoz_list: list = field(default_factory=list, metadata=field_options(alias="taozList"))
+    report_status_text: Optional[str] = field(default=None, metadata=field_options(alias="reportStatusText"))
 
 
 @dataclass
@@ -176,14 +168,3 @@ class MeterReadingData(DataClassDictMixin):
     period_consumptions: list[PeriodConsumption] = field(
         default_factory=list, metadata=field_options(alias="periodConsumptions")
     )
-
-
-@dataclass
-class RemoteReadingResponseV2(DataClassDictMixin):
-    """Remote Reading Response V2 dataclass."""
-
-    report_status: int = field(metadata=field_options(alias="reportStatus"))
-    contract_number: str = field(default="", metadata=field_options(alias="contractNumber"))
-    meter_list: list[MeterReadingData] = field(default_factory=list, metadata=field_options(alias="meterList"))
-    taoz_list: list = field(default_factory=list, metadata=field_options(alias="taozList"))
-    report_status_text: Optional[str] = field(default=None, metadata=field_options(alias="reportStatusText"))
