@@ -94,17 +94,13 @@ class FutureConsumptionInfo(DataClassDictMixin):
     total_export: Optional[float] = field(default=None, metadata=field_options(alias="totalExport"))
 
 
-@dataclass
+@dataclass(frozen=True)
 class RemoteReading(DataClassDictMixin):
     """Remote Reading Data dataclass."""
 
     status: int
     date: datetime
     value: float
-
-    def __hash__(self):
-        """Compute the hash value the remote reading, based on all fields."""
-        return hash((self.status, self.date, self.value))
 
     @classmethod
     def __post_deserialize__(cls, obj: "RemoteReading") -> "RemoteReading":
@@ -123,7 +119,7 @@ class RemoteReadingResponse(DataClassDictMixin):
     report_status_text: Optional[str] = field(default=None, metadata=field_options(alias="reportStatusText"))
 
 
-@dataclass
+@dataclass(frozen=True)
 class PeriodConsumption(DataClassDictMixin):
     """Period Consumption dataclass."""
 

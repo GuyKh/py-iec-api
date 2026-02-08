@@ -23,7 +23,6 @@ async def main():
     try:
         # Example of usage
         client = IecClient(123456782, session)
-
         token_json_file = "token.json"
         if os.path.exists(token_json_file):
             await client.load_token_from_file(token_json_file)
@@ -79,10 +78,15 @@ async def main():
             device.device_number, int(device.device_code), selected_date, selected_date
         )
 
-        if remote_readings:
-            print("Got " + str(len(remote_readings.data)) + " readings for " + selected_date.strftime("%Y-%m-%d"))
-            for remote_reading in remote_readings.data:
-                print(remote_reading.date, remote_reading.value)
+        if remote_readings and remote_readings.meter_list and len(remote_readings.meter_list) > 0:
+            print(
+                "Got "
+                + str(len(remote_readings.meter_list[0].period_consumptions))
+                + " readings for "
+                + selected_date.strftime("%Y-%m-%d")
+            )
+            for remote_reading in remote_readings.meter_list[0].period_consumptions:
+                print(remote_reading.interval, remote_reading.consumption)
         else:
             print("Got no readings")
 
