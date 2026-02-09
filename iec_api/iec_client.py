@@ -68,8 +68,10 @@ class IecClient:
         if not session:
             session = aiohttp.ClientSession(trace_configs=[trace_config])
             atexit.register(self._shutdown)
+            self._owns_session = True
         else:
             session.trace_configs.append(trace_config)
+            self._owns_session = False
 
         self._session = session
 
@@ -88,8 +90,22 @@ class IecClient:
         self._masa_connection_size_map: Optional[dict[int, str]] = None
 
     def _shutdown(self):
-        if not self._session.closed:
-            asyncio.run(self._session.close())
+        if self._owns_session and not self._session.closed:
+            try:
+                loop = asyncio.get_event_loop()
+                if loop.is_running():
+                    loop.create_task(self._session.close())
+                else:
+                    loop.run_until_complete(self._session.close())
+            except RuntimeError:
+                pass
+
+    async def __aenter__(self):
+        return self
+
+    async def __aexit__(self, exc_type, exc_val, exc_tb):
+        if self._owns_session and not self._session.closed:
+            await self._session.close()
 
     # -------------
     # Data methods:
