@@ -208,8 +208,9 @@ async def send_non_json_post_request(
         raise IECError(-1, f"Received invalid response from IEC API: {str(ex)}")
 
     if resp.status != http.HTTPStatus.OK:
-        if is_json(resp):
-            parse_error_response(resp, json.loads(resp.content))
+        content = await resp.text()
+        if is_json(content):
+            parse_error_response(resp, json.loads(content))
         raise IECError(resp.status, resp.reason)
     return resp.content
 
