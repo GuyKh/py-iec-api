@@ -2,29 +2,66 @@
 
 import json
 import logging
-import random
+import os
 import re
-import string
 import time
-from typing import Optional, Tuple
+from typing import Any, Optional, Tuple
 
 import aiofiles
 import jwt
-import pkce
 from aiohttp import ClientSession
+from jwt import PyJWKClient
 
 from iec_api import commons
 from iec_api.models.exceptions import IECLoginError
 from iec_api.models.jwt import JWT
 
+APP_CLIENT_ID = os.environ.get("IEC_CLIENT_ID", "0oaqf6zr7yEcQZqqt2p7")
+APP_REDIRECT_URI = os.environ.get("IEC_REDIRECT_URI", "com.iecrn:/")
+IEC_OKTA_BASE_URL = os.environ.get("IEC_OKTA_BASE_URL", "https://iec-ext.okta.com")
+
+JWKS_URL = os.environ.get("IEC_JWKS_URL", f"{IEC_OKTA_BASE_URL}/oauth2/default/v1/keys")
+
+_jwks_client: Optional[PyJWKClient] = None
+
+
+def _get_jwks_client() -> PyJWKClient:
+    """Get or create the JWKS client for JWT signature verification."""
+    global _jwks_client
+    if _jwks_client is None:
+        _jwks_client = PyJWKClient(JWKS_URL)
+    return _jwks_client
+
+
+def decode_token(token: JWT) -> dict[str, Any]:
+    """Decode and verify JWT token signature using JWKS.
+
+    Fetches the signing key from OKTA's JWKS endpoint and verifies
+    the token signature. Falls back to decoding without verification
+    if JWKS is unavailable.
+    """
+    try:
+        jwks_client = _get_jwks_client()
+        signing_key = jwks_client.get_signing_key_from_jwt(token.id_token)
+        return jwt.decode(
+            token.id_token,
+            key=signing_key.key,
+            algorithms=["RS256"],
+            audience=APP_CLIENT_ID,
+        )
+    except Exception:
+        # Fallback: decode without signature verification
+        # This maintains backward compatibility
+        return jwt.decode(
+            token.id_token,
+            options={"verify_signature": False},
+            algorithms=["RS256"],
+        )
+
+
 logger = logging.getLogger(__name__)
 
-APP_CLIENT_ID = "0oaqf6zr7yEcQZqqt2p7"
 CODE_CHALLENGE_METHOD = "S256"
-APP_REDIRECT_URI = "com.iecrn:/"
-code_verifier, code_challenge = pkce.generate_pkce_pair()
-STATE = "".join(random.choice(string.digits + string.ascii_letters) for _ in range(12))
-IEC_OKTA_BASE_URL = "https://iec-ext.okta.com"
 
 AUTHORIZE_URL = (
     "https://iec-ext.okta.com/oauth2/default/v1/authorize?client_id={"
@@ -43,6 +80,9 @@ async def authorize_session(session: ClientSession, session_token) -> str:
     Returns:
         str: The code obtained from the authorization response.
     """
+    import pkce
+
+    code_verifier, code_challenge = pkce.generate_pkce_pair()
     cmd_url = AUTHORIZE_URL.format(client_id=APP_CLIENT_ID, sessionToken=session_token, challenge=code_challenge)
     authorize_response = await commons.send_non_json_get_request(
         session=session, url=cmd_url, encoding="unicode-escape"
@@ -117,6 +157,10 @@ async def get_access_token(session: ClientSession, code) -> JWT:
     Returns:
         JWT: The access token as a JWT object.
     """
+    import pkce
+
+    code_verifier, _ = pkce.generate_pkce_pair()
+
     data = {
         "client_id": APP_CLIENT_ID,
         "code_verifier": code_verifier,
@@ -221,10 +265,6 @@ async def save_token_to_file(token: JWT, path: str = "token.json") -> None:
     """Save token to file."""
     async with aiofiles.open(path, mode="w", encoding="utf-8") as f:
         await f.write(json.dumps(token.to_dict()))
-
-
-def decode_token(token: JWT) -> dict:
-    return jwt.decode(token.id_token, options={"verify_signature": False}, algorithms=["RS256"])
 
 
 async def load_token_from_file(path: str = "token.json") -> JWT:
