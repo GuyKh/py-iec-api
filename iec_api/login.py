@@ -234,9 +234,22 @@ async def refresh_token(session: ClientSession, token: JWT) -> JWT:
 
 
 async def save_token_to_file(token: JWT, path: str = "token.json") -> None:
-    """Save token to file."""
-    async with aiofiles.open(path, mode="w", encoding="utf-8") as f:
-        await f.write(json.dumps(token.to_dict()))
+    """
+    Save token to file with optional encryption.
+    If IEC_TOKEN_ENCRYPTION_KEY env var is set, encrypts the token using Fernet (AES-128).
+    """
+    fernet = _get_fernet()
+    token_json = json.dumps(token.to_dict())
+
+    if fernet:
+        # Encrypt token before saving
+        encrypted_data = fernet.encrypt(token_json.encode())
+        async with aiofiles.open(path, mode="wb") as f:
+            await f.write(encrypted_data)
+    else:
+        # Save as plain text (backward compatible)
+        async with aiofiles.open(path, mode="w", encoding="utf-8") as f:
+            await f.write(token_json)
 
 
 def _get_jwks_client() -> PyJWKClient:
@@ -245,6 +258,22 @@ def _get_jwks_client() -> PyJWKClient:
     if _jwks_client is None:
         _jwks_client = PyJWKClient(JWKS_URL)
     return _jwks_client
+
+
+def _get_encryption_key() -> bytes | None:
+    """Get encryption key from environment variable."""
+    key = os.environ.get("IEC_TOKEN_ENCRYPTION_KEY")
+    if key:
+        return key.encode()
+    return None
+
+
+def _get_fernet() -> Fernet | None:
+    """Get Fernet instance if encryption key is available."""
+    key = _get_encryption_key()
+    if key:
+        return Fernet(key)
+    return None
 
 
 def decode_token(token: JWT, verify: bool = True) -> dict[str, Any]:
@@ -270,9 +299,28 @@ def decode_token(token: JWT, verify: bool = True) -> dict[str, Any]:
 
 
 async def load_token_from_file(path: str = "token.json") -> JWT:
-    """Load token from file."""
-    async with aiofiles.open(path, "r", encoding="utf-8") as f:
-        contents = await f.read()
+    """
+    Load token from file with optional decryption.
+    If IEC_TOKEN_ENCRYPTION_KEY env var is set, decrypts the token using Fernet.
+    Falls back to plain text for backward compatibility.
+    """
+    fernet = _get_fernet()
+
+    if fernet:
+        # Try to read as encrypted file
+        async with aiofiles.open(path, "rb") as f:
+            encrypted_data = await f.read()
+        try:
+            decrypted_data = fernet.decrypt(encrypted_data)
+            contents = decrypted_data.decode("utf-8")
+        except Exception:
+            # If decryption fails, try reading as plain text (backward compatible)
+            async with aiofiles.open(path, "r", encoding="utf-8") as f:
+                contents = await f.read()
+    else:
+        # Read as plain text
+        async with aiofiles.open(path, "r", encoding="utf-8") as f:
+            contents = await f.read()
 
     jwt_data = JWT.from_dict(json.loads(contents))
 
