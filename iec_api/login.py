@@ -239,8 +239,34 @@ async def save_token_to_file(token: JWT, path: str = "token.json") -> None:
         await f.write(json.dumps(token.to_dict()))
 
 
-def decode_token(token: JWT) -> dict:
-    return jwt.decode(token.id_token, options={"verify_signature": False}, algorithms=["RS256"])
+def _get_jwks_client() -> PyJWKClient:
+    """Get or create JWKS client for JWT signature verification."""
+    global _jwks_client
+    if _jwks_client is None:
+        _jwks_client = PyJWKClient(JWKS_URL)
+    return _jwks_client
+
+
+def decode_token(token: JWT, verify: bool = True) -> dict[str, Any]:
+    """
+    Decode and verify JWT token.
+    Args:
+        token: The JWT token to decode.
+        verify: Whether to verify the token signature (default: True).
+    Returns:
+        dict: The decoded token claims.
+    """
+    if verify:
+        jwks_client = _get_jwks_client()
+        signing_key = jwks_client.get_signing_key_from_jwt(token.id_token)
+        return jwt.decode(
+            token.id_token,
+            signing_key.key,
+            algorithms=["RS256"],
+            audience=APP_CLIENT_ID,
+        )
+    else:
+        return jwt.decode(token.id_token, options={"verify_signature": False}, algorithms=["RS256"])
 
 
 async def load_token_from_file(path: str = "token.json") -> JWT:
