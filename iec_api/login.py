@@ -32,32 +32,42 @@ IEC_OKTA_BASE_URL = os.environ.get("IEC_OKTA_BASE_URL", "https://iec-ext.okta.co
 JWKS_URL = os.environ.get("IEC_JWKS_URL", f"{IEC_OKTA_BASE_URL}/oauth2/default/v1/keys")
 _jwks_client: Optional[PyJWKClient] = None
 
-AUTHORIZE_URL = (
-    "https://iec-ext.okta.com/oauth2/default/v1/authorize?client_id={"
-    "client_id}&response_type=id_token+code&response_mode=form_post&scope=openid%20email%20profile"
-    "%20offline_access&redirect_uri=com.iecrn:/&state=123abc&nonce=abc123&code_challenge_method=S256"
-    "&sessionToken={sessionToken}&code_challenge={challenge}"
-)
 
-
-async def authorize_session(session: ClientSession, session_token) -> str:
+async def authorize_session(session: ClientSession, session_token) -> Tuple[str, str]:
     """
     Authorizes a session using the provided session token.
     Args:
         session: The aiohttp ClientSession object.
         session_token (str): The session token to be used for authorization.
     Returns:
-        str: The code obtained from the authorization response.
+        Tuple[str, str]: The code obtained from the authorization response and the code verifier.
     """
-    cmd_url = AUTHORIZE_URL.format(client_id=APP_CLIENT_ID, sessionToken=session_token, challenge=code_challenge)
+    # Generate PKCE pair per authentication flow for security
+    code_verifier, code_challenge = pkce.generate_pkce_pair()
+    state = "".join(random.choice(string.digits + string.ascii_letters) for _ in range(12))
+
+    authorize_url = (
+        f"{IEC_OKTA_BASE_URL}/oauth2/default/v1/authorize?"
+        f"client_id={APP_CLIENT_ID}&"
+        f"response_type=id_token+code&"
+        f"response_mode=form_post&"
+        f"scope=openid%20email%20profile%20offline_access&"
+        f"redirect_uri={APP_REDIRECT_URI}&"
+        f"state={state}&"
+        f"nonce=abc123&"
+        f"code_challenge_method=S256&"
+        f"sessionToken={session_token}&"
+        f"code_challenge={code_challenge}"
+    )
+
     authorize_response = await commons.send_non_json_get_request(
-        session=session, url=cmd_url, encoding="unicode-escape"
+        session=session, url=authorize_url, encoding="unicode-escape"
     )
     code = re.findall(
-        r"<input type=\"hidden\" name=\"code\" value=\"(.+)\"/>",
+        r"<input type=\"hidden\" name=\"code\" value=\"(.+)\"\/>",
         authorize_response.encode("latin1").decode("utf-8"),
     )[0]
-    return code
+    return code, code_verifier
 
 
 async def get_first_factor_id(session: ClientSession, user_id: str) -> Tuple[str, str]:
@@ -114,12 +124,13 @@ async def send_otp_code(
     return None, None
 
 
-async def get_access_token(session: ClientSession, code) -> JWT:
+async def get_access_token(session: ClientSession, code: str, code_verifier: str) -> JWT:
     """
     Get the access token using the provided authorization code.
     Args:
         session: The aiohttp ClientSession object.
         code (str): The authorization code.
+        code_verifier (str): The PKCE code verifier for token exchange.
     Returns:
         JWT: The access token as a JWT object.
     """
@@ -179,8 +190,8 @@ async def verify_otp_code(session: ClientSession, factor_id: str, state_token: s
         otp_session_token, _ = await send_otp_code(session, factor_id, state_token, otp_code)
         if not otp_session_token:
             raise IECLoginError(-1, "OTP verification failed: no session token")
-        code = await authorize_session(session, otp_session_token)
-        jwt_token = await get_access_token(session, code)
+        code, code_verifier = await authorize_session(session, otp_session_token)
+        jwt_token = await get_access_token(session, code, code_verifier)
         return jwt_token
     except Exception as error:
         logger.warning(f"Failed at OTP verification: {error}")
@@ -197,8 +208,7 @@ async def manual_authorization(session: ClientSession, id_number) -> JWT:  # pra
         raise IECLoginError(-1, "Failed to send OTP, no state_token")
 
     otp_code = await commons.read_user_input(f"Enter your OTP code sent to your {factor_type}: ")
-    code = await authorize_session(session, otp_code)
-    jwt_token = await verify_otp_code(session, factor_id, state_token, code)
+    jwt_token = await verify_otp_code(session, factor_id, state_token, otp_code)
     logger.debug(
         f"Access token: {jwt_token.access_token}\n"
         f"Refresh token: {jwt_token.refresh_token}\n"
