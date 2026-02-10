@@ -324,12 +324,12 @@ async def load_token_from_file(path: str = "token.json") -> JWT:
 
     jwt_data = JWT.from_dict(json.loads(contents))
 
-    # decode token to verify validity
-    decode_token(jwt_data)
+    # decode token to verify validity (without signature verification to handle expired tokens)
+    decode_token(jwt_data, verify=False)
 
     return jwt_data
 
 
 def get_token_remaining_time_to_expiration(token: JWT):
-    decoded_token = decode_token(token)
+    decoded_token = decode_token(token, verify=False)
     return decoded_token["exp"] - int(time.time())
