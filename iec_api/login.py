@@ -2,16 +2,19 @@
 
 import json
 import logging
+import os
 import random
 import re
 import string
 import time
-from typing import Optional, Tuple
+from typing import Any, Optional, Tuple
 
 import aiofiles
 import jwt
 import pkce
 from aiohttp import ClientSession
+from cryptography.fernet import Fernet
+from jwt import PyJWKClient
 
 from iec_api import commons
 from iec_api.models.exceptions import IECLoginError
@@ -19,12 +22,15 @@ from iec_api.models.jwt import JWT
 
 logger = logging.getLogger(__name__)
 
-APP_CLIENT_ID = "0oaqf6zr7yEcQZqqt2p7"
+# Environment variables for security
+APP_CLIENT_ID = os.environ.get("IEC_CLIENT_ID", "0oaqf6zr7yEcQZqqt2p7")
 CODE_CHALLENGE_METHOD = "S256"
-APP_REDIRECT_URI = "com.iecrn:/"
-code_verifier, code_challenge = pkce.generate_pkce_pair()
-STATE = "".join(random.choice(string.digits + string.ascii_letters) for _ in range(12))
-IEC_OKTA_BASE_URL = "https://iec-ext.okta.com"
+APP_REDIRECT_URI = os.environ.get("IEC_REDIRECT_URI", "com.iecrn:/")
+IEC_OKTA_BASE_URL = os.environ.get("IEC_OKTA_BASE_URL", "https://iec-ext.okta.com")
+
+# JWKS for JWT signature verification
+JWKS_URL = os.environ.get("IEC_JWKS_URL", f"{IEC_OKTA_BASE_URL}/oauth2/default/v1/keys")
+_jwks_client: Optional[PyJWKClient] = None
 
 AUTHORIZE_URL = (
     "https://iec-ext.okta.com/oauth2/default/v1/authorize?client_id={"
