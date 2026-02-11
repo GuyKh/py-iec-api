@@ -33,6 +33,7 @@ IEC_MASA_MAINPORTAL_API_BASE_URL = "https://masa-mainportalapi.iec.co.il/api/"
 
 GET_ACCOUNTS_URL = IEC_API_BASE_URL + "outages/accounts"
 GET_CONSUMER_URL = IEC_API_BASE_URL + "customer"
+GET_CUSTOMER_MOBILE_URL = IEC_API_BASE_URL + "customer/mobile/{contract_number}"
 GET_REQUEST_READING_URL = IEC_API_BASE_URL + "Consumption/RemoteReadingRange/{contract_id}"
 GET_ELECTRIC_BILL_URL = IEC_API_BASE_URL + "ElectricBillsDrawers/ElectricBills/{contract_id}/{bp_number}"
 GET_CONTRACTS_URL = IEC_API_BASE_URL + "customer/contract/{bp_number}"
@@ -58,6 +59,7 @@ GET_TOUZ_COMPATIBILITY_URL = IEC_API_BASE_URL + "calculator/touz/{contract_id}/{
 
 GET_MASA_CITIES_LOOKUP_URL = IEC_MASA_MAINPORTAL_API_BASE_URL + "cities"
 GET_MASA_USER_PROFILE_LOOKUP_URL = IEC_MASA_MAINPORTAL_API_BASE_URL + "contacts/userprofile"
+GET_MASA_CONTACT_ACCOUNT_USER_PROFILE_URL = IEC_MASA_MAINPORTAL_API_BASE_URL + "contacts/account/0/userprofile"
 GET_MASA_ORDER_TITLES_URL = IEC_MASA_API_BASE_URL + "accounts/{account_id}/orders/titles"
 GET_MASA_ORDER_LOOKUP_URL = IEC_MASA_API_BASE_URL + "orderLookup"
 GET_MASA_VOLT_LEVELS_URL = IEC_MASA_API_BASE_URL + "voltLevels/active"
@@ -66,5 +68,6 @@ GET_MASA_LOOKUP_URL = IEC_MASA_BASE_URL + "lookup/all"
 
 GET_USER_PROFILE_FROM_FAULT_PORTAL_URL = IEC_FAULT_PORTAL_API_URL + "contacts/userprofile"
 GET_OUTAGES_FROM_FAULT_PORTAL_URL = IEC_FAULT_PORTAL_API_URL + "accounts/{account_id}/tranzactions/2"
+POST_ACCOUNTS_TRANSACTIONS_URL = IEC_FAULT_PORTAL_API_URL + "accounts/tranzactions"
 ERROR_FIELD_NAME = "Error"
 ERROR_SUMMARY_FIELD_NAME = "errorSummary"
