@@ -3,7 +3,7 @@ from typing import List, Optional
 from aiohttp import ClientSession
 
 from iec_api import commons
-from iec_api.const import GET_USER_PROFILE_FROM_FAULT_PORTAL_URL, HEADERS_WITH_AUTH, POST_ACCOUNTS_TRANSACTIONS_URL
+from iec_api.const import GET_USER_PROFILE_FROM_FAULT_PORTAL_URL, HEADERS_WITH_AUTH, POST_ACCOUNTS_TRANSACTIONS_URL, GET_OUTAGES_FROM_FAULT_PORTAL_URL
 from iec_api.fault_portal_models.accounts_transactions import AccountsTransactionsRequest, AccountsTransactionsResponse
 from iec_api.fault_portal_models.outages import FaultPortalOutage, OutagesResponse
 from iec_api.fault_portal_models.user_profile import UserProfile
@@ -38,7 +38,7 @@ async def post_accounts_transactions(
     """
 
     headers = commons.add_auth_bearer_to_headers(HEADERS_WITH_AUTH, token.id_token)
-    request = AccountsTransactionsRequest(accounts=accounts, state_code=state_code).to_dict()
+    request = AccountsTransactionsRequest(accounts=accounts, state_code=state_code).to_dict(by_alias=True)
     response = await commons.send_post_request(
         session=session, url=POST_ACCOUNTS_TRANSACTIONS_URL, headers=headers, json_data=request
     )
@@ -54,7 +54,7 @@ async def get_outages_by_account(
     headers = commons.add_auth_bearer_to_headers(HEADERS_WITH_AUTH, token.id_token)
     # sending get request and saving the response as response object
     response = await commons.send_get_request(
-        session=session, url=GET_USER_PROFILE_FROM_FAULT_PORTAL_URL, headers=headers
+        session=session, url=GET_OUTAGES_FROM_FAULT_PORTAL_URL, headers=headers
     )
 
     return OutagesResponse.from_dict(response).data_collection
