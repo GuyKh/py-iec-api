@@ -10,9 +10,11 @@ import jwt
 from aiohttp import ClientSession
 
 from iec_api import commons, data, fault_portal_data, login, masa_data, static_data
+from iec_api.fault_portal_models.accounts_transactions import AccountsTransactionsResponse
 from iec_api.fault_portal_models.outages import FaultPortalOutage
 from iec_api.fault_portal_models.user_profile import UserProfile
 from iec_api.masa_api_models.cities import City
+from iec_api.masa_api_models.contact_account_user_profile import MasaMainPortalContactAccountUserProfile
 from iec_api.masa_api_models.equipment import GetEquipmentResponse
 from iec_api.masa_api_models.lookup import GetLookupResponse
 from iec_api.masa_api_models.order_lookup import OrderCategory
@@ -23,6 +25,7 @@ from iec_api.models.account import Account
 from iec_api.models.contract import Contract
 from iec_api.models.contract_check import ContractCheck
 from iec_api.models.customer import Customer
+from iec_api.models.customer_mobile import CustomerMobileResponse
 from iec_api.models.device import Device, Devices
 from iec_api.models.device_identity import DeviceDetails
 from iec_api.models.device_in import DeviceInResponse
@@ -106,6 +109,22 @@ class IecClient:
             self._bp_number = customer.bp_number
         return customer
 
+    async def get_customer_mobile(self, contract_id: Optional[str]) -> CustomerMobileResponse:
+        """
+        Get customer mobile data response from IEC API.
+        :param contract_number: The contract number to query
+        :return: Customer mobile data
+        """
+        await self.check_token()
+
+        if not contract_id:
+            contract_id = self._contract_id
+
+        if not contract_id:
+            raise ValueError("Contract id must be provided")
+
+        return await data.get_customer_mobile(self._session, self._token, contract_id)
+
     async def get_accounts(self) -> Optional[List[Account]]:
         """
         Get consumer data response from IEC API.
@@ -140,7 +159,8 @@ class IecClient:
         if not bp_number and self._bp_number:
             bp_number = self._bp_number
 
-        assert bp_number, "BP number must be provided"
+        if not bp_number:
+            raise ValueError("BP number must be provided")
 
         get_contract_response = await data.get_contracts(self._session, self._token, bp_number)
         if get_contract_response:
@@ -150,10 +170,14 @@ class IecClient:
             return contracts[0]
         return None
 
-    async def get_contracts(self, bp_number: Optional[str] = None) -> list[Contract]:
+    async def get_contracts(
+        self, bp_number: Optional[str] = None, count: Optional[int] = None, contract_number: Optional[str] = None
+    ) -> list[Contract]:
         """
-        This function retrieves a contract based on the given BP number.
+        This function retrieves contracts based on the given BP number.
         :param bp_number: A string representing the BP number
+        :param count: Optional limit on number of contracts to return
+        :param contract_number: Optional specific contract number to filter by
         :return: list of Contract objects
         """
 
@@ -162,9 +186,12 @@ class IecClient:
         if not bp_number:
             bp_number = self._bp_number
 
-        assert bp_number, "BP number must be provided"
+        if not bp_number:
+            raise ValueError("BP number must be provided")
 
-        get_contract_response = await data.get_contracts(self._session, self._token, bp_number)
+        get_contract_response = await data.get_contracts(
+            self._session, self._token, bp_number, count=count, contract_number=contract_number
+        )
         if get_contract_response:
             contracts = get_contract_response.contracts
             if contracts and len(contracts) > 0:
@@ -186,7 +213,8 @@ class IecClient:
         if not contract_id:
             contract_id = self._contract_id
 
-        assert contract_id, "Contract Id must be provided"
+        if not contract_id:
+            raise ValueError("Contract Id must be provided")
 
         return await data.get_contract_check(self._session, self._token, contract_id)
 
@@ -206,12 +234,14 @@ class IecClient:
         if not bp_number:
             bp_number = self._bp_number
 
-        assert bp_number, "BP number must be provided"
+        if not bp_number:
+            raise ValueError("BP number must be provided")
 
         if not contract_id:
             contract_id = self._contract_id
 
-        assert contract_id, "Contract ID must be provided"
+        if not contract_id:
+            raise ValueError("Contract ID must be provided")
 
         return await data.get_last_meter_reading(self._session, self._token, bp_number, contract_id)
 
@@ -232,12 +262,14 @@ class IecClient:
         if not bp_number:
             bp_number = self._bp_number
 
-        assert bp_number, "BP number must be provided"
+        if not bp_number:
+            raise ValueError("BP number must be provided")
 
         if not contract_id:
             contract_id = self._contract_id
 
-        assert contract_id, "Contract ID must be provided"
+        if not contract_id:
+            raise ValueError("Contract ID must be provided")
 
         return await data.get_electric_bill(self._session, self._token, bp_number, contract_id)
 
@@ -262,12 +294,14 @@ class IecClient:
         if not bp_number:
             bp_number = self._bp_number
 
-        assert bp_number, "BP number must be provided"
+        if not bp_number:
+            raise ValueError("BP number must be provided")
 
         if not contract_id:
             contract_id = self._contract_id
 
-        assert contract_id, "Contract ID must be provided"
+        if not contract_id:
+            raise ValueError("Contract ID must be provided")
 
         response_bytes = await data.get_invoice_pdf(self._session, self._token, bp_number, contract_id, invoice_number)
         if response_bytes:
@@ -295,23 +329,28 @@ class IecClient:
         if not contract_id:
             contract_id = self._contract_id
 
-        assert contract_id, "Contract ID must be provided"
+        if not contract_id:
+            raise ValueError("Contract ID must be provided")
 
         if not device_id:
             devices = await self.get_devices()
 
-            assert devices, "No Devices found"
+            if not devices:
+                raise ValueError("No Devices found")
             device_id = devices[0].device_number
 
-        assert device_id, "Device ID must be provided"
+        if not device_id:
+            raise ValueError("Device ID must be provided")
 
         if not device_code:
             devices = await self.get_devices()
 
-            assert devices, "No Devices found"
+            if not devices:
+                raise ValueError("No Devices found")
             device_code = devices[0].device_code
 
-        assert device_code, "Device Code must be provided"
+        if not device_code:
+            raise ValueError("Device Code must be provided")
 
         return await data.send_consumption_report_to_mail(
             self._session, self._token, contract_id, email, device_code, device_id
@@ -331,7 +370,8 @@ class IecClient:
         if not contract_id:
             contract_id = self._contract_id
 
-        assert contract_id, "Contract Id must be provided"
+        if not contract_id:
+            raise ValueError("Contract Id must be provided")
 
         return await data.get_devices(self._session, self._token, contract_id)
 
@@ -350,7 +390,8 @@ class IecClient:
         if not contract_id:
             contract_id = self._contract_id
 
-        assert contract_id, "Contract ID must be provided"
+        if not contract_id:
+            raise ValueError("Contract ID must be provided")
 
         return await data.get_device_by_device_id(self._session, self._token, contract_id, device_id)
 
@@ -437,24 +478,30 @@ class IecClient:
         if not bp_number:
             bp_number = self._bp_number
 
-        assert bp_number, "BP number must be provided"
+        if not bp_number:
+            raise ValueError("BP number must be provided")
 
         if not contract_id:
             contract_id = self._contract_id
 
-        assert contract_id, "Contract ID must be provided"
+        if not contract_id:
+            raise ValueError("Contract ID must be provided")
 
         return await data.get_device_type(self._session, self._token, bp_number, contract_id)
 
     async def get_billing_invoices(
-        self, bp_number: Optional[str] = None, contract_id: Optional[str] = None
+        self,
+        bp_number: Optional[str] = None,
+        contract_id: Optional[str] = None,
+        only_open: Optional[bool] = None,
     ) -> Optional[GetInvoicesBody]:
         """
-        Get a list of devices for the user
+        Get billing invoices for the user
         Args:
             self: The instance of the class.
             bp_number (str): The BP number of the meter.
-            contract_id (str: The Contract ID
+            contract_id (str): The Contract ID
+            only_open (bool): If True, only return open invoices
         Returns:
             Billing Invoices data
         """
@@ -463,14 +510,16 @@ class IecClient:
         if not bp_number:
             bp_number = self._bp_number
 
-        assert bp_number, "BP number must be provided"
+        if not bp_number:
+            raise ValueError("BP number must be provided")
 
         if not contract_id:
             contract_id = self._contract_id
 
-        assert contract_id, "Contract ID must be provided"
+        if not contract_id:
+            raise ValueError("Contract ID must be provided")
 
-        return await data.get_billing_invoices(self._session, self._token, bp_number, contract_id)
+        return await data.get_billing_invoices(self._session, self._token, bp_number, contract_id, only_open=only_open)
 
     async def get_kwh_tariff(self) -> float:
         """Get kWh tariff"""
@@ -482,11 +531,13 @@ class IecClient:
         if not phase_count:
             devices = await self.get_devices()
 
-            assert devices, "No Devices found"
+            if not devices:
+                raise ValueError("No Devices found")
             device = devices[0]
 
             device_details = await self.get_device_by_device_id(device.device_number)
-            assert device_details, "No Device Details"
+            if not device_details:
+                raise ValueError("No Device Details")
 
             phase_count = device_details.counter_devices[0].connection_size.phase
 
@@ -498,11 +549,13 @@ class IecClient:
         if not phase_count:
             devices = await self.get_devices()
 
-            assert devices, "No Devices found"
+            if not devices:
+                raise ValueError("No Devices found")
             device = devices[0]
 
             device_details = await self.get_device_by_device_id(device.device_number)
-            assert device_details, "No Device Details"
+            if not device_details:
+                raise ValueError("No Device Details")
 
             phase_count = device_details.counter_devices[0].connection_size.phase
 
@@ -518,11 +571,13 @@ class IecClient:
         if not connection:
             devices = await self.get_devices()
 
-            assert devices, "No Devices found"
+            if not devices:
+                raise ValueError("No Devices found")
             device = devices[0]
 
             device_details = await self.get_device_by_device_id(device.device_number)
-            assert device_details, "No Device Details"
+            if not device_details:
+                raise ValueError("No Device Details")
 
             connection = device_details.counter_devices[0].connection_size.representative_connection_size
 
@@ -555,7 +610,8 @@ class IecClient:
         if not contract_id:
             contract_id = self._contract_id
 
-        assert contract_id, "Contract Id must be provided"
+        if not contract_id:
+            raise ValueError("Contract Id must be provided")
 
         return await data.get_efs_messages(self._session, self._token, contract_id, service_code)
 
@@ -573,7 +629,8 @@ class IecClient:
         if not bp_number:
             bp_number = self._bp_number
 
-        assert bp_number, "BP number must be provided"
+        if not bp_number:
+            raise ValueError("BP number must be provided")
 
         return await data.get_social_discount(self._session, self._token, bp_number)
 
@@ -591,7 +648,8 @@ class IecClient:
         if not bp_number:
             bp_number = self._bp_number
 
-        assert bp_number, "BP number must be provided"
+        if not bp_number:
+            raise ValueError("BP number must be provided")
 
         return await data.get_device_in(self._session, self._token, bp_number)
 
@@ -604,12 +662,14 @@ class IecClient:
         if not contract_id:
             contract_id = self._contract_id
 
-        assert contract_id, "Contract ID must be provided"
+        if not contract_id:
+            raise ValueError("Contract ID must be provided")
 
         if not bp_number:
             bp_number = self._bp_number
 
-        assert bp_number, "BP number must be provided"
+        if not bp_number:
+            raise ValueError("BP number must be provided")
 
         return await data.get_touz_compatibility(self._session, self._token, contract_id, bp_number)
 
@@ -626,7 +686,8 @@ class IecClient:
         if not account_id:
             account_id = self._account_id
 
-        assert account_id, "Account Id must be provided"
+        if not account_id:
+            raise ValueError("Account Id must be provided")
 
         return await data.get_outages_by_account(self._session, self._token, account_id)
 
@@ -647,7 +708,8 @@ class IecClient:
         if not account_id:
             account_id = self._account_id
 
-        assert account_id, "Account Id must be provided"
+        if not account_id:
+            raise ValueError("Account Id must be provided")
 
         return await masa_data.get_masa_equipments(self._session, self._token, account_id)
 
@@ -661,6 +723,17 @@ class IecClient:
         await self.check_token()
 
         return await masa_data.get_masa_user_profile(self._session, self._token)
+
+    async def get_masa_contact_account_user_profile(self) -> MasaMainPortalContactAccountUserProfile:
+        """Get Masa Contact Account User Profile with detailed account and contract information.
+        Args:
+            self: The instance of the class.
+        Returns:
+            MasaMainPortalContactAccountUserProfile: Contact Account User Profile with accounts and connections.
+        """
+        await self.check_token()
+
+        return await masa_data.get_masa_contact_account_user_profile(self._session, self._token)
 
     async def get_masa_cities(self) -> List[City]:
         """Get Masa Cities
@@ -707,7 +780,8 @@ class IecClient:
         if not account_id:
             account_id = self._account_id
 
-        assert account_id, "Account Id must be provided"
+        if not account_id:
+            raise ValueError("Account Id must be provided")
 
         return await masa_data.get_masa_order_titles(self._session, self._token, account_id)
 
@@ -765,9 +839,25 @@ class IecClient:
         if not account_id:
             account_id = self._account_id
 
-        assert account_id, "Account Id must be provided"
+        if not account_id:
+            raise ValueError("Account Id must be provided")
 
         return await fault_portal_data.get_outages_by_account(self._session, self._token, account_id)
+
+    async def post_fault_portal_accounts_transactions(
+        self, accounts: List[str], state_code: int = 0
+    ) -> AccountsTransactionsResponse:
+        """Post Accounts Transactions to Fault Portal
+        Args:
+            self: The instance of the class.
+            accounts (List[str]): List of account UUIDs to query.
+            state_code (int): The state code filter (default 0).
+        Returns:
+            AccountsTransactionsResponse: The accounts transactions response.
+        """
+        await self.check_token()
+
+        return await fault_portal_data.post_accounts_transactions(self._session, self._token, accounts, state_code)
 
     # ----------------
     # Login/Token Flow

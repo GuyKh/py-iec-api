@@ -12,6 +12,7 @@ from iec_api.const import (
     GET_CHECK_CONTRACT_URL,
     GET_CONSUMER_URL,
     GET_CONTRACTS_URL,
+    GET_CUSTOMER_MOBILE_URL,
     GET_DEFAULT_CONTRACT_URL,
     GET_DEVICE_BY_DEVICE_ID_URL,
     GET_DEVICE_IN_URL,
@@ -36,6 +37,7 @@ from iec_api.models.contract import decoder as contract_decoder
 from iec_api.models.contract_check import ContractCheck
 from iec_api.models.contract_check import decoder as contract_check_decoder
 from iec_api.models.customer import Customer
+from iec_api.models.customer_mobile import CustomerMobileResponse
 from iec_api.models.device import Device, Devices
 from iec_api.models.device import decoder as devices_decoder
 from iec_api.models.device_identity import DeviceDetails, DeviceIdentity
@@ -142,6 +144,25 @@ async def get_customer(session: ClientSession, token: JWT) -> Optional[Customer]
     return Customer.from_dict(response)
 
 
+async def get_customer_mobile(session: ClientSession, token: JWT, contract_number: str) -> CustomerMobileResponse:
+    """Get customer mobile data response from IEC API.
+
+    Args:
+        session: The aiohttp ClientSession object.
+        token: The JWT token for authentication.
+        contract_number: The contract number to query.
+
+    Returns:
+        CustomerMobileResponse: The customer mobile response.
+    """
+    headers = commons.add_auth_bearer_to_headers(HEADERS_WITH_AUTH.copy(), token.id_token)
+    response = await commons.send_get_request(
+        session=session, url=GET_CUSTOMER_MOBILE_URL.format(contract_number=contract_number), headers=headers
+    )
+
+    return CustomerMobileResponse.from_dict(response)
+
+
 async def get_remote_reading(
     session: ClientSession,
     token: JWT,
@@ -205,11 +226,35 @@ async def get_default_contract(session: ClientSession, token: JWT, bp_number: st
     )
 
 
-async def get_contracts(session: ClientSession, token: JWT, bp_number: str) -> Optional[Contracts]:
-    """Get all user's Contracts from IEC API."""
-    return await _get_response_with_descriptor(
-        session, token, GET_CONTRACTS_URL.format(bp_number=bp_number), contract_decoder
-    )
+async def get_contracts(
+    session: ClientSession,
+    token: JWT,
+    bp_number: str,
+    count: Optional[int] = None,
+    contract_number: Optional[str] = None,
+) -> Optional[Contracts]:
+    """Get all user's Contracts from IEC API.
+
+    Args:
+        session: The aiohttp ClientSession object.
+        token: The JWT token for authentication.
+        bp_number: The BP number.
+        count: Optional limit on number of contracts to return.
+        contract_number: Optional specific contract number to filter by.
+
+    Returns:
+        Contracts: The contracts response.
+    """
+    url = GET_CONTRACTS_URL.format(bp_number=bp_number)
+    params = []
+    if count is not None:
+        params.append(f"count={count}")
+    if contract_number is not None:
+        params.append(f"contractNumber={contract_number}")
+    if params:
+        url += "?" + "&".join(params)
+
+    return await _get_response_with_descriptor(session, token, url, contract_decoder)
 
 
 async def get_contract_check(session: ClientSession, token: JWT, contract_id: str) -> Optional[ContractCheck]:
@@ -281,12 +326,25 @@ async def get_device_type(session: ClientSession, token: JWT, bp_number: str, co
 
 
 async def get_billing_invoices(
-    session: ClientSession, token: JWT, bp_number: str, contract_id: str
+    session: ClientSession, token: JWT, bp_number: str, contract_id: str, only_open: Optional[bool] = None
 ) -> Optional[GetInvoicesBody]:
-    """Get Device Type data response from IEC API."""
-    return await _get_response_with_descriptor(
-        session, token, GET_BILLING_INVOICES_URL.format(bp_number=bp_number, contract_id=contract_id), invoice_decoder
-    )
+    """Get Billing Invoices data response from IEC API.
+
+    Args:
+        session: The aiohttp ClientSession object.
+        token: The JWT token for authentication.
+        bp_number: The BP number.
+        contract_id: The contract ID.
+        only_open: If True, only return open invoices. If False, return all invoices.
+
+    Returns:
+        GetInvoicesBody: The invoices body response.
+    """
+    url = GET_BILLING_INVOICES_URL.format(bp_number=bp_number, contract_id=contract_id)
+    if only_open is not None:
+        url += f"?onlyOpen={str(only_open).lower()}"
+
+    return await _get_response_with_descriptor(session, token, url, invoice_decoder)
 
 
 async def get_invoice_pdf(

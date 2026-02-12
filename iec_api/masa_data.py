@@ -5,6 +5,7 @@ from aiohttp import ClientSession
 from iec_api import commons
 from iec_api.const import (
     GET_MASA_CITIES_LOOKUP_URL,
+    GET_MASA_CONTACT_ACCOUNT_USER_PROFILE_URL,
     GET_MASA_EQUIPMENTS_URL,
     GET_MASA_LOOKUP_URL,
     GET_MASA_ORDER_LOOKUP_URL,
@@ -14,6 +15,7 @@ from iec_api.const import (
     HEADERS_WITH_AUTH,
 )
 from iec_api.masa_api_models.cities import CitiesResponse, City
+from iec_api.masa_api_models.contact_account_user_profile import MasaMainPortalContactAccountUserProfile
 from iec_api.masa_api_models.equipment import GetEquipmentResponse
 from iec_api.masa_api_models.lookup import GetLookupResponse
 from iec_api.masa_api_models.order_lookup import OrderCategory, OrderLookupResponse
@@ -62,6 +64,30 @@ async def get_masa_user_profile(session: ClientSession, token: JWT) -> MasaUserP
     response = await commons.send_get_request(session=session, url=GET_MASA_USER_PROFILE_LOOKUP_URL, headers=headers)
 
     return MasaUserProfile.from_dict(response)
+
+
+async def get_masa_contact_account_user_profile(
+    session: ClientSession, token: JWT
+) -> MasaMainPortalContactAccountUserProfile:
+    """Get Contact Account User Profile from IEC Masa Main Portal API.
+
+    This endpoint returns a detailed user profile including accounts and contract connections.
+
+    Args:
+        session: The aiohttp ClientSession object.
+        token: The JWT token for authentication.
+
+    Returns:
+        MasaMainPortalContactAccountUserProfile: The contact account user profile.
+    """
+
+    headers = commons.add_auth_bearer_to_headers(HEADERS_WITH_AUTH, token.id_token)
+    # sending get request and saving the response as response object
+    response = await commons.send_get_request(
+        session=session, url=GET_MASA_CONTACT_ACCOUNT_USER_PROFILE_URL, headers=headers
+    )
+
+    return MasaMainPortalContactAccountUserProfile.from_dict(response)
 
 
 async def get_masa_equipments(session: ClientSession, token: JWT, account_id: str) -> GetEquipmentResponse:
