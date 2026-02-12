@@ -94,6 +94,14 @@ class IecClient:
         if not self._session.closed:
             asyncio.run(self._session.close())
 
+    async def __aenter__(self):
+        """Async context manager entry."""
+        return self
+
+    async def __aexit__(self, exc_type, exc_val, exc_tb):
+        """Async context manager exit - properly close the session."""
+        await self._session.close()
+
     # -------------
     # Data methods:
     # -------------
