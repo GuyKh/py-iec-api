@@ -155,7 +155,7 @@ async def get_customer_mobile(session: ClientSession, token: JWT, contract_numbe
     Returns:
         CustomerMobileResponse: The customer mobile response.
     """
-    headers = commons.add_auth_bearer_to_headers(HEADERS_WITH_AUTH, token.id_token)
+    headers = commons.add_auth_bearer_to_headers(HEADERS_WITH_AUTH.copy(), token.id_token)
     response = await commons.send_get_request(
         session=session, url=GET_CUSTOMER_MOBILE_URL.format(contract_number=contract_number), headers=headers
     )
