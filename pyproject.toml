@@ -23,7 +23,8 @@ pkce = "^1.0.3"
 aiohttp = "^3.9.1"
 aiofiles = ">=25.1.0,<25.2.0"
 pytz = "^2024.1"
-cryptography = ">=44.0.0"
+cryptography = "^44.0.0"
+
 
 [tool.poetry.group.dev.dependencies]
 pytest = "9.0.2"
