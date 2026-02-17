@@ -7,7 +7,6 @@ from mashumaro import DataClassDictMixin, field_options
 # GET https://masaapi-wa.azurewebsites.net/equipments/get?accountId={account_id}&pageNumber=1&pageSize=10
 
 # {
-#     {
 #     "pageSize": 10,
 #     "pageNumber": 1,
 #     "moreRecords": false,
@@ -15,28 +14,28 @@ from mashumaro import DataClassDictMixin, field_options
 #     "pageCookie": 0,
 #     "items": [
 #         {
-#             "accountId": "b67ea524-300f-4a85-9ef4-54d30a753452",
+#             "accountId": "00000000-0000-0000-0000-000000000001",
 #             "accountType": 279830001,
-#             "accountName": "זינגר מיטל",
-#             "addressId": "b67ea524-300f-4a85-9ef4-54d30a753452",
-#             "areaId": "b67ea524-300f-4a85-9ef4-54d30a753452",
-#             "regionId": "b67ea524-300f-4a85-9ef4-54d30a753452",
-#             "fullAddress": "פרישמן 47  ,תל אביב - יפו, קומה ב",
-#             "siteId": "b67ea524-300f-4a85-9ef4-54d30a753452",
-#             "iec_ContractNumber": "346669815",
+#             "accountName": "Sanitized Account",
+#             "addressId": "00000000-0000-0000-0000-000000000002",
+#             "areaId": "00000000-0000-0000-0000-000000000003",
+#             "regionId": "00000000-0000-0000-0000-000000000004",
+#             "fullAddress": "Sanitized Address 10, Sample City, Floor 1",
+#             "siteId": "00000000-0000-0000-0000-000000000005",
+#             "iec_ContractNumber": "000000000",
 #             "siteType": 18,
 #             "activeConnections": 1,
 #             "connections": [
 #                 {
-#                     "connectionId": "b67ea524-300f-4a85-9ef4-54d30a753452",
-#                     "connectionNumber": "12345",
+#                     "connectionId": "00000000-0000-0000-0000-000000000006",
+#                     "connectionNumber": "000001",
 #                     "hasOpenOrders": false,
 #                     "shovalOpenOrder": null,
 #                     "powerConnectionSize": 279830006,
 #                     "isLowVolte": true,
 #                     "isCanIncrease": false,
-#                     "meterId": "b67ea524-300f-4a85-9ef4-54d30a753452",
-#                     "meterNumber": "1234",
+#                     "meterId": "00000000-0000-0000-0000-000000000007",
+#                     "meterNumber": "000001",
 #                     "voltType": 279830001,
 #                     "currentReader": "17.32",
 #                     "currentAmpere": null,
@@ -48,8 +47,8 @@ from mashumaro import DataClassDictMixin, field_options
 #             ],
 #             "possible2ShiftBit": false,
 #             "building": {
-#                 "id": "b67ea524-300f-4a85-9ef4-54d30a753452",
-#                 "name": "700045035",
+#                 "id": "00000000-0000-0000-0000-000000000008",
+#                 "name": "BLDG-0001",
 #                 "hasSAOrders": null,
 #                 "shovalSAOrder": null,
 #                 "multiResidentialBuilding": true,
@@ -61,7 +60,6 @@ from mashumaro import DataClassDictMixin, field_options
 #             "hasBackuplineOrders": false
 #         }
 #     ]
-# }
 # }
 
 

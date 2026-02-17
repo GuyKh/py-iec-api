@@ -210,6 +210,42 @@ IEC_OKTA_BASE_URL = "https://iec-ext.okta.com"
 - `fault_portal_models/` - Fault portal API models
 - `usage_calculator/` - Usage calculation logic
 
+### Model Structure Nuances (Implementation Rules)
+
+**Folder placement by endpoint family**:
+- IEC endpoints (`https://iecapi.iec.co.il/api/...`) -> `iec_api/models/`
+- MASA endpoints (`https://masa-mainportalapi.iec.co.il/api/...`, `https://masaapi-wa.azurewebsites.net/...`) -> `iec_api/masa_api_models/`
+- Fault portal endpoints -> `iec_api/fault_portal_models/`
+
+**File structure by endpoint**:
+- Prefer one file per endpoint/request-response shape in MASA and Fault Portal models.
+- Use endpoint-oriented names, e.g.:
+  - `manage_shared_accounts.py`
+  - `remove_contact_from_shared_account.py`
+  - `send_shared_account_invitation.py`
+- Avoid collecting unrelated request/response models in a single generic file.
+
+**Dataclass + mashumaro conventions**:
+- Use `@dataclass` with `DataClassDictMixin`.
+- Map API fields with `field_options(alias="...")` when Python names differ.
+- For request models that must serialize API keys exactly (e.g. `Id`, `primaryContact`), use:
+  - `class Config(BaseConfig): serialize_by_alias = True`
+- Keep model fields minimal and typed; avoid speculative fields.
+
+**Sanitization and privacy rules**:
+- Strip/normalize IDs and tokens in `__post_init__` (for example: `value.strip()`).
+- Do not include private/personally identifying fields in model classes unless required by behavior.
+- If API response includes private fields (name/government ID/phone/email), model only required non-sensitive fields by default.
+
+**Required endpoint comment examples in model files**:
+- Each new model file should include a top comment block with:
+  - HTTP method
+  - Full endpoint URL with placeholders
+  - Request example (if applicable)
+  - Response example
+- Example data must be sanitized (placeholder UUIDs, masked/synthetic values, no real personal data).
+- Match the existing repository style used in other model files (plain `#` comment blocks above classes).
+
 **Core Models** (using `mashumaro` for JSON serialization):
 
 | Model | Purpose |
@@ -492,9 +528,41 @@ equipment = await client.get_masa_equipment()
 - Docstrings on all public methods
 - Type hints on all parameters/returns
 - Comments for complex logic
+- New endpoint model files must include method/URL/request/response comment examples with sanitized data
+
+**Tooling and Workflow Standards**:
+- Use `ruff` for linting and import ordering; fix `I001` and style issues before committing.
+- Validate model parsing/serialization behavior with focused pytest cases under `tests/`.
+- When adding endpoints, update all required layers together:
+  1. `const.py` (URL constant)
+  2. model file(s)
+  3. `data.py` method
+  4. `iec_client.py` facade method
+  5. tests
+- Keep changes surgical: avoid unrelated refactors in endpoint/model PRs.
 
 **Git**:
 - Pre-commit hooks enabled
 - Atomic, meaningful commits
 - Branch protection on main
 
+## PR Checklist
+
+Use this checklist before opening or merging a PR (especially endpoint/model work):
+
+- [ ] Endpoint constants added/updated in `iec_api/const.py`
+- [ ] Model files placed in the correct folder (`models/`, `masa_api_models/`, `fault_portal_models/`)
+- [ ] For MASA/Fault Portal: models split by endpoint file (no unrelated model bundling)
+- [ ] Request models serialize API keys correctly (`field_options(alias=...)`, `serialize_by_alias` when needed)
+- [ ] Sensitive/private fields are excluded unless strictly required
+- [ ] ID/token/date normalization/sanitization logic added where relevant (`__post_init__`)
+- [ ] Each new model file includes sanitized HTTP comment examples:
+  - [ ] Method
+  - [ ] URL
+  - [ ] Request (if applicable)
+  - [ ] Response
+- [ ] Data layer wired in `iec_api/data.py`
+- [ ] Client facade wired in `iec_api/iec_client.py`
+- [ ] Focused tests added/updated in `tests/`
+- [ ] `ruff check` passes
+- [ ] Relevant `pytest` tests pass

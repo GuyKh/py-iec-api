@@ -56,10 +56,20 @@ GET_OUTAGES_URL = IEC_API_BASE_URL + "outages/transactions/{account_id}/2"
 SEND_CONSUMPTION_REPORT_TO_MAIL_URL = IEC_API_BASE_URL + "/Consumption/SendConsumptionReportToMail/{contract_id}"
 GET_SOCIAL_DISCOUNT_URL = IEC_API_BASE_URL + "SocialDiscount/{bp_number}"
 GET_TOUZ_COMPATIBILITY_URL = IEC_API_BASE_URL + "calculator/touz/{contract_id}/{bp_number}/compatible"
+GET_MOBILITY_STATUS_URL = IEC_API_BASE_URL + "Mobility/{contract_id}/{device_id}"
 
 GET_MASA_CITIES_LOOKUP_URL = IEC_MASA_MAINPORTAL_API_BASE_URL + "cities"
 GET_MASA_USER_PROFILE_LOOKUP_URL = IEC_MASA_MAINPORTAL_API_BASE_URL + "contacts/userprofile"
 GET_MASA_CONTACT_ACCOUNT_USER_PROFILE_URL = IEC_MASA_MAINPORTAL_API_BASE_URL + "contacts/account/0/userprofile"
+GET_MASA_MANAGE_SHARED_ACCOUNTS_URL = (
+    IEC_MASA_MAINPORTAL_API_BASE_URL + "contacts/{user_profile_id}/contract/{contract_id}"
+)
+POST_MASA_REMOVE_SHARED_CONTRACT_CONTACT_URL = (
+    IEC_MASA_MAINPORTAL_API_BASE_URL + "connectionbetweencontactandcontract/remove"
+)
+POST_MASA_CREATE_CONNECTION_REQUEST_URL = (
+    IEC_MASA_MAINPORTAL_API_BASE_URL + "connectionbetweencontactandcontract/createconnectionrequest"
+)
 GET_MASA_ORDER_TITLES_URL = IEC_MASA_API_BASE_URL + "accounts/{account_id}/orders/titles"
 GET_MASA_ORDER_LOOKUP_URL = IEC_MASA_API_BASE_URL + "orderLookup"
 GET_MASA_VOLT_LEVELS_URL = IEC_MASA_API_BASE_URL + "voltLevels/active"
