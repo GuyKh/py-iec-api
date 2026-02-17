@@ -3,6 +3,7 @@ import atexit
 import logging
 from datetime import datetime
 from typing import List, Optional
+from uuid import UUID
 
 import aiofiles
 import aiohttp
@@ -17,7 +18,11 @@ from iec_api.masa_api_models.cities import City
 from iec_api.masa_api_models.contact_account_user_profile import MasaMainPortalContactAccountUserProfile
 from iec_api.masa_api_models.equipment import GetEquipmentResponse
 from iec_api.masa_api_models.lookup import GetLookupResponse
+from iec_api.masa_api_models.manage_shared_accounts import ManageSharedAccountsResponse
+from iec_api.masa_api_models.masa_types import IDWrapper
 from iec_api.masa_api_models.order_lookup import OrderCategory
+from iec_api.masa_api_models.remove_contact_from_shared_account import RemoveContactFromSharedAccountRequest
+from iec_api.masa_api_models.send_shared_account_invitation import SendSharedAccountInvitationRequest
 from iec_api.masa_api_models.titles import GetTitleResponse
 from iec_api.masa_api_models.user_profile import MasaUserProfile
 from iec_api.masa_api_models.volt_levels import VoltLevel
@@ -36,6 +41,7 @@ from iec_api.models.exceptions import IECLoginError
 from iec_api.models.invoice import GetInvoicesBody
 from iec_api.models.jwt import JWT
 from iec_api.models.meter_reading import MeterReadings
+from iec_api.models.mobility import MobilityStatus
 from iec_api.models.outages import Outage
 from iec_api.models.remote_reading import ReadingResolution, RemoteReadingResponse
 from iec_api.models.social_discount import SocialDiscount
@@ -681,6 +687,57 @@ class IecClient:
 
         return await data.get_touz_compatibility(self._session, self._token, contract_id, bp_number)
 
+    async def get_mobility_status(
+        self, device_id: str, contract_id: Optional[str] = None
+    ) -> Optional[MobilityStatus]:
+        """Get mobility status for a contract/device pair."""
+        await self.check_token()
+
+        if not contract_id:
+            contract_id = self._contract_id
+
+        if not contract_id:
+            raise ValueError("Contract ID must be provided")
+
+        return await data.get_mobility_status(self._session, self._token, contract_id, device_id)
+
+    async def get_shared_accounts(
+        self, masa_user_profile_id: UUID | str, masa_contract_id: UUID | str
+    ) -> ManageSharedAccountsResponse:
+        """Get all shared-account connections for a MASA user profile and MASA contract."""
+        await self.check_token()
+        return await data.get_shared_accounts(self._session, self._token, masa_user_profile_id, masa_contract_id)
+
+    async def remove_contact_from_shared_account(
+        self,
+        masa_connection_id: UUID | str,
+        masa_contact_id: UUID | str,
+        masa_primary_contact_id: UUID | str,
+        masa_contract_id: UUID | str,
+    ) -> bool:
+        """Remove a shared contact from a MASA contract."""
+        await self.check_token()
+
+        request = RemoveContactFromSharedAccountRequest(
+            id=UUID(masa_connection_id),
+            contact=IDWrapper(id=UUID(masa_contact_id)),
+            contract=IDWrapper(id=UUID(masa_contract_id)),
+            primary_contact=IDWrapper(id=UUID(masa_primary_contact_id)),
+        )
+        return await data.remove_contact_from_shared_account(self._session, self._token, request)
+
+    async def send_shared_account_invitation(
+        self, masa_contact_id: UUID | str, masa_contract_id: UUID | str
+    ) -> Optional[str]:
+        """Create a shared contract invitation and return the invitation URL."""
+        await self.check_token()
+
+        request = SendSharedAccountInvitationRequest(
+            contact=IDWrapper(id=UUID(masa_contact_id)),
+            contract=IDWrapper(id=UUID(masa_contract_id)),
+        )
+        return await data.send_shared_account_invitation(self._session, self._token, request)
+
     async def get_outages_by_account(self, account_id: Optional[str] = None) -> Optional[List[Outage]]:
         """Get Outages for the Account
         Args:
@@ -703,23 +760,23 @@ class IecClient:
     # Masa API Flow
     # ----------------
 
-    async def get_masa_equipment_by_account(self, account_id: Optional[str] = None) -> GetEquipmentResponse:
+    async def get_masa_equipment_by_account(self, masa_account_id: Optional[str] = None) -> GetEquipmentResponse:
         """Get Equipment for the Account
         Args:
             self: The instance of the class.
-            account_id (str): The Account ID of the meter.
+            masa_account_id (str): The MASA account ID of the meter.
         Returns:
             GetEquipmentResponse: Get Equipment Response
         """
         await self.check_token()
 
-        if not account_id:
-            account_id = self._account_id
+        if not masa_account_id:
+            masa_account_id = self._account_id
 
-        if not account_id:
+        if not masa_account_id:
             raise ValueError("Account Id must be provided")
 
-        return await masa_data.get_masa_equipments(self._session, self._token, account_id)
+        return await masa_data.get_masa_equipments(self._session, self._token, masa_account_id)
 
     async def get_masa_user_profile(self) -> MasaUserProfile:
         """Get Masa User Profile
@@ -775,23 +832,23 @@ class IecClient:
         await self.check_token()
         return await masa_data.get_masa_volt_levels(self._session, self._token)
 
-    async def get_masa_order_titles(self, account_id: Optional[str] = None) -> GetTitleResponse:
+    async def get_masa_order_titles(self, masa_account_id: Optional[str] = None) -> GetTitleResponse:
         """Get Masa Cities
         Args:
             self: The instance of the class.
-            account_id (str): The Account ID of the meter.
+            masa_account_id (str): The MASA account ID of the meter.
         Returns:
             GetTitleResponse: Get Title Response
         """
         await self.check_token()
 
-        if not account_id:
-            account_id = self._account_id
+        if not masa_account_id:
+            masa_account_id = self._account_id
 
-        if not account_id:
+        if not masa_account_id:
             raise ValueError("Account Id must be provided")
 
-        return await masa_data.get_masa_order_titles(self._session, self._token, account_id)
+        return await masa_data.get_masa_order_titles(self._session, self._token, masa_account_id)
 
     async def get_masa_lookup(self) -> GetLookupResponse:
         """Get Masa Lookup
@@ -803,12 +860,12 @@ class IecClient:
         await self.check_token()
         return await masa_data.get_masa_lookup(self._session, self._token)
 
-    async def get_masa_connection_size_from_masa(self, account_id: Optional[str] = None) -> Optional[str]:
+    async def get_masa_connection_size_from_masa(self, masa_account_id: Optional[str] = None) -> Optional[str]:
         if not self._masa_connection_size_map:
             lookup = await self.get_masa_lookup()
             self._masa_connection_size_map = {obj.size_type: obj.name for obj in lookup.connection_size_types}
 
-        equipment = await self.get_masa_equipment_by_account(account_id)
+        equipment = await self.get_masa_equipment_by_account(masa_account_id)
 
         if not equipment or len(equipment.items) < 1 or len(equipment.items[0].connections) < 1:
             return None

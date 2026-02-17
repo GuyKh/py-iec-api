@@ -1,6 +1,7 @@
 import logging
 from datetime import datetime
-from typing import List, Optional, TypeVar
+from typing import Any, List, Optional, TypeVar
+from uuid import UUID
 
 from aiohttp import ClientSession
 from mashumaro.codecs import BasicDecoder
@@ -22,14 +23,21 @@ from iec_api.const import (
     GET_ELECTRIC_BILL_URL,
     GET_INVOICE_PDF_URL,
     GET_LAST_METER_READING_URL,
+    GET_MASA_MANAGE_SHARED_ACCOUNTS_URL,
+    GET_MOBILITY_STATUS_URL,
     GET_OUTAGES_URL,
     GET_REQUEST_READING_URL,
     GET_SOCIAL_DISCOUNT_URL,
     GET_TENANT_IDENTITY_URL,
     GET_TOUZ_COMPATIBILITY_URL,
     HEADERS_WITH_AUTH,
+    POST_MASA_CREATE_CONNECTION_REQUEST_URL,
+    POST_MASA_REMOVE_SHARED_CONTRACT_CONTACT_URL,
     SEND_CONSUMPTION_REPORT_TO_MAIL_URL,
 )
+from iec_api.masa_api_models.manage_shared_accounts import ManageSharedAccountsResponse
+from iec_api.masa_api_models.remove_contact_from_shared_account import RemoveContactFromSharedAccountRequest
+from iec_api.masa_api_models.send_shared_account_invitation import SendSharedAccountInvitationRequest
 from iec_api.models.account import Account
 from iec_api.models.account import decoder as account_decoder
 from iec_api.models.contract import Contract, Contracts
@@ -56,6 +64,8 @@ from iec_api.models.invoice import decoder as invoice_decoder
 from iec_api.models.jwt import JWT
 from iec_api.models.meter_reading import MeterReadings
 from iec_api.models.meter_reading import decoder as meter_reading_decoder
+from iec_api.models.mobility import MobilityStatus
+from iec_api.models.mobility import decoder as mobility_decoder
 from iec_api.models.outages import Outage
 from iec_api.models.outages import decoder as outages_decoder
 from iec_api.models.remote_reading import (
@@ -117,8 +127,7 @@ async def _post_response_with_descriptor(
     Returns:
         T: The response with a descriptor, with its type specified by the return type annotation.
     """
-    headers = commons.add_auth_bearer_to_headers(HEADERS_WITH_AUTH, jwt_token.id_token)
-    response = await commons.send_post_request(session=session, url=request_url, headers=headers, json_data=json_data)
+    response = await _post_response(session=session, jwt_token=jwt_token, request_url=request_url, json_data=json_data)
 
     response_with_descriptor = decoder.decode(response)
 
@@ -128,6 +137,13 @@ async def _post_response_with_descriptor(
         )
 
     return response_with_descriptor.data
+
+
+async def _post_response(
+    session: ClientSession, jwt_token: JWT, request_url: str, json_data: Optional[dict]
+) -> dict[str, Any]:
+    headers = commons.add_auth_bearer_to_headers(HEADERS_WITH_AUTH, jwt_token.id_token)
+    return await commons.send_post_request(session=session, url=request_url, headers=headers, json_data=json_data)
 
 
 async def get_accounts(session: ClientSession, token: JWT) -> Optional[List[Account]]:
@@ -420,3 +436,60 @@ async def get_touz_compatibility(
         headers=headers,
     )
     return TouzCompatibility.from_dict(response)
+
+
+async def get_mobility_status(
+    session: ClientSession, token: JWT, contract_id: str, device_id: str
+) -> Optional[MobilityStatus]:
+    """Get mobility status for a contract/device pair."""
+    return await _get_response_with_descriptor(
+        session,
+        token,
+        GET_MOBILITY_STATUS_URL.format(contract_id=contract_id, device_id=device_id),
+        mobility_decoder,
+    )
+
+
+async def get_shared_accounts(
+    session: ClientSession, token: JWT, masa_user_profile_id: UUID | str, masa_contract_id: UUID | str
+) -> ManageSharedAccountsResponse:
+    """Get the contact/contract sharing map for a user profile."""
+    headers = commons.add_auth_bearer_to_headers(HEADERS_WITH_AUTH.copy(), token.id_token)
+    response = await commons.send_get_request(
+        session=session,
+        url=GET_MASA_MANAGE_SHARED_ACCOUNTS_URL.format(
+            user_profile_id=str(masa_user_profile_id), contract_id=str(masa_contract_id)
+        ),
+        headers=headers,
+    )
+    return ManageSharedAccountsResponse.from_dict(response)
+
+
+async def remove_contact_from_shared_account(
+    session: ClientSession, token: JWT, request: RemoveContactFromSharedAccountRequest
+) -> bool:
+    """Remove a shared contact from a contract."""
+    await _post_response(
+        session=session,
+        jwt_token=token,
+        request_url=POST_MASA_REMOVE_SHARED_CONTRACT_CONTACT_URL,
+        json_data=request.to_dict(),
+    )
+    return True
+
+
+async def send_shared_account_invitation(
+    session: ClientSession, token: JWT, request: SendSharedAccountInvitationRequest
+) -> Optional[str]:
+    """Create a shared contract invitation and return the invitation URL."""
+    response = await _post_response(
+        session=session,
+        jwt_token=token,
+        request_url=POST_MASA_CREATE_CONNECTION_REQUEST_URL,
+        json_data=request.to_dict(),
+    )
+    if isinstance(response, str):
+        return response.strip()
+    if response is None:
+        return None
+    return str(response).strip()
