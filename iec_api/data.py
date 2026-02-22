@@ -31,6 +31,7 @@ from iec_api.const import (
     GET_TENANT_IDENTITY_URL,
     GET_TOUZ_COMPATIBILITY_URL,
     HEADERS_WITH_AUTH,
+    HEADERS_WITH_AUTH_MASA_PORTAL,
     POST_MASA_CREATE_CONNECTION_REQUEST_URL,
     POST_MASA_REMOVE_SHARED_CONTRACT_CONTACT_URL,
     SEND_CONSUMPTION_REPORT_TO_MAIL_URL,
@@ -454,7 +455,7 @@ async def get_shared_accounts(
     session: ClientSession, token: JWT, masa_user_profile_id: UUID | str, masa_contract_id: UUID | str
 ) -> ManageSharedAccountsResponse:
     """Get the contact/contract sharing map for a user profile."""
-    headers = commons.add_auth_bearer_to_headers(HEADERS_WITH_AUTH.copy(), token.id_token)
+    headers = commons.add_auth_bearer_to_headers(HEADERS_WITH_AUTH_MASA_PORTAL.copy(), token.id_token)
     response = await commons.send_get_request(
         session=session,
         url=GET_MASA_MANAGE_SHARED_ACCOUNTS_URL.format(
@@ -469,10 +470,11 @@ async def remove_contact_from_shared_account(
     session: ClientSession, token: JWT, request: RemoveContactFromSharedAccountRequest
 ) -> bool:
     """Remove a shared contact from a contract."""
-    await _post_response(
+    headers = commons.add_auth_bearer_to_headers(HEADERS_WITH_AUTH_MASA_PORTAL.copy(), token.id_token)
+    await commons.send_post_request(
         session=session,
-        jwt_token=token,
-        request_url=POST_MASA_REMOVE_SHARED_CONTRACT_CONTACT_URL,
+        url=POST_MASA_REMOVE_SHARED_CONTRACT_CONTACT_URL,
+        headers=headers,
         json_data=request.to_dict(),
     )
     return True
@@ -482,10 +484,11 @@ async def send_shared_account_invitation(
     session: ClientSession, token: JWT, request: SendSharedAccountInvitationRequest
 ) -> Optional[str]:
     """Create a shared contract invitation and return the invitation URL."""
-    response = await _post_response(
+    headers = commons.add_auth_bearer_to_headers(HEADERS_WITH_AUTH_MASA_PORTAL.copy(), token.id_token)
+    response = await commons.send_post_request(
         session=session,
-        jwt_token=token,
-        request_url=POST_MASA_CREATE_CONNECTION_REQUEST_URL,
+        url=POST_MASA_CREATE_CONNECTION_REQUEST_URL,
+        headers=headers,
         json_data=request.to_dict(),
     )
     if isinstance(response, str):

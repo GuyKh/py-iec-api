@@ -52,6 +52,9 @@ async def main():
         tariff = await client.get_kwh_tariff()
         print(tariff)
 
+        profile = await client.get_masa_contact_account_user_profile()
+        print(profile)
+
         # client.manual_login()
         customer = await client.get_customer()
         print(customer)

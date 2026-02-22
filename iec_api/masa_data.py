@@ -13,6 +13,7 @@ from iec_api.const import (
     GET_MASA_USER_PROFILE_LOOKUP_URL,
     GET_MASA_VOLT_LEVELS_URL,
     HEADERS_WITH_AUTH,
+    HEADERS_WITH_AUTH_MASA_PORTAL,
 )
 from iec_api.masa_api_models.cities import CitiesResponse, City
 from iec_api.masa_api_models.contact_account_user_profile import MasaMainPortalContactAccountUserProfile
@@ -35,7 +36,7 @@ async def get_masa_cities(session: ClientSession, token: JWT) -> List[City]:
 
     global cities
     if not cities:
-        headers = commons.add_auth_bearer_to_headers(HEADERS_WITH_AUTH, token.id_token)
+        headers = commons.add_auth_bearer_to_headers(HEADERS_WITH_AUTH_MASA_PORTAL, token.id_token)
         # sending get request and saving the response as response object
         response = await commons.send_get_request(session=session, url=GET_MASA_CITIES_LOOKUP_URL, headers=headers)
 
@@ -59,7 +60,7 @@ async def get_masa_order_categories(session: ClientSession, token: JWT) -> List[
 async def get_masa_user_profile(session: ClientSession, token: JWT) -> MasaUserProfile:
     """Get User Profile from IEC Masa API."""
 
-    headers = commons.add_auth_bearer_to_headers(HEADERS_WITH_AUTH, token.id_token)
+    headers = commons.add_auth_bearer_to_headers(HEADERS_WITH_AUTH_MASA_PORTAL, token.id_token)
     # sending get request and saving the response as response object
     response = await commons.send_get_request(session=session, url=GET_MASA_USER_PROFILE_LOOKUP_URL, headers=headers)
 
@@ -81,7 +82,7 @@ async def get_masa_contact_account_user_profile(
         MasaMainPortalContactAccountUserProfile: The contact account user profile.
     """
 
-    headers = commons.add_auth_bearer_to_headers(HEADERS_WITH_AUTH, token.id_token)
+    headers = commons.add_auth_bearer_to_headers(HEADERS_WITH_AUTH_MASA_PORTAL, token.id_token)
     # sending get request and saving the response as response object
     response = await commons.send_get_request(
         session=session, url=GET_MASA_CONTACT_ACCOUNT_USER_PROFILE_URL, headers=headers

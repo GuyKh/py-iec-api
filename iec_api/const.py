@@ -23,6 +23,10 @@ HEADERS_WITH_AUTH = HEADERS_NO_AUTH.copy()  # Make a copy of the original dictio
 HEADERS_WITH_AUTH["Authorization"] = "Bearer 1234"
 HEADERS_WITH_AUTH["Cookie"] = "ARRAffinity=?; ARRAffinitySameSite=?; GCLB=?"
 
+HEADERS_WITH_AUTH_MASA_PORTAL = HEADERS_NO_AUTH.copy()
+HEADERS_WITH_AUTH_MASA_PORTAL["Authorization"] = "Bearer 1234"
+HEADERS_WITH_AUTH_MASA_PORTAL["portalcode"] = "6"
+
 TIMEZONE = pytz.timezone("Asia/Jerusalem")
 IEC_API_BASE_URL = "https://iecapi.iec.co.il/api/"
 IEC_FAULT_PORTAL_API_URL = "https://masa-faultsportalapi.iec.co.il/api/"
