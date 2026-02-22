@@ -2,16 +2,18 @@ FROM python:3.13.2-slim AS base
 
 WORKDIR /src
 
+# Install uv
+RUN pip install uv
+
 COPY pyproject.toml README.md .
 COPY iec_api ./iec_api
-RUN pip install poetry
 
 FROM base AS dependencies
-RUN poetry install --no-dev
+RUN uv pip install --system -r pyproject.toml
 
 FROM base AS development
-RUN poetry install
+RUN uv sync --dev
 COPY . .
 
 FROM dependencies AS production
-COPY iec_api src
+COPY iec_api ./iec_api
