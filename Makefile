@@ -5,20 +5,20 @@ APP_NAME="iec-api"
 ################################
 
 local/install:
-	poetry install
+	uv sync
 
 local/tests:
-	poetry run pytest --cov-report=html --cov-report=term --cov . 
+	uv run pytest --cov-report=html --cov-report=term --cov . 
 
 local/lint:
-	poetry run ruff check .
-	poetry run ruff . --fix --exit-non-zero-on-fix
+	uv run ruff check .
+	uv run ruff . --fix --exit-non-zero-on-fix
 
 local/lint/fix:
-	poetry run black .
+	uv run black .
 
 local/run:
-	poetry run python src/main.py
+	uv run python src/main.py
 
 
 ############################################
@@ -35,16 +35,16 @@ docker/down:
 	docker compose down --remove-orphans
 
 docker/test:
-	docker compose run ${APP_NAME} poetry run pytest --cov-report=html --cov-report=term --cov .
+	docker compose run ${APP_NAME} uv run pytest --cov-report=html --cov-report=term --cov .
 
 docker/lint:
-	docker compose run ${APP_NAME} poetry run ruff check .
+	docker compose run ${APP_NAME} uv run ruff check .
 
 docker/lint/fix:
-	docker compose run ${APP_NAME} poetry run ruff . --fix --exit-non-zero-on-fix
+	docker compose run ${APP_NAME} uv run ruff . --fix --exit-non-zero-on-fix
 
 docker/run:
-	docker compose run ${APP_NAME} poetry run python src/main.py
+	docker compose run ${APP_NAME} uv run python src/main.py
 
 ##################
 # HEPFUL COMMANDS

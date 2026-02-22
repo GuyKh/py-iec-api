@@ -5,6 +5,7 @@ from iec_api.iec_client import IecClient
 from iec_api.models.jwt import JWT
 
 
+@unittest.skip("Requires real IEC API credentials - not a unit test")
 class CommonsTest(unittest.IsolatedAsyncioTestCase):
     jwt_token = {
         "access_token": "Fill",
@@ -16,7 +17,7 @@ class CommonsTest(unittest.IsolatedAsyncioTestCase):
     }
 
     async def test_e2e_with_existing_token(self):
-        user_id = 1234567832
+        user_id = 123456782
 
         client = IecClient(user_id)
         await client.load_jwt_token(JWT.from_dict(self.jwt_token))

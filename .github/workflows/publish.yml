@@ -77,21 +77,21 @@ jobs:
               with:
                   python-version: "3.11"
 
-            - name: Install Poetry
-              run: |
-                  curl -sSL https://install.python-poetry.org | python3 -
-                  echo "$HOME/.local/bin" >> $GITHUB_PATH
+            - name: Install uv
+              uses: astral-sh/setup-uv@v5
+              with:
+                  enable-cache: true
 
-            - name: Set project version with Poetry
+            - name: Set project version
               run: |
-                  poetry version ${{ needs.details.outputs.new_version }}
+                  uv version ${{ needs.details.outputs.new_version }}
 
             - name: Install dependencies
-              run: poetry install --sync --no-interaction
+              run: uv sync
 
             - name: Build source publish
               env:
                   PYPI_TOKEN: ${{ secrets.PYPI_API_TOKEN }}
               run: |
-                  poetry config pypi-token.pypi $PYPI_TOKEN
-                  poetry publish --build
+                  uv build
+                  uv publish --key $PYPI_TOKEN
