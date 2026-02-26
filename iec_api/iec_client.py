@@ -440,13 +440,13 @@ class IecClient:
 
     async def get_remote_reading(
         self,
-        meter_kind: str,
         meter_serial_number: str,
         meter_code: int,
         last_invoice_date: datetime,
         from_date: datetime,
         resolution: ReadingResolution = ReadingResolution.DAILY,
         contract_id: Optional[str] = None,
+        meter_kind: str = "Consumption",
     ) -> Optional[RemoteReadingResponse]:
         """
         Retrieves a remote reading for a specific meter using the provided parameters.
@@ -467,15 +467,15 @@ class IecClient:
             contract_id = self._contract_id
 
         return await data.get_remote_reading(
-            self._session,
-            self._token,
-            contract_id,
-            meter_kind,
-            meter_serial_number,
-            meter_code,
-            last_invoice_date,
-            from_date,
-            resolution,
+            session=self._session,
+            token=self._token,
+            contract_id=contract_id,
+            meter_serial_number=meter_serial_number,
+            meter_code=meter_code,
+            last_invoice_date=last_invoice_date,
+            from_date=from_date,
+            resolution=resolution,
+            meter_kind=meter_kind,
         )
 
     async def get_device_type(
