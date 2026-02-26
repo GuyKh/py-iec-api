@@ -440,6 +440,7 @@ class IecClient:
 
     async def get_remote_reading(
         self,
+        meter_kind: str,
         meter_serial_number: str,
         meter_code: int,
         last_invoice_date: datetime,
@@ -451,6 +452,7 @@ class IecClient:
         Retrieves a remote reading for a specific meter using the provided parameters.
         Args:
             self: The instance of the class.
+            meter_kind (str): The meter kind (for example from devices API).
             meter_serial_number (str): The serial number of the meter.
             meter_code (int): The code associated with the meter.
             last_invoice_date (str): The date of the last invoice.
@@ -468,6 +470,7 @@ class IecClient:
             self._session,
             self._token,
             contract_id,
+            meter_kind,
             meter_serial_number,
             meter_code,
             last_invoice_date,
