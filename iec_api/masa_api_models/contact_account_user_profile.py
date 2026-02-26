@@ -296,7 +296,6 @@ class MasaMainPortalContactAccountUserProfile(DataClassDictMixin):
     government_id: str = field(metadata=field_options(alias="governmentid"))
     id_type: int = field(metadata=field_options(alias="idType"))
     first_name: str = field(metadata=field_options(alias="firstName"))
-    last_name: str = field(metadata=field_options(alias="lastName"))
     email: str = field(metadata=field_options(alias="email"))
     phone_number: str = field(metadata=field_options(alias="phoneNumber"))
     accounts: List[MainPortalFullAccount] = field(metadata=field_options(alias="accounts"))
@@ -310,3 +309,4 @@ class MasaMainPortalContactAccountUserProfile(DataClassDictMixin):
     verification_status: bool = field(metadata=field_options(alias="verificationStatus"))
     id: UUID = field(metadata=field_options(alias="id"))
     logical_name: str = field(metadata=field_options(alias="logicalName"))
+    last_name: Optional[str] = field(default=None, metadata=field_options(alias="lastName"))
