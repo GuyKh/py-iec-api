@@ -115,7 +115,7 @@ class RemoteReadingResponse(DataClassDictMixin):
     report_status: int = field(metadata=field_options(alias="reportStatus"))
     contract_number: str = field(default="", metadata=field_options(alias="contractNumber"))
     meter_list: list["MeterReadingData"] = field(default_factory=list, metadata=field_options(alias="meterList"))
-    taoz_list: list = field(default_factory=list, metadata=field_options(alias="taozList"))
+    taoz_list: list["TaozReading"] = field(default_factory=list, metadata=field_options(alias="taozList"))
     report_status_text: Optional[str] = field(default=None, metadata=field_options(alias="reportStatusText"))
 
 
@@ -130,6 +130,19 @@ class PeriodConsumption(DataClassDictMixin):
 
     @classmethod
     def __post_deserialize__(cls, obj: "PeriodConsumption") -> "PeriodConsumption":
+        object.__setattr__(obj, "interval", convert_to_tz_aware_datetime(obj.interval))
+        return obj
+
+
+@dataclass(frozen=True)
+class TaozReading(DataClassDictMixin):
+    """Taoz reading dataclass."""
+
+    interval: datetime
+    taoz: int
+
+    @classmethod
+    def __post_deserialize__(cls, obj: "TaozReading") -> "TaozReading":
         object.__setattr__(obj, "interval", convert_to_tz_aware_datetime(obj.interval))
         return obj
 

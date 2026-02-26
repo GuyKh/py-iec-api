@@ -1,6 +1,6 @@
 import unittest
 
-from iec_api.models.remote_reading import PeriodConsumption, RemoteReadingResponse
+from iec_api.models.remote_reading import PeriodConsumption, RemoteReadingResponse, TaozReading
 
 
 class PeriodConsumptionTest(unittest.TestCase):
@@ -57,6 +57,24 @@ class MeterReadingDataTest(unittest.TestCase):
         self.assertEqual(intervals, sorted(intervals))
         for pc in meter.period_consumptions:
             self.assertIsNotNone(pc.interval.tzinfo)
+
+
+class TaozListTest(unittest.TestCase):
+    def test_taoz_list_items_are_typed_and_tz_aware(self):
+        payload = {
+            "reportStatus": 0,
+            "meterList": [],
+            "taozList": [
+                {"interval": "2026-02-25T22:00:00+00:00", "taoz": 3},
+                {"interval": "2026-02-25T23:00:00+00:00", "taoz": 1},
+            ],
+        }
+
+        resp = RemoteReadingResponse.from_dict(payload)
+        self.assertEqual(len(resp.taoz_list), 2)
+        self.assertIsInstance(resp.taoz_list[0], TaozReading)
+        self.assertEqual(resp.taoz_list[0].taoz, 3)
+        self.assertIsNotNone(resp.taoz_list[0].interval.tzinfo)
 
 
 if __name__ == "__main__":
