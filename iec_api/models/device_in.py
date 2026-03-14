@@ -2,7 +2,7 @@ from dataclasses import dataclass, field
 
 from mashumaro import DataClassDictMixin, field_options
 
-# GET https://iecapi.iec.co.il/api/DeviceIn/{bp_number}
+# GET https://iecapi.iec.co.il/api/DeviceIn/{contract_id}
 #
 # Return format is:
 # {

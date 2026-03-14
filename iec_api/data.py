@@ -419,11 +419,11 @@ async def get_social_discount(session: ClientSession, token: JWT, bp_number: str
     return SocialDiscount.from_dict(response)
 
 
-async def get_device_in(session: ClientSession, token: JWT, bp_number: str) -> Optional[DeviceInResponse]:
+async def get_device_in(session: ClientSession, token: JWT, contract_id: str) -> Optional[DeviceInResponse]:
     """Get device information from DeviceIn endpoint."""
     headers = commons.add_auth_bearer_to_headers(HEADERS_WITH_AUTH, token.id_token)
     response = await commons.send_get_request(
-        session=session, url=GET_DEVICE_IN_URL.format(bp_number=bp_number), headers=headers
+        session=session, url=GET_DEVICE_IN_URL.format(contract_id=contract_id), headers=headers
     )
     return DeviceInResponse.from_dict(response)
 
