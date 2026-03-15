@@ -66,8 +66,8 @@ async def main():
         reading = await client.get_last_meter_reading(customer.bp_number, contracts[0].contract_id)
         print(reading)
 
-        devices = await client.get_devices()
-        device = devices[0]
+        device_in = await client.get_device_in()
+        device = device_in.devices[0]
         print(device)
 
         device_details = await client.get_device_by_device_id(device.device_number)
@@ -78,7 +78,7 @@ async def main():
         selected_date: datetime = datetime.now() - timedelta(days=30)
 
         remote_readings = await client.get_remote_reading(
-            device.device_number, int(device.device_code), selected_date, selected_date
+            "Consumption", device.device_number, int(device.device_code), selected_date, selected_date
         )
 
         if remote_readings and remote_readings.meter_list and len(remote_readings.meter_list) > 0:

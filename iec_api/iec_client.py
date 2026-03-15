@@ -651,24 +651,24 @@ class IecClient:
 
         return await data.get_social_discount(self._session, self._token, bp_number)
 
-    async def get_device_in(self, bp_number: Optional[str] = None) -> Optional[DeviceInResponse]:
+    async def get_device_in(self, contract_id: Optional[str] = None) -> Optional[DeviceInResponse]:
         """
         Get device information for active devices
         Args:
             self: The instance of the class.
-            bp_number (str): The BP number. Defaults to client's BP number.
+            contract_id (str): The Contract ID. Defaults to client's Contract ID.
         Returns:
             DeviceInResponse: Device information including status and device list
         """
         await self.check_token()
 
-        if not bp_number:
-            bp_number = self._bp_number
+        if not contract_id:
+            contract_id = self._contract_id
 
-        if not bp_number:
-            raise ValueError("BP number must be provided")
+        if not contract_id:
+            raise ValueError("Contract ID must be provided")
 
-        return await data.get_device_in(self._session, self._token, bp_number)
+        return await data.get_device_in(self._session, self._token, contract_id)
 
     async def get_touz_compatibility(
         self, contract_id: Optional[str] = None, bp_number: Optional[str] = None
