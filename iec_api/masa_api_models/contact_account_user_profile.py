@@ -189,13 +189,15 @@ class MainPortalContract(DataClassDictMixin):
     is_matam: bool = field(metadata=field_options(alias="isMatam"))
     supply_code: int = field(metadata=field_options(alias="supplyCode"))
     is_private_producer: bool = field(metadata=field_options(alias="isPrivateProducer"))
-    overload_rate_switch_bit: bool = field(metadata=field_options(alias="overloadRateSwitchBit"))
     contract_acc_number_in_shoval: int = field(metadata=field_options(alias="contractAccNumberInShoval"))
     account: SimpleAccount = field(metadata=field_options(alias="account"))
     id: UUID = field(metadata=field_options(alias="id"))
     logical_name: str = field(metadata=field_options(alias="logicalName"))
     state_code: int = field(metadata=field_options(alias="stateCode"))
     site: Optional[MainPortalSite] = field(default=None, metadata=field_options(alias="site"))
+    overload_rate_switch_bit: Optional[bool] = field(
+        default=None, metadata=field_options(alias="overloadRateSwitchBit")
+    )
 
 
 @dataclass
