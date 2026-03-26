@@ -298,6 +298,7 @@ class MasaMainPortalContactAccountUserProfile(DataClassDictMixin):
     first_name: str = field(metadata=field_options(alias="firstName"))
     email: str = field(metadata=field_options(alias="email"))
     phone_number: str = field(metadata=field_options(alias="phoneNumber"))
+    last_name: Optional[str] = field(default=None, metadata=field_options(alias="lastName"))
     accounts: List[MainPortalFullAccount] = field(metadata=field_options(alias="accounts"))
     phone_prefix: str = field(metadata=field_options(alias="phonePrefix"))
     is_connected_to_private_account: bool = field(metadata=field_options(alias="isConnectedToPrivateAccount"))
