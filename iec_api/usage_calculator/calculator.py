@@ -19,14 +19,32 @@ class UsageCalculator:
 
     def __init__(self):
         self.devices: list[ElectricDevice] = []
+        self._device_map: dict[str, ElectricDevice] = {}  # New: name -> device map
         self.rates: Rates | None = None
         self.is_loaded = False
 
     async def load_data(self, session: ClientSession):
+        """Load usage calculator data from the IEC API.
+
+        This method fetches device and rate information from the IEC API and
+        populates the internal caches for quick access.
+
+        Args:
+            session (ClientSession): The aiohttp client session to use for requests.
+
+        Returns:
+            None
+
+        Note:
+            If data is already loaded, this method will log an info message and return early.
+        """
         if not self.is_loaded:
             iec_api_data = await commons.send_get_request(session=session, url=GET_CALCULATOR_GADGET_URL)
             response = GetCalculatorResponse.from_dict(iec_api_data)
             self.devices: list[ElectricDevice] = response.electric_devices
+            self._device_map = {
+                device.name: device for device in response.electric_devices
+            }  # Build name -> device map for O(1) lookup
             self.rates: Rates | None = response.gadget_calculator_rates
             self.is_loaded = True
         else:
@@ -50,10 +68,7 @@ class UsageCalculator:
     def get_device_info_by_name(self, name: str) -> Optional[ElectricDevice]:
         if not self.is_loaded:
             raise ValueError("Usage calculator data is not loaded")
-        for device in self.devices:
-            if device.name == name:
-                return device
-        return None
+        return self._device_map.get(name)  # O(1) lookup using name -> device map
 
     def get_consumption_by_device_and_time(
         self, name: str, time_delta: timedelta, custom_usage_value: Optional[float]

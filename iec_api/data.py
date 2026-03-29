@@ -184,12 +184,12 @@ async def get_remote_reading(
     session: ClientSession,
     token: JWT,
     contract_id: str,
-    meter_kind: str,
     meter_serial_number: str,
     meter_code: int,
     last_invoice_date: datetime,
     from_date: datetime,
     resolution: ReadingResolution = ReadingResolution.DAILY,
+    meter_kind: str = "Consumption",
 ) -> Optional[RemoteReadingResponse]:
     smart_meter = SmartMeter(
         meter_kind=meter_kind,

@@ -78,7 +78,11 @@ async def main():
         selected_date: datetime = datetime.now() - timedelta(days=30)
 
         remote_readings = await client.get_remote_reading(
-            "Consumption", device.device_number, int(device.device_code), selected_date, selected_date
+            meter_kind="Consumption",
+            meter_serial_number=device.device_number,
+            meter_code=int(device.device_code),
+            last_invoice_date=selected_date,
+            from_date=selected_date,
         )
 
         if remote_readings and remote_readings.meter_list and len(remote_readings.meter_list) > 0:
