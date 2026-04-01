@@ -74,8 +74,10 @@ class IecClient:
         trace_config.on_request_end.append(commons.on_request_end_debug)
         trace_config.freeze()
 
+        # Increase timeout to handle DNS resolution delays
+        timeout = aiohttp.ClientTimeout(total=120, connect=60, sock_read=60)
         if not session:
-            session = aiohttp.ClientSession(trace_configs=[trace_config])
+            session = aiohttp.ClientSession(trace_configs=[trace_config], timeout=timeout)
             atexit.register(self._shutdown)
         else:
             session.trace_configs.append(trace_config)
