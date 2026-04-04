@@ -99,7 +99,7 @@ def parse_error_response(resp: ClientResponse, json_resp: dict[str, Any]):
             raise IECError(error_response.code, error_response.error)
         elif json_resp.get(ERROR_SUMMARY_FIELD_NAME) is not None:
             login_error_response = OktaError.from_dict(json_resp)
-            raise IECLoginError(resp.status, resp.reason + ": " + login_error_response.error_summary)
+            raise IECLoginError(resp.status, f"{resp.reason}: {login_error_response.error_summary}")
     raise IECError(resp.status, resp.reason)
 
 
