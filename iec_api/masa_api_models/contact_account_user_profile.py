@@ -117,18 +117,18 @@ class MainPortalAddress(DataClassDictMixin):
     """Represents an address in the main portal API.
 
     Attributes:
+        id: The unique identifier for the address.
+        logical_name: The logical name of the entity.
         street: The street information.
         city: The city information.
         house_number: The house number.
-        id: The unique identifier for the address.
-        logical_name: The logical name of the entity.
     """
 
-    street: MainPortalStreet = field(metadata=field_options(alias="street"))
-    city: MainPortalCity = field(metadata=field_options(alias="city"))
-    house_number: str = field(metadata=field_options(alias="houseNumber"))
     id: UUID = field(metadata=field_options(alias="id"))
     logical_name: str = field(metadata=field_options(alias="logicalName"))
+    street: Optional[MainPortalStreet] = field(default=None, metadata=field_options(alias="street"))
+    city: Optional[MainPortalCity] = field(default=None, metadata=field_options(alias="city"))
+    house_number: Optional[str] = field(default=None, metadata=field_options(alias="houseNumber"))
 
 
 @dataclass
