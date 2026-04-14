@@ -44,4 +44,4 @@ jobs:
         run: uv sync --dev
 
       - name: Running Mypy
-        run: uv run mypy . --follow-untyped-imports --explicit-package-bases --check-untyped-defs
+        run: uv run --with mypy python3 -m mypy . --follow-untyped-imports --explicit-package-bases --check-untyped-defs
