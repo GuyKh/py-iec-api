@@ -1,5 +1,5 @@
 import base64
-from decimal import Decimal
+from typing import Any
 
 from aiohttp import ClientSession
 
@@ -8,7 +8,7 @@ from iec_api.const import GET_KWH_TARIFF_URL, GET_PREIOD_CALCULATOR_URL
 from iec_api.usage_calculator.calculator import UsageCalculator
 
 usage_calculator = UsageCalculator()
-cache = {}
+cache: dict[str, Any] = {}
 distribution_1p_tariff_key = "distribution_1p_tariff"
 distribution_3p_tariff_key = "distribution_3p_tariff"
 delivery_1p_tariff_key = "delivery_1p_tariff"
@@ -95,7 +95,7 @@ async def get_kva_tariff(session: ClientSession) -> float:
     return cache[key]
 
 
-async def _get_vat(session: ClientSession) -> Decimal:
+async def _get_vat(session: ClientSession) -> float:
     """Get VAT from IEC API."""
 
     key = vat_key
@@ -103,7 +103,7 @@ async def _get_vat(session: ClientSession) -> Decimal:
         calculator = await get_usage_calculator(session)
         cache[key] = calculator.get_vat()
 
-    return cache[key]
+    return float(cache[key])
 
 
 async def _get_connection_to_power_size(session: ClientSession) -> dict[str, float]:
@@ -122,7 +122,7 @@ async def get_power_size(session: ClientSession, connection: str) -> float:
     if key not in cache:
         await _get_connection_to_power_size(session)
 
-    connection_to_power_size_map = cache[key]
+    connection_to_power_size_map: dict[str, float] = cache[key]
 
     # If connection is not found, return 0
     power_size = connection_to_power_size_map.get(connection, 0)

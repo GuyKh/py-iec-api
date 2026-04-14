@@ -33,7 +33,9 @@ class CommonsTest(unittest.IsolatedAsyncioTestCase):
 
         await client.get_device_type()
         devices = await client.get_devices()
+        assert devices is not None and len(devices) > 0
         device = devices[0]
+        assert device.device_number is not None
         await client.get_device_by_device_id(device_id=device.device_number)
 
         await client.get_billing_invoices()
@@ -42,7 +44,10 @@ class CommonsTest(unittest.IsolatedAsyncioTestCase):
 
         selected_date: datetime = datetime.now() - timedelta(days=30)
 
-        await client.get_remote_reading(device.device_number, int(device.device_code), selected_date, selected_date)
+        assert device.device_code is not None
+        await client.get_remote_reading(
+            "Consumption", device.device_number, int(device.device_code), selected_date, selected_date
+        )
 
         await client.save_token_to_file()
         await client.load_token_from_file()

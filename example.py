@@ -63,35 +63,38 @@ async def main():
         for contract in contracts:
             print(contract)
 
-        reading = await client.get_last_meter_reading(customer.bp_number, contracts[0].contract_id)
-        print(reading)
+        if customer and contracts:
+            reading = await client.get_last_meter_reading(customer.bp_number, contracts[0].contract_id)
+            print(reading)
 
         device_in = await client.get_device_in()
-        device = device_in.devices[0]
-        print(device)
+        if device_in and device_in.devices:
+            device = device_in.devices[0]
+            print(device)
 
-        device_details = await client.get_device_by_device_id(device.device_number)
-        print(device_details)
+            if device.device_number and device.device_code:
+                device_details = await client.get_device_by_device_id(device.device_number)
+                print(device_details)
 
-        # Get Remote Readings from the last three days
+                # Get Remote Readings from the last three days
 
-        selected_date: datetime = datetime.now() - timedelta(days=30)
+                selected_date: datetime = datetime.now() - timedelta(days=30)
 
-        remote_readings = await client.get_remote_reading(
-            "Consumption", device.device_number, int(device.device_code), selected_date, selected_date
-        )
+                remote_readings = await client.get_remote_reading(
+                    "Consumption", device.device_number, int(device.device_code), selected_date, selected_date
+                )
 
-        if remote_readings and remote_readings.meter_list and len(remote_readings.meter_list) > 0:
-            print(
-                "Got "
-                + str(len(remote_readings.meter_list[0].period_consumptions))
-                + " readings for "
-                + selected_date.strftime("%Y-%m-%d")
-            )
-            for remote_reading in remote_readings.meter_list[0].period_consumptions:
-                print(remote_reading.interval, remote_reading.consumption)
-        else:
-            print("Got no readings")
+                if remote_readings and remote_readings.meter_list and len(remote_readings.meter_list) > 0:
+                    print(
+                        "Got "
+                        + str(len(remote_readings.meter_list[0].period_consumptions))
+                        + " readings for "
+                        + selected_date.strftime("%Y-%m-%d")
+                    )
+                    for remote_reading in remote_readings.meter_list[0].period_consumptions:
+                        print(remote_reading.interval, remote_reading.consumption)
+                else:
+                    print("Got no readings")
 
         print(await client.get_electric_bill())
         print(await client.get_device_type())
@@ -122,8 +125,8 @@ async def main():
         print(f"Selected device: [{device_name}]")
 
         # Get device info by name
-        device = usage_calculator.get_device_info_by_name(device_name)
-        print(device)
+        calc_device = usage_calculator.get_device_info_by_name(device_name)
+        print(calc_device)
 
         # Get default utility consumption by time
         consumption = usage_calculator.get_consumption_by_device_and_time(device_name, timedelta(days=1), None)
@@ -134,11 +137,12 @@ async def main():
         consumption = usage_calculator.get_consumption_by_device_and_time(
             device_name, timedelta(hours=6), custom_usage_value=3.5
         )
-        print(
-            f"Running a {consumption.power} {consumption.power_unit.name} {consumption.name} "
-            f"for {consumption.duration.seconds // (60 * 60)} hours would cost: "
-            f"{round(consumption.cost, 2)} ILS"
-        )
+        if consumption:
+            print(
+                f"Running a {consumption.power} {consumption.power_unit.name} {consumption.name} "
+                f"for {consumption.duration.seconds // (60 * 60)} hours would cost: "
+                f"{round(consumption.cost, 2)} ILS"
+            )
 
     finally:
         await session.close()
