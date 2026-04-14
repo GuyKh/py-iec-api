@@ -111,6 +111,9 @@ async def send_get_request(
     headers: Optional[dict[str, str]] = None,
 ) -> Any:
     try:
+        if isinstance(timeout, int):
+            timeout = aiohttp.ClientTimeout(total=timeout)
+
         resp = await session.get(url=url, headers=headers, timeout=timeout)
         json_resp: dict = await resp.json(content_type=None)
     except TimeoutError as ex:
@@ -134,6 +137,9 @@ async def send_non_json_get_request(
     encoding: Optional[str] = None,
 ) -> str:
     try:
+        if isinstance(timeout, int):
+            timeout = aiohttp.ClientTimeout(total=timeout)
+
         resp = await session.get(url=url, headers=headers, timeout=timeout)
         resp_content = await resp.text(encoding=encoding)
     except TimeoutError as ex:
@@ -155,6 +161,9 @@ async def send_post_request(
     json_data: Optional[dict] = None,
 ) -> Any:
     try:
+        if isinstance(timeout, int):
+            timeout = aiohttp.ClientTimeout(total=timeout)
+
         resp = await session.post(url=url, data=data, json=json_data, headers=headers, timeout=timeout)
 
         json_resp: dict = await resp.json(content_type=None)
@@ -179,6 +188,9 @@ async def send_non_json_post_request(
     json_data: Optional[dict] = None,
 ) -> StreamReader:
     try:
+        if isinstance(timeout, int):
+            timeout = aiohttp.ClientTimeout(total=timeout)
+
         resp = await session.post(url=url, data=data, json=json_data, headers=headers, timeout=timeout)
     except TimeoutError as ex:
         raise IECError(-1, f"Failed to communicate with IEC API due to time out: ({str(ex)})")
