@@ -692,9 +692,7 @@ class IecClient:
 
         return await data.get_touz_compatibility(self._session, self._token, contract_id, bp_number)
 
-    async def get_mobility_status(
-        self, device_id: str, contract_id: Optional[str] = None
-    ) -> Optional[MobilityStatus]:
+    async def get_mobility_status(self, device_id: str, contract_id: Optional[str] = None) -> Optional[MobilityStatus]:
         """Get mobility status for a contract/device pair."""
         await self.check_token()
 
@@ -933,13 +931,20 @@ class IecClient:
     # Login/Token Flow
     # ----------------
 
-    async def login_with_id(self) -> Optional[str]:
+    async def login_with_id(self, prefer_sms: bool = True) -> Optional[str]:
         """
-        Login with ID and wait for OTP
+        Login with ID and wait for OTP.
+        Supports preferring SMS factor if multiple are available.
+
+        Args:
+            prefer_sms (bool): Whether to prefer SMS factor if multiple are available. Default is True.
+
         Returns:
-            str: The OTP factor type
+            str: The OTP factor type.
         """
-        state_token, factor_id, session_token, otp_factor_type = await login.first_login(self._session, self._user_id)
+        state_token, factor_id, session_token, otp_factor_type = await login.first_login(
+            self._session, self._user_id, prefer_sms=prefer_sms
+        )
         self._state_token = state_token
         self._factor_id = factor_id
         self._session_token = session_token
@@ -960,12 +965,15 @@ class IecClient:
         self.logged_in = True
         return True
 
-    async def manual_login(self):
+    async def manual_login(self, prefer_sms: bool = True):
         """
         Logs the user in by obtaining an authorization token, setting the authorization header,
         and updating the login status and token attribute.
+
+        Args:
+            prefer_sms (bool): Whether to prefer SMS factor if multiple are available. Default is True.
         """
-        token = await login.manual_authorization(self._session, self._user_id)
+        token = await login.manual_authorization(self._session, self._user_id, prefer_sms=prefer_sms)
         self.logged_in = True
         self._token = token
 
