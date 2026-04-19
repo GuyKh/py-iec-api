@@ -67,6 +67,7 @@ class SharedAccountAccount(IDWrapper):
         default=None, metadata=field_options(alias="consumptionOrderViewTypeCode")
     )
 
+
 @dataclass
 class SharedAccountConnectionType(IDWrapper):
     logical_name: str = field(metadata=field_options(alias="logicalName"))

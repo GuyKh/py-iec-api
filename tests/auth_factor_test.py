@@ -48,7 +48,7 @@ class AuthFactorTest(unittest.IsolatedAsyncioTestCase):
     @patch("iec_api.commons.send_post_request")
     async def test_get_first_factor_id_no_factors(self, mock_post):
         mock_post.return_value = {"stateToken": "token123", "_embedded": {"factors": []}}
-        
+
         with self.assertRaises(IndexError):
             await login.get_first_factor_id(AsyncMock(), "123456782", prefer_sms=True)
 
