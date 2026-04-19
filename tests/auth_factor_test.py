@@ -45,6 +45,13 @@ class AuthFactorTest(unittest.IsolatedAsyncioTestCase):
         state_token, factor_id = await login.get_first_factor_id(AsyncMock(), "123456782", prefer_sms=True)
         self.assertEqual(factor_id, "f2")
 
+    @patch("iec_api.commons.send_post_request")
+    async def test_get_first_factor_id_no_factors(self, mock_post):
+        mock_post.return_value = {"stateToken": "token123", "_embedded": {"factors": []}}
+        
+        with self.assertRaises(IndexError):
+            await login.get_first_factor_id(AsyncMock(), "123456782", prefer_sms=True)
+
     def test_get_factor_type_sms(self):
         factor = {"factorType": "email", "profile": {"email": "test@sns.iec.co.il"}}
         self.assertEqual(login._get_factor_type(factor), "sms")

@@ -81,8 +81,6 @@ def _get_factor_type(factor: dict) -> str:
 
 def _select_factor(factors: list[dict], prefer_sms: bool = True) -> dict:
     """Select the preferred factor from the list."""
-    if not factors:
-        return {}
     selected_factor = factors[0]
     if len(factors) > 1:
         for factor in factors:
@@ -123,7 +121,7 @@ async def get_first_factor_id(session: ClientSession, user_id: str, prefer_sms: 
     """
     state_token, factors = await get_auth_factors(session, user_id)
     selected_factor = _select_factor(factors, prefer_sms)
-    return state_token, selected_factor.get("id", "")
+    return state_token, selected_factor.get("id")
 
 
 async def send_otp_code(
