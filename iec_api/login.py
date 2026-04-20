@@ -70,14 +70,35 @@ async def authorize_session(session: ClientSession, session_token) -> Tuple[str,
     return code, code_verifier
 
 
-async def get_first_factor_id(session: ClientSession, user_id: str) -> Tuple[str, str]:
+def _get_factor_type(factor: dict) -> str:
+    """Get human-readable factor type."""
+    factor_type = factor.get("factorType", "")
+    email = factor.get("profile", {}).get("email", "")
+    if factor_type == "email" and "@sns.iec.co.il" in email:
+        return "sms"
+    return factor_type
+
+
+def _select_factor(factors: list[dict], prefer_sms: bool = True) -> dict:
+    """Select the preferred factor from the list."""
+    selected_factor = factors[0]
+    if len(factors) > 1:
+        for factor in factors:
+            is_sms = _get_factor_type(factor) == "sms"
+            if (prefer_sms and is_sms) or (not prefer_sms and not is_sms):
+                selected_factor = factor
+                break
+    return selected_factor
+
+
+async def get_auth_factors(session: ClientSession, user_id: str) -> Tuple[str, list[dict]]:
     """
-    Function to get the first factor ID using the provided ID.
-        Args:
+    Get the available factors for authentication.
+    Args:
         session: The aiohttp ClientSession object.
         user_id (str): The user ID be used for authorization.
     Returns:
-        Tuple[str,str]: [The state token, the factor id]
+        Tuple[str, list[dict]]: [The state token, the list of factors]
     """
     data = {"username": f"{user_id}@iec.co.il"}
     headers = {"accept": "application/json", "content-type": "application/json"}
@@ -85,7 +106,22 @@ async def get_first_factor_id(session: ClientSession, user_id: str) -> Tuple[str
     response = await commons.send_post_request(
         session=session, url=f"{IEC_OKTA_BASE_URL}/api/v1/authn", json_data=data, headers=headers
     )
-    return response.get("stateToken", ""), response.get("_embedded", {}).get("factors", {})[0].get("id")
+    return response.get("stateToken", ""), response.get("_embedded", {}).get("factors", [])
+
+
+async def get_first_factor_id(session: ClientSession, user_id: str, prefer_sms: bool = True) -> Tuple[str, str]:
+    """
+    Function to get the first factor ID using the provided ID.
+    Args:
+        session: The aiohttp ClientSession object.
+        user_id (str): The user ID be used for authorization.
+        prefer_sms (bool): Whether to prefer SMS if multiple factors exist.
+    Returns:
+        Tuple[str,str]: [The state token, the factor id]
+    """
+    state_token, factors = await get_auth_factors(session, user_id)
+    selected_factor = _select_factor(factors, prefer_sms)
+    return state_token, selected_factor.get("id")
 
 
 async def send_otp_code(
@@ -116,7 +152,8 @@ async def send_otp_code(
     )
 
     session_token = response.get("sessionToken")
-    factor_type = response.get("_embedded", {}).get("factor", {}).get("factorType")
+    factor_obj = response.get("_embedded", {}).get("factor", {})
+    factor_type = _get_factor_type(factor_obj)
 
     if response.get("status") in ("SUCCESS", "MFA_CHALLENGE"):
         return session_token, factor_type
@@ -147,13 +184,16 @@ async def get_access_token(session: ClientSession, code: str, code_verifier: str
     return JWT.from_dict(response)
 
 
-async def first_login(session: ClientSession, id_number: str) -> Tuple[str, str, Optional[str], Optional[str]]:
+async def first_login(
+    session: ClientSession, id_number: str, prefer_sms: bool = True
+) -> Tuple[str, str, Optional[str], Optional[str]]:
     """
     Perform the first login for a user.
 
     Args:
         session: The aiohttp ClientSession object.
         id_number (str): The user's ID number.
+        prefer_sms (bool): Whether to prefer SMS if multiple factors exist.
 
     Returns:
         Tuple[str, str, str, str]: A tuple containing the state token, factor ID, session token,
@@ -161,11 +201,14 @@ async def first_login(session: ClientSession, id_number: str) -> Tuple[str, str,
     """
 
     try:
-        # Get the first factor ID and state token
-        state_token, factor_id = await get_first_factor_id(session, id_number)
+        # Get the available factors and state token
+        state_token, factors = await get_auth_factors(session, id_number)
+        selected_factor = _select_factor(factors, prefer_sms)
+        factor_id = selected_factor.get("id")
+        factor_type = _get_factor_type(selected_factor)
 
         # Send OTP code and get session token
-        session_token, factor_type = await send_otp_code(session, factor_id, state_token)
+        session_token, _ = await send_otp_code(session, factor_id, state_token)
 
         return state_token, factor_id, session_token, factor_type
     except Exception as error:
@@ -198,11 +241,11 @@ async def verify_otp_code(session: ClientSession, factor_id: str, state_token: s
         raise IECLoginError(-1, "Failed at OTP verification") from error
 
 
-async def manual_authorization(session: ClientSession, id_number) -> JWT:  # pragma: no cover
+async def manual_authorization(session: ClientSession, id_number, prefer_sms: bool = True) -> JWT:  # pragma: no cover
     """Get authorization token from IEC API."""
     if not id_number:
         id_number = await commons.read_user_input("Enter your ID Number: ")
-    state_token, factor_id, session_token, factor_type = await first_login(session, id_number)
+    state_token, factor_id, session_token, factor_type = await first_login(session, id_number, prefer_sms)
     if not state_token:
         logger.error("Failed to send OTP")
         raise IECLoginError(-1, "Failed to send OTP, no state_token")
