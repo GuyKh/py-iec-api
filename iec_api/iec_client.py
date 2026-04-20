@@ -69,9 +69,9 @@ class IecClient:
 
         # Custom Logger to the session
         trace_config = aiohttp.TraceConfig()
-        trace_config.on_request_start.append(commons.on_request_start_debug)
-        trace_config.on_request_chunk_sent.append(commons.on_request_chunk_sent_debug)
-        trace_config.on_request_end.append(commons.on_request_end_debug)
+        trace_config.on_request_start.append(commons.on_request_start_debug)  # type: ignore[arg-type]
+        trace_config.on_request_chunk_sent.append(commons.on_request_chunk_sent_debug)  # type: ignore[arg-type]
+        trace_config.on_request_end.append(commons.on_request_end_debug)  # type: ignore[arg-type]
         trace_config.freeze()
 
         # Increase timeout to handle DNS resolution delays
@@ -155,15 +155,17 @@ class IecClient:
 
         return accounts
 
-    async def get_default_account(self) -> Account:
+    async def get_default_account(self) -> Optional[Account]:
         """
         Get consumer data response from IEC API.
         :return: Customer data
         """
         accounts = await self.get_accounts()
-        return accounts[0]
+        if accounts and len(accounts) > 0:
+            return accounts[0]
+        return None
 
-    async def get_default_contract(self, bp_number: str = None) -> Optional[Contract]:
+    async def get_default_contract(self, bp_number: Optional[str] = None) -> Optional[Contract]:
         """
         This function retrieves the default contract based on the given BP number.
         :param bp_number: A string representing the BP number
@@ -465,8 +467,11 @@ class IecClient:
             RemoteReadingResponse: The response containing the remote reading or None if not found
         """
         await self.check_token()
-        if not contract_id and self._contract_id:
+        if not contract_id:
             contract_id = self._contract_id
+
+        if not contract_id:
+            raise ValueError("Contract id must be provided")
 
         return await data.get_remote_reading(
             session=self._session,
@@ -554,8 +559,11 @@ class IecClient:
                 raise ValueError("No Devices found")
             device = devices[0]
 
+            if not device.device_number:
+                raise ValueError("Device number is missing")
+
             device_details = await self.get_device_by_device_id(device.device_number)
-            if not device_details:
+            if not device_details or not device_details.counter_devices:
                 raise ValueError("No Device Details")
 
             phase_count = device_details.counter_devices[0].connection_size.phase
@@ -572,8 +580,11 @@ class IecClient:
                 raise ValueError("No Devices found")
             device = devices[0]
 
+            if not device.device_number:
+                raise ValueError("Device number is missing")
+
             device_details = await self.get_device_by_device_id(device.device_number)
-            if not device_details:
+            if not device_details or not device_details.counter_devices:
                 raise ValueError("No Device Details")
 
             phase_count = device_details.counter_devices[0].connection_size.phase
@@ -594,8 +605,11 @@ class IecClient:
                 raise ValueError("No Devices found")
             device = devices[0]
 
+            if not device.device_number:
+                raise ValueError("Device number is missing")
+
             device_details = await self.get_device_by_device_id(device.device_number)
-            if not device_details:
+            if not device_details or not device_details.counter_devices:
                 raise ValueError("No Device Details")
 
             connection = device_details.counter_devices[0].connection_size.representative_connection_size
@@ -722,10 +736,14 @@ class IecClient:
         await self.check_token()
 
         request = RemoveContactFromSharedAccountRequest(
-            id=UUID(masa_connection_id),
-            contact=IDWrapper(id=UUID(masa_contact_id)),
-            contract=IDWrapper(id=UUID(masa_contract_id)),
-            primary_contact=IDWrapper(id=UUID(masa_primary_contact_id)),
+            id=masa_connection_id if isinstance(masa_connection_id, UUID) else UUID(masa_connection_id),
+            contact=IDWrapper(id=masa_contact_id if isinstance(masa_contact_id, UUID) else UUID(masa_contact_id)),
+            contract=IDWrapper(id=masa_contract_id if isinstance(masa_contract_id, UUID) else UUID(masa_contract_id)),
+            primary_contact=IDWrapper(
+                id=masa_primary_contact_id
+                if isinstance(masa_primary_contact_id, UUID)
+                else UUID(masa_primary_contact_id)
+            ),
         )
         return await data.remove_contact_from_shared_account(self._session, self._token, request)
 
@@ -736,8 +754,8 @@ class IecClient:
         await self.check_token()
 
         request = SendSharedAccountInvitationRequest(
-            contact=IDWrapper(id=UUID(masa_contact_id)),
-            contract=IDWrapper(id=UUID(masa_contract_id)),
+            contact=IDWrapper(id=masa_contact_id if isinstance(masa_contact_id, UUID) else UUID(masa_contact_id)),
+            contract=IDWrapper(id=masa_contract_id if isinstance(masa_contract_id, UUID) else UUID(masa_contract_id)),
         )
         return await data.send_shared_account_invitation(self._session, self._token, request)
 

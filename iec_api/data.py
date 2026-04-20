@@ -49,7 +49,7 @@ from iec_api.models.customer import Customer
 from iec_api.models.customer_mobile import CustomerMobileResponse
 from iec_api.models.device import Device, Devices
 from iec_api.models.device import decoder as devices_decoder
-from iec_api.models.device_identity import DeviceDetails, DeviceIdentity
+from iec_api.models.device_identity import DeviceDetails
 from iec_api.models.device_identity import decoder as device_identity_decoder
 from iec_api.models.device_in import DeviceInResponse
 from iec_api.models.device_type import DeviceType
@@ -86,7 +86,7 @@ logger = logging.getLogger(__name__)
 
 async def _get_response_with_descriptor(
     session: ClientSession, jwt_token: JWT, request_url: str, decoder: BasicDecoder[ResponseWithDescriptor[T]]
-) -> T:
+) -> Optional[T]:
     """
     A function to retrieve a response with a descriptor using a JWT token and a URL.
 
@@ -95,7 +95,7 @@ async def _get_response_with_descriptor(
         request_url (str): The URL to send the request to.
 
     Returns:
-        T: The response with a descriptor, with its type specified by the return type annotation.
+        Optional[T]: The response with a descriptor, with its type specified by the return type annotation.
     """
     headers = commons.add_auth_bearer_to_headers(HEADERS_WITH_AUTH, jwt_token.id_token)
     response = await commons.send_get_request(session=session, url=request_url, headers=headers)
@@ -116,7 +116,7 @@ async def _post_response_with_descriptor(
     request_url: str,
     json_data: Optional[dict],
     decoder: BasicDecoder[ResponseWithDescriptor[T]],
-) -> T:
+) -> Optional[T]:
     """
     A function to retrieve a response with a descriptor using a JWT token and a URL.
 
@@ -126,7 +126,7 @@ async def _post_response_with_descriptor(
         json_data (dict): POST content
 
     Returns:
-        T: The response with a descriptor, with its type specified by the return type annotation.
+        Optional[T]: The response with a descriptor, with its type specified by the return type annotation.
     """
     response = await _post_response(session=session, jwt_token=jwt_token, request_url=request_url, json_data=json_data)
 
@@ -216,6 +216,7 @@ async def get_efs_messages(
     session: ClientSession, token: JWT, contract_id: str, service_code: Optional[int] = None
 ) -> Optional[List[EfsMessage]]:
     """Get EFS Messages response from IEC API."""
+    req: EfsRequestSingleService | EfsRequestAllServices
     if service_code:
         req = EfsRequestSingleService(contract_number=contract_id, process_type=1, service_code=f"EFS{service_code:03}")
     else:
@@ -240,9 +241,12 @@ async def get_electric_bill(
 
 async def get_default_contract(session: ClientSession, token: JWT, bp_number: str) -> Optional[Contract]:
     """Get Contract data response from IEC API."""
-    return await _get_response_with_descriptor(
+    contracts_obj = await _get_response_with_descriptor(
         session, token, GET_DEFAULT_CONTRACT_URL.format(bp_number=bp_number), contract_decoder
     )
+    if contracts_obj and contracts_obj.contracts:
+        return contracts_obj.contracts[0]
+    return None
 
 
 async def get_contracts(
@@ -308,7 +312,7 @@ async def get_devices(session: ClientSession, token: JWT, contract_id: str) -> l
 
 async def get_device_details(session: ClientSession, token: JWT, device_id: str) -> Optional[List[DeviceDetails]]:
     """Get Device Details response from IEC API."""
-    device_identity: DeviceIdentity = await _get_response_with_descriptor(
+    device_identity = await _get_response_with_descriptor(
         session, token, GET_TENANT_IDENTITY_URL.format(device_id=device_id), device_identity_decoder
     )
 
@@ -320,6 +324,8 @@ async def get_device_details_by_code(
 ) -> Optional[DeviceDetails]:
     """Get Device Details response from IEC API."""
     devices = await get_device_details(session, token, device_id)
+    if not devices:
+        return None
 
     return next((device for device in devices if device.device_code == device_code), None)
 
@@ -390,7 +396,7 @@ async def send_consumption_report_to_mail(
     headers = commons.add_auth_bearer_to_headers(HEADERS_WITH_AUTH, token.id_token)
 
     request = SendConsumptionReportToMailRequest(
-        email=email, device_code=str(device_code), device_id=str(device_id)
+        email_address=email, meter_code=str(device_code), meter_serial=str(device_id)
     ).to_dict()
     response = await commons.send_non_json_post_request(
         session,
@@ -398,7 +404,7 @@ async def send_consumption_report_to_mail(
         headers=headers,
         json_data=request,
     )
-    return await bool(response.read())
+    return bool(await response.read())
 
 
 async def get_outages_by_account(session: ClientSession, token: JWT, account_id: str) -> Optional[list[Outage]]:

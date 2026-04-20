@@ -91,27 +91,28 @@ def parse_error_response(resp: ClientResponse, json_resp: dict[str, Any]):
     """
     logger.warning(f"Failed call: (Code {resp.status}): {resp.reason}")
     if json_resp and len(json_resp) > 0:
-        if json_resp.get(RESPONSE_DESCRIPTOR_FIELD) is not None:
-            login_error_response = ErrorResponseDescriptor.from_dict(json_resp.get(RESPONSE_DESCRIPTOR_FIELD))
+        if (descriptor := json_resp.get(RESPONSE_DESCRIPTOR_FIELD)) is not None:
+            login_error_response = ErrorResponseDescriptor.from_dict(descriptor)
             raise IECError(login_error_response.code, login_error_response.error)
         elif json_resp.get(ERROR_FIELD_NAME) is not None:
             error_response = IecErrorResponse.from_dict(json_resp)
             raise IECError(error_response.code, error_response.error)
         elif json_resp.get(ERROR_SUMMARY_FIELD_NAME) is not None:
-            login_error_response = OktaError.from_dict(json_resp)
-            raise IECLoginError(resp.status, resp.reason + ": " + login_error_response.error_summary)
+            okta_error = OktaError.from_dict(json_resp)
+            reason = resp.reason if resp.reason else "Unknown Error"
+            raise IECLoginError(resp.status, reason + ": " + okta_error.error_summary)
     raise IECError(resp.status, resp.reason)
 
 
 async def send_get_request(
-    session: ClientSession, url: str, timeout: Optional[int] = 60, headers: Optional[dict] = None
-) -> dict[str, Any]:
+    session: ClientSession,
+    url: str,
+    timeout: Optional[int | aiohttp.ClientTimeout] = 60,
+    headers: Optional[dict[str, str]] = None,
+) -> Any:
     try:
-        if not headers:
-            headers = session.headers
-
-        if not timeout:
-            timeout = session.timeout
+        if isinstance(timeout, int):
+            timeout = aiohttp.ClientTimeout(total=timeout)
 
         resp = await session.get(url=url, headers=headers, timeout=timeout)
         json_resp: dict = await resp.json(content_type=None)
@@ -131,16 +132,13 @@ async def send_get_request(
 async def send_non_json_get_request(
     session: ClientSession,
     url: str,
-    timeout: Optional[int] = 60,
-    headers: Optional[dict] = None,
+    timeout: Optional[int | aiohttp.ClientTimeout] = 60,
+    headers: Optional[dict[str, str]] = None,
     encoding: Optional[str] = None,
 ) -> str:
     try:
-        if not headers:
-            headers = session.headers
-
-        if not timeout:
-            timeout = session.timeout
+        if isinstance(timeout, int):
+            timeout = aiohttp.ClientTimeout(total=timeout)
 
         resp = await session.get(url=url, headers=headers, timeout=timeout)
         resp_content = await resp.text(encoding=encoding)
@@ -157,17 +155,14 @@ async def send_non_json_get_request(
 async def send_post_request(
     session: ClientSession,
     url: str,
-    timeout: Optional[int] = 60,
-    headers: Optional[dict] = None,
+    timeout: Optional[int | aiohttp.ClientTimeout] = 60,
+    headers: Optional[dict[str, str]] = None,
     data: Optional[dict] = None,
     json_data: Optional[dict] = None,
-) -> dict[str, Any]:
+) -> Any:
     try:
-        if not headers:
-            headers = session.headers
-
-        if not timeout:
-            timeout = session.timeout
+        if isinstance(timeout, int):
+            timeout = aiohttp.ClientTimeout(total=timeout)
 
         resp = await session.post(url=url, data=data, json=json_data, headers=headers, timeout=timeout)
 
@@ -187,17 +182,14 @@ async def send_post_request(
 async def send_non_json_post_request(
     session: ClientSession,
     url: str,
-    timeout: Optional[int] = 60,
-    headers: Optional[dict] = None,
+    timeout: Optional[int | aiohttp.ClientTimeout] = 60,
+    headers: Optional[dict[str, str]] = None,
     data: Optional[dict] = None,
     json_data: Optional[dict] = None,
 ) -> StreamReader:
     try:
-        if not headers:
-            headers = session.headers
-
-        if not timeout:
-            headers = session.timeout
+        if isinstance(timeout, int):
+            timeout = aiohttp.ClientTimeout(total=timeout)
 
         resp = await session.post(url=url, data=data, json=json_data, headers=headers, timeout=timeout)
     except TimeoutError as ex:
@@ -241,7 +233,7 @@ async def on_request_chunk_sent_debug(
     session: aiohttp.ClientSession, context, params: aiohttp.TraceRequestChunkSentParams
 ):
     if (params.method == "POST" or params.method == "PUT") and params.chunk:
-        logger.debug(f"HTTP Content {params.method}: {params.chunk}")
+        logger.debug(f"HTTP Content {params.method}: {params.chunk!r}")
 
 
 async def on_request_end_debug(session: aiohttp.ClientSession, context, params: aiohttp.TraceRequestEndParams):

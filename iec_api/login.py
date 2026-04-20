@@ -117,24 +117,24 @@ async def get_first_factor_id(session: ClientSession, user_id: str, prefer_sms: 
         user_id (str): The user ID be used for authorization.
         prefer_sms (bool): Whether to prefer SMS if multiple factors exist.
     Returns:
-        Tuple[str,str]: [The state token, the factor id]
+        Tuple[str, str]: [The state token, the factor id]
     """
     state_token, factors = await get_auth_factors(session, user_id)
     selected_factor = _select_factor(factors, prefer_sms)
-    return state_token, selected_factor.get("id")
+    return state_token, selected_factor["id"]
 
 
 async def send_otp_code(
-    session: ClientSession, factor_id: object, state_token: object, pass_code: object = None
+    session: ClientSession, factor_id: Optional[str], state_token: str, pass_code: Optional[str] = None
 ) -> Tuple[Optional[str], Optional[str]]:
     """
     Send OTP code for factor verification and return the session token and factor type.
 
     Args:
         session: The aiohttp ClientSession object.
-        factor_id (object): The identifier of the factor for verification.
-        state_token (object): The state token for the verification process.
-        pass_code (object, optional): The pass code for verification. Defaults to None.
+        factor_id (Optional[str]): The identifier of the factor for verification.
+        state_token (str): The state token for the verification process.
+        pass_code (Optional[str], optional): The pass code for verification. Defaults to None.
 
     Returns:
         Tuple[Optional[str], Optional[str]]: A tuple containing the session token and the factor type.
@@ -186,7 +186,7 @@ async def get_access_token(session: ClientSession, code: str, code_verifier: str
 
 async def first_login(
     session: ClientSession, id_number: str, prefer_sms: bool = True
-) -> Tuple[str, str, Optional[str], Optional[str]]:
+) -> Tuple[str, str, Optional[str], str]:
     """
     Perform the first login for a user.
 
@@ -196,15 +196,18 @@ async def first_login(
         prefer_sms (bool): Whether to prefer SMS if multiple factors exist.
 
     Returns:
-        Tuple[str, str, str, str]: A tuple containing the state token, factor ID, session token,
-         and factor type.
+        Tuple[str, str, Optional[str], str]: A tuple containing:
+        - state token
+        - factor ID
+        - session token (may be None)
+        - factor type
     """
 
     try:
         # Get the available factors and state token
         state_token, factors = await get_auth_factors(session, id_number)
         selected_factor = _select_factor(factors, prefer_sms)
-        factor_id = selected_factor.get("id")
+        factor_id = selected_factor["id"]
         factor_type = _get_factor_type(selected_factor)
 
         # Send OTP code and get session token

@@ -1,5 +1,6 @@
 import logging
 from datetime import timedelta
+from decimal import Decimal
 from typing import Optional
 
 from aiohttp import ClientSession
@@ -26,19 +27,19 @@ class UsageCalculator:
         if not self.is_loaded:
             iec_api_data = await commons.send_get_request(session=session, url=GET_CALCULATOR_GADGET_URL)
             response = GetCalculatorResponse.from_dict(iec_api_data)
-            self.devices: list[ElectricDevice] = response.electric_devices
-            self.rates: Rates | None = response.gadget_calculator_rates
+            self.devices = response.electric_devices
+            self.rates = response.gadget_calculator_rates
             self.is_loaded = True
         else:
             logger.info("Usage calculator data was already loaded")
 
     def get_vat(self) -> float:
-        if not self.is_loaded:
+        if not self.is_loaded or self.rates is None:
             raise ValueError("Usage calculator data is not loaded")
-        return self.rates.vat / 100
+        return float(self.rates.vat / 100)
 
     def get_kwh_tariff(self) -> float:
-        if not self.is_loaded:
+        if not self.is_loaded or self.rates is None:
             raise ValueError("Usage calculator data is not loaded")
         return float(self.rates.home_rate * (1 + self.rates.vat / 100))
 
@@ -59,20 +60,20 @@ class UsageCalculator:
         self, name: str, time_delta: timedelta, custom_usage_value: Optional[float]
     ) -> Optional[Consumption]:
         device = self.get_device_info_by_name(name)
-        if not device:
+        if not device or self.rates is None:
             return None
 
         minutes = time_delta.total_seconds() / 60
 
         consumption = self._convert_to_kwh(device, custom_usage_value)
-        rate = float(self.rates.home_rate * (1 + self.rates.vat / 100))
+        rate = self.rates.home_rate * (1 + self.rates.vat / 100)
 
         return Consumption(
             name=name,
             power=custom_usage_value if custom_usage_value else device.power,
             power_unit=device.power_unit,
             consumption=consumption,
-            cost=consumption * rate,
+            cost=Decimal(str(consumption)) * rate,
             duration=timedelta(minutes=minutes),
         )
 

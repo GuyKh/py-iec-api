@@ -25,3 +25,23 @@ jobs:
 
       - name: Running tests
         run: uv run --with pytest --with pytest-cov pytest --cov-report=term --cov .
+
+  mypy:
+    name: "Mypy Validation"
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 1
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v7
+        with:
+          enable-cache: true
+
+      - name: Install dependencies
+        run: uv sync --dev
+
+      - name: Running Mypy
+        run: uv run --with mypy python3 -m mypy . --follow-untyped-imports --explicit-package-bases --check-untyped-defs
