@@ -51,6 +51,9 @@ GET_TENANT_IDENTITY_URL = IEC_API_BASE_URL + "Tenant/Identify/{device_id}"
 GET_DEVICE_BY_DEVICE_ID_URL = GET_DEVICES_URL + "/{device_id}"
 GET_DEVICE_TYPE_URL = IEC_API_BASE_URL + "Device/type/{bp_number}/{contract_id}/false"
 GET_BILLING_INVOICES_URL = IEC_API_BASE_URL + "BillingCollection/invoices/{contract_id}/{bp_number}"
+# Deprecated: as of 2025 this endpoint returns HTTP 400 ("Token should be provide")
+# unless a reCAPTCHA token is supplied via the `RecaptchToken` header. data.get_device_in
+# now sources the device list from GET_DEVICES_URL (Device/{contract_id}) instead.
 GET_DEVICE_IN_URL = IEC_API_BASE_URL + "DeviceIn/{contract_id}"
 GET_INVOICE_PDF_URL = IEC_API_BASE_URL + "BillingCollection/pdf"
 GET_KWH_TARIFF_URL = IEC_API_BASE_URL + "content/he-IL/content/tariffs/contentpages/homeelectricitytariff"

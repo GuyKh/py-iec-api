@@ -16,7 +16,6 @@ from iec_api.const import (
     GET_CUSTOMER_MOBILE_URL,
     GET_DEFAULT_CONTRACT_URL,
     GET_DEVICE_BY_DEVICE_ID_URL,
-    GET_DEVICE_IN_URL,
     GET_DEVICE_TYPE_URL,
     GET_DEVICES_URL,
     GET_EFS_MESSAGES_URL,
@@ -51,7 +50,7 @@ from iec_api.models.device import Device, Devices
 from iec_api.models.device import decoder as devices_decoder
 from iec_api.models.device_identity import DeviceDetails
 from iec_api.models.device_identity import decoder as device_identity_decoder
-from iec_api.models.device_in import DeviceInResponse
+from iec_api.models.device_in import DEFAULT_METER_KIND, DeviceInDevice, DeviceInResponse
 from iec_api.models.device_type import DeviceType
 from iec_api.models.device_type import decoder as device_type_decoder
 from iec_api.models.efs import EfsMessage, EfsRequestAllServices, EfsRequestSingleService
@@ -426,12 +425,34 @@ async def get_social_discount(session: ClientSession, token: JWT, bp_number: str
 
 
 async def get_device_in(session: ClientSession, token: JWT, contract_id: str) -> Optional[DeviceInResponse]:
-    """Get device information from DeviceIn endpoint."""
-    headers = commons.add_auth_bearer_to_headers(HEADERS_WITH_AUTH, token.id_token)
-    response = await commons.send_get_request(
-        session=session, url=GET_DEVICE_IN_URL.format(contract_id=contract_id), headers=headers
+    """Get the list of devices (meters) for a contract.
+
+    The legacy ``GET /api/DeviceIn/{contract_id}`` endpoint now rejects calls with
+    HTTP 400 ("Token should be provide") unless a reCAPTCHA token is supplied via
+    the ``RecaptchToken`` header, which is not feasible for headless clients.
+
+    Instead, this fetches the same device list from the reCAPTCHA-free
+    ``GET /api/Device/{contract_id}`` endpoint and adapts it to
+    :class:`DeviceInResponse`, so callers keep the same return shape. That
+    endpoint returns everything the old one did except ``meterKind``, which
+    defaults to ``"Consumption"`` (the value RemoteReadingRange expects).
+    """
+    devices = await get_devices(session, token, contract_id)
+    device_in_devices = [
+        DeviceInDevice(
+            is_active=device.is_active,
+            device_type=device.device_type,
+            device_number=device.device_number,
+            device_code=device.device_code,
+            meter_kind=DEFAULT_METER_KIND,
+        )
+        for device in (devices or [])
+    ]
+    return DeviceInResponse(
+        status=0,
+        is_active=any(device.is_active for device in device_in_devices),
+        devices=device_in_devices,
     )
-    return DeviceInResponse.from_dict(response)
 
 
 async def get_touz_compatibility(
