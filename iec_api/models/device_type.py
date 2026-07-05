@@ -21,7 +21,10 @@ from iec_api.models.response_descriptor import ResponseWithDescriptor
 #         "balanceTime": null,
 #         "balanceDate": null,
 #         "isActive": true,
-#         "numberOfDevices": 1
+#         "numberOfDevices": 1,
+#         "isElectronic": false,
+#         "disconnectReason": "",
+#         "isDisconnected": false
 #     },
 #     "reponseDescriptor": {
 #         "isSuccess": true,
@@ -40,6 +43,8 @@ class DeviceType(DataClassDictMixin):
     device_type: int = field(metadata=field_options(alias="deviceType"))
     is_active: bool = field(metadata=field_options(alias="isActive"))
     number_of_devices: int = field(metadata=field_options(alias="numberOfDevices"))
+    is_electronic: bool = field(metadata=field_options(alias="isElectronic"))
+    is_disconnected: bool = field(metadata=field_options(alias="isDisconnected"))
     device_balance: Optional[int] = field(default=None, metadata=field_options(alias="deviceBalance"))
     estimated_days_by_week: Optional[int] = field(default=None, metadata=field_options(alias="estimatedDaysByWeek"))
     average_usage_cost_by_week: Optional[int] = field(
@@ -51,6 +56,7 @@ class DeviceType(DataClassDictMixin):
     )
     balance_time: Optional[str] = field(default=None, metadata=field_options(alias="balanceTime"))
     balance_date: Optional[str] = field(default=None, metadata=field_options(alias="balanceDate"))
+    disconnect_reason: Optional[str] = field(default=None, metadata=field_options(alias="disconnectReason"))
 
 
 decoder = BasicDecoder(ResponseWithDescriptor[DeviceType])

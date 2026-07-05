@@ -55,7 +55,10 @@ class Device(DataClassDictMixin):
     device_type: Optional[int] = field(default=None, metadata=field_options(alias="deviceType"))
     device_number: Optional[str] = field(default=None, metadata=field_options(alias="deviceNumber"))
     device_code: Optional[str] = field(default=None, metadata=field_options(alias="deviceCode"))
-
+    report_result_status: Optional[int] = field(default=None, metadata=field_options(alias="reportResultStatus"))
+    disconnect_reason: Optional[str] = field(default=None, metadata=field_options(alias="disconnectReason"))
+    is_disconnected: Optional[bool] = field(default=None, metadata=field_options(alias="isDisconnected"))
+    is_electronic: Optional[bool] = field(default=None, metadata=field_options(alias="isElectronic"))
 
 @dataclass
 class ConnectionSize(DataClassDictMixin):
@@ -76,8 +79,9 @@ class CounterDevice(DataClassDictMixin):
     last_mr_type: str = field(metadata=field_options(alias="lastMRType"))
     last_mr_type_desc: str = field(metadata=field_options(alias="lastMRTypeDesc"))
     connection_size: ConnectionSize = field(metadata=field_options(alias="connectionSize"))
+    last_mr_type_code: Optional[int] = field(default=None, metadata=field_options(alias="lastMrTypeCode"))
+    device_digit_length: Optional[int] = field(default=None, metadata=field_options(alias="deviceDigitLength"))
     last_mr_date: Optional[date] = field(default=None, metadata=field_options(alias="lastMRDate"))
-
 
 @dataclass
 class Devices(DataClassDictMixin):

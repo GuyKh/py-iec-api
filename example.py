@@ -67,9 +67,9 @@ async def main():
             reading = await client.get_last_meter_reading(customer.bp_number, contracts[0].contract_id)
             print(reading)
 
-        device_in = await client.get_device_in()
-        if device_in and device_in.devices:
-            device = device_in.devices[0]
+        devices = await client.get_devices()
+        if devices:
+            device = devices[0]
             print(device)
 
             if device.device_number and device.device_code:
