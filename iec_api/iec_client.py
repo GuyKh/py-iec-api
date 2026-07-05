@@ -667,12 +667,15 @@ class IecClient:
 
         return await data.get_social_discount(self._session, self._token, bp_number)
 
-    async def get_device_in(self, contract_id: Optional[str] = None) -> Optional[DeviceInResponse]:
+    async def get_device_in(
+        self, contract_id: Optional[str] = None, recaptcha_token: Optional[str] = None
+    ) -> Optional[DeviceInResponse]:
         """
         Get device information for active devices
         Args:
             self: The instance of the class.
             contract_id (str): The Contract ID. Defaults to client's Contract ID.
+            recaptcha_token (str, optional): Recaptcha token for the DeviceIn endpoint.
         Returns:
             DeviceInResponse: Device information including status and device list
         """
@@ -684,7 +687,7 @@ class IecClient:
         if not contract_id:
             raise ValueError("Contract ID must be provided")
 
-        return await data.get_device_in(self._session, self._token, contract_id)
+        return await data.get_device_in(self._session, self._token, contract_id, recaptcha_token)
 
     async def get_touz_compatibility(
         self, contract_id: Optional[str] = None, bp_number: Optional[str] = None

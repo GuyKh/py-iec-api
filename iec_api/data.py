@@ -425,9 +425,13 @@ async def get_social_discount(session: ClientSession, token: JWT, bp_number: str
     return SocialDiscount.from_dict(response)
 
 
-async def get_device_in(session: ClientSession, token: JWT, contract_id: str) -> Optional[DeviceInResponse]:
+async def get_device_in(
+    session: ClientSession, token: JWT, contract_id: str, recaptcha_token: Optional[str] = None
+) -> Optional[DeviceInResponse]:
     """Get device information from DeviceIn endpoint."""
-    headers = commons.add_auth_bearer_to_headers(HEADERS_WITH_AUTH, token.id_token)
+    headers = commons.add_auth_bearer_to_headers(HEADERS_WITH_AUTH.copy(), token.id_token)
+    if recaptcha_token:
+        headers["RecaptchaToken"] = recaptcha_token
     response = await commons.send_get_request(
         session=session, url=GET_DEVICE_IN_URL.format(contract_id=contract_id), headers=headers
     )
