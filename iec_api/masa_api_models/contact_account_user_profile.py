@@ -310,9 +310,5 @@ class MasaMainPortalContactAccountUserProfile(DataClassDictMixin):
     )
     id: UUID = field(metadata=field_options(alias="id"))
     logical_name: str = field(metadata=field_options(alias="logicalName"))
-    # Optional: the profile endpoint omits "verificationStatus" for some accounts
-    # (e.g. accounts on a private supplier), so a required bool breaks parsing.
-    # Moved below the remaining required fields to keep dataclass field ordering
-    # valid once it has a default.
     verification_status: Optional[bool] = field(default=None, metadata=field_options(alias="verificationStatus"))
     last_name: Optional[str] = field(default=None, metadata=field_options(alias="lastName"))
