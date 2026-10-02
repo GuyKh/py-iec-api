@@ -115,7 +115,12 @@ async def send_get_request(
             timeout = aiohttp.ClientTimeout(total=timeout)
 
         resp = await session.get(url=url, headers=headers, timeout=timeout)
-        json_resp: dict = await resp.json(content_type=None)
+        try:
+            json_resp: dict = await resp.json(content_type=None)
+        except JSONDecodeError as ex:
+            if resp.status != http.HTTPStatus.OK:
+                parse_error_response(resp, {})
+            raise IECError(-1, f"Received invalid response from IEC API: {str(ex)}")
     except TimeoutError as ex:
         raise IECError(-1, f"Failed to communicate with IEC API due to time out: ({str(ex)})")
     except ClientError as ex:
@@ -165,8 +170,12 @@ async def send_post_request(
             timeout = aiohttp.ClientTimeout(total=timeout)
 
         resp = await session.post(url=url, data=data, json=json_data, headers=headers, timeout=timeout)
-
-        json_resp: dict = await resp.json(content_type=None)
+        try:
+            json_resp: dict = await resp.json(content_type=None)
+        except JSONDecodeError as ex:
+            if resp.status != http.HTTPStatus.OK:
+                parse_error_response(resp, {})
+            raise IECError(-1, f"Received invalid response from IEC API: {str(ex)}")
     except TimeoutError as ex:
         raise IECError(-1, f"Failed to communicate with IEC API due to time out: ({str(ex)})")
     except ClientError as ex:
