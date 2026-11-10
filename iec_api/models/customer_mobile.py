@@ -1,7 +1,7 @@
 # Customer Mobile Model
 
 from dataclasses import dataclass, field
-from typing import List
+from typing import List, Optional
 
 from mashumaro import DataClassDictMixin, field_options
 
@@ -68,15 +68,15 @@ class CustomerMobileAccount(DataClassDictMixin):
         account_type: The account type.
     """
 
-    main_contract_id: str = field(metadata=field_options(alias="mainContractId"))
-    main_contract_id_type: int = field(metadata=field_options(alias="mainContractIdType"))
-    company_id: str = field(metadata=field_options(alias="companyId"))
-    name: str = field(metadata=field_options(alias="name"))
-    bp_number: str = field(metadata=field_options(alias="bpNumber"))
-    bp_type: int = field(metadata=field_options(alias="bpType"))
-    is_active_account: bool = field(metadata=field_options(alias="isActiveAccount"))
-    customer_role: int = field(metadata=field_options(alias="customerRole"))
-    account_type: int = field(metadata=field_options(alias="accountType"))
+    main_contract_id: Optional[str] = field(default=None, metadata=field_options(alias="mainContractId"))
+    main_contract_id_type: Optional[int] = field(default=None, metadata=field_options(alias="mainContractIdType"))
+    company_id: Optional[str] = field(default=None, metadata=field_options(alias="companyId"))
+    name: Optional[str] = field(default=None, metadata=field_options(alias="name"))
+    bp_number: Optional[str] = field(default=None, metadata=field_options(alias="bpNumber"))
+    bp_type: Optional[int] = field(default=None, metadata=field_options(alias="bpType"))
+    is_active_account: Optional[bool] = field(default=None, metadata=field_options(alias="isActiveAccount"))
+    customer_role: Optional[int] = field(default=None, metadata=field_options(alias="customerRole"))
+    account_type: Optional[int] = field(default=None, metadata=field_options(alias="accountType"))
 
 
 @dataclass
@@ -95,15 +95,15 @@ class CustomerMobileInfo(DataClassDictMixin):
         email: The email address.
     """
 
-    bp_number: str = field(metadata=field_options(alias="bpNumber"))
-    id_type: int = field(metadata=field_options(alias="idType"))
-    accounts: List[CustomerMobileAccount] = field(metadata=field_options(alias="accounts"))
-    customer_status: int = field(metadata=field_options(alias="customerStatus"))
-    id_number: str = field(metadata=field_options(alias="idNumber"))
-    first_name: str = field(metadata=field_options(alias="firstName"))
-    last_name: str = field(metadata=field_options(alias="lastName"))
-    mobile_phone: str = field(metadata=field_options(alias="mobilePhone"))
-    email: str = field(metadata=field_options(alias="email"))
+    bp_number: Optional[str] = field(default=None, metadata=field_options(alias="bpNumber"))
+    id_type: Optional[int] = field(default=None, metadata=field_options(alias="idType"))
+    accounts: Optional[List[CustomerMobileAccount]] = field(default=None, metadata=field_options(alias="accounts"))
+    customer_status: Optional[int] = field(default=None, metadata=field_options(alias="customerStatus"))
+    id_number: Optional[str] = field(default=None, metadata=field_options(alias="idNumber"))
+    first_name: Optional[str] = field(default=None, metadata=field_options(alias="firstName"))
+    last_name: Optional[str] = field(default=None, metadata=field_options(alias="lastName"))
+    mobile_phone: Optional[str] = field(default=None, metadata=field_options(alias="mobilePhone"))
+    email: Optional[str] = field(default=None, metadata=field_options(alias="email"))
 
 
 @dataclass
@@ -129,24 +129,24 @@ class CustomerMobileContract(DataClassDictMixin):
         is_domestic: Whether is domestic.
     """
 
-    address: str = field(metadata=field_options(alias="address"))
-    contract_id: str = field(metadata=field_options(alias="contractId"))
-    total_debt: float = field(metadata=field_options(alias="totalDebt"))
-    frequency: int = field(metadata=field_options(alias="frequency"))
-    status: int = field(metadata=field_options(alias="status"))
-    from_private_producer: bool = field(metadata=field_options(alias="fromPativteProducer"))
-    city_code: str = field(metadata=field_options(alias="cityCode"))
-    city_name: str = field(metadata=field_options(alias="cityName"))
-    street_code: str = field(metadata=field_options(alias="streetCode"))
-    street_name: str = field(metadata=field_options(alias="streetName"))
-    house_number: str = field(metadata=field_options(alias="houseNumber"))
-    debt_for_invoices_due_date_not_passed: float = field(
-        metadata=field_options(alias="debtForInvoicesDueDateNotPassed")
+    address: Optional[str] = field(default=None, metadata=field_options(alias="address"))
+    contract_id: Optional[str] = field(default=None, metadata=field_options(alias="contractId"))
+    total_debt: Optional[float] = field(default=None, metadata=field_options(alias="totalDebt"))
+    frequency: Optional[int] = field(default=None, metadata=field_options(alias="frequency"))
+    status: Optional[int] = field(default=None, metadata=field_options(alias="status"))
+    from_private_producer: Optional[bool] = field(default=None, metadata=field_options(alias="fromPativteProducer"))
+    city_code: Optional[str] = field(default=None, metadata=field_options(alias="cityCode"))
+    city_name: Optional[str] = field(default=None, metadata=field_options(alias="cityName"))
+    street_code: Optional[str] = field(default=None, metadata=field_options(alias="streetCode"))
+    street_name: Optional[str] = field(default=None, metadata=field_options(alias="streetName"))
+    house_number: Optional[str] = field(default=None, metadata=field_options(alias="houseNumber"))
+    debt_for_invoices_due_date_not_passed: Optional[float] = field(
+        default=None, metadata=field_options(alias="debtForInvoicesDueDateNotPassed")
     )
-    is_touz: bool = field(metadata=field_options(alias="isTouz"))
-    smart_meter: bool = field(metadata=field_options(alias="smartMeter"))
-    producer_type: int = field(metadata=field_options(alias="producerType"))
-    is_domestic: bool = field(metadata=field_options(alias="isDomestic"))
+    is_touz: Optional[bool] = field(default=None, metadata=field_options(alias="isTouz"))
+    smart_meter: Optional[bool] = field(default=None, metadata=field_options(alias="smartMeter"))
+    producer_type: Optional[int] = field(default=None, metadata=field_options(alias="producerType"))
+    is_domestic: Optional[bool] = field(default=None, metadata=field_options(alias="isDomestic"))
 
 
 @dataclass
@@ -158,5 +158,5 @@ class CustomerMobileResponse(DataClassDictMixin):
         contract: The contract information.
     """
 
-    customer: CustomerMobileInfo = field(metadata=field_options(alias="customer"))
-    contract: CustomerMobileContract = field(metadata=field_options(alias="contract"))
+    customer: Optional[CustomerMobileInfo] = field(default=None, metadata=field_options(alias="customer"))
+    contract: Optional[CustomerMobileContract] = field(default=None, metadata=field_options(alias="contract"))
