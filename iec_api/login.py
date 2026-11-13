@@ -63,10 +63,13 @@ async def authorize_session(session: ClientSession, session_token) -> Tuple[str,
     authorize_response = await commons.send_non_json_get_request(
         session=session, url=authorize_url, encoding="unicode-escape"
     )
-    code = re.findall(
+    code_match = re.findall(
         r"<input type=\"hidden\" name=\"code\" value=\"(.+)\"\/>",
         authorize_response.encode("latin1").decode("utf-8"),
-    )[0]
+    )
+    if not code_match:
+        raise ValueError("Could not extract OTP code from IEC login page. Please enter the OTP manually.")
+    code = code_match[0]
     return code, code_verifier
 
 
