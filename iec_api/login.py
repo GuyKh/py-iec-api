@@ -63,10 +63,17 @@ async def authorize_session(session: ClientSession, session_token) -> Tuple[str,
     authorize_response = await commons.send_non_json_get_request(
         session=session, url=authorize_url, encoding="unicode-escape"
     )
-    code = re.findall(
+    code_matches = re.findall(
         r"<input type=\"hidden\" name=\"code\" value=\"(.+)\"\/>",
         authorize_response.encode("latin1").decode("utf-8"),
-    )[0]
+    )
+    if not code_matches:
+        raise IECLoginError(
+            -1,
+            "Could not extract authorization code from IEC login page. "
+            "Please enter the OTP code manually if you have it, or try again later.",
+        )
+    code = code_matches[0]
     return code, code_verifier
 
 
@@ -74,9 +81,16 @@ def _get_factor_type(factor: dict) -> str:
     """Get human-readable factor type."""
     factor_type = factor.get("factorType", "")
     email = factor.get("profile", {}).get("email", "")
-    if factor_type == "email" and "@sns.iec.co.il" in email:
+    # Only classify as SMS if factor_type is explicitly "sms"
+    # or if there's no email in the profile and factor_type is not "email"
+    if factor_type == "sms":
         return "sms"
-    return factor_type
+    if factor_type == "email":
+        return "email"
+    # For unknown factor types, check if email exists in profile
+    if "@" in email and ".il" in email:
+        return "email"
+    return factor_type or "unknown"
 
 
 def _select_factor(factors: list[dict], prefer_sms: bool = True) -> dict:
@@ -158,6 +172,13 @@ async def send_otp_code(
     if response.get("status") in ("SUCCESS", "MFA_CHALLENGE"):
         return session_token, factor_type
 
+    # Handle case where verification fails or returns unexpected status
+    _LOGGER.warning(
+        "OTP verification failed for factor %s: status=%s, response=%s",
+        factor_id,
+        response.get("status"),
+        response,
+    )
     return None, None
 
 
@@ -184,8 +205,22 @@ async def get_access_token(session: ClientSession, code: str, code_verifier: str
     return JWT.from_dict(response)
 
 
+OTP_METHOD_EMAIL = "email"
+OTP_METHOD_SMS = "sms"
+
+
+def _parse_otp_method(method: str) -> bool:
+    """Parse OTP method string to prefer_sms boolean."""
+    if method == OTP_METHOD_SMS:
+        return True
+    if method == OTP_METHOD_EMAIL:
+        return False
+    # Default to SMS for backward compatibility
+    return True
+
+
 async def first_login(
-    session: ClientSession, id_number: str, prefer_sms: bool = True
+    session: ClientSession, id_number: str, otp_method: str = OTP_METHOD_SMS
 ) -> Tuple[str, str, Optional[str], str]:
     """
     Perform the first login for a user.
@@ -193,7 +228,8 @@ async def first_login(
     Args:
         session: The aiohttp ClientSession object.
         id_number (str): The user's ID number.
-        prefer_sms (bool): Whether to prefer SMS if multiple factors exist.
+        otp_method (str): The OTP method to use. One of: "email" or "sms".
+            Defaults to "sms" for backward compatibility.
 
     Returns:
         Tuple[str, str, Optional[str], str]: A tuple containing:
@@ -206,6 +242,7 @@ async def first_login(
     try:
         # Get the available factors and state token
         state_token, factors = await get_auth_factors(session, id_number)
+        prefer_sms = _parse_otp_method(otp_method)
         selected_factor = _select_factor(factors, prefer_sms)
         factor_id = selected_factor["id"]
         factor_type = _get_factor_type(selected_factor)
